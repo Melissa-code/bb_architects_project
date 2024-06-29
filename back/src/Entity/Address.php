@@ -2,10 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AddressRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
+#[ApiResource]
 class Address
 {
     #[ORM\Id]
@@ -17,15 +20,19 @@ class Address
     private ?int $numberStreet = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"Veuillez renseigner la rue.")]
     private ?string $street = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Le code postal doit comporter 5 chiffres.")]
     private ?int $zipcode = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"Veuillez renseigner la ville.")]
     private ?string $city = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message:"Veuillez renseigner le pays.")]
     private ?string $country = null;
 
     #[ORM\OneToOne(mappedBy: 'address', cascade: ['persist', 'remove'])]
