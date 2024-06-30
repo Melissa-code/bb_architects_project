@@ -36,7 +36,7 @@ class RegisterController extends AbstractController
 
             $address = $registerService->createAddress($data);
             $user = $registerService->createUser($data, $address);
-            $registerService->createStorageSpace($user);
+            $registerService->linkStorageSpaceToUser($user);
 
             return new JsonResponse(['message' => 'Nouveau compte utilisateur créé avec succès.'], 201);
         } catch (\InvalidArgumentException $e) {

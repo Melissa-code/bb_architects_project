@@ -20,8 +20,6 @@ class RegisterService
     private ValidatorInterface $validator;
 
     const NAME_STORAGE_SPACE = "Abonnement de 20 Go à 20 €";
-    const PRICE_STORAGE_SPACE = "20.00";
-    const CAPACITY_STORAGE_SPACE = 20;
 
     public function __construct(
         EntityManagerInterface $entityManagerInterface,
@@ -46,6 +44,7 @@ class RegisterService
         $address = new Address();
         $address->setNumberStreet($data['number_street'] ?? null);
         $address->setStreet($data['street']);
+        $this->validateFrenchZipcode($data['country'], $data['zipcode']);
         $address->setZipcode($data['zipcode']);
         $address->setCity($data['city']);
         $address->setCountry($data['country']);
@@ -77,6 +76,7 @@ class RegisterService
         $user->setEmail($data['email']);
         // Hash the password in the database
         $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
+        $this->validateFrenchPhone($data['country'], $data['phone']);
         $user->setPhone($data['phone']);
         $user->setCreatedAt(new DateTimeImmutable());
         $user->setAddress($address);
@@ -99,18 +99,22 @@ class RegisterService
      * @param User $user
      * @return StorageSpace
      */
-    public function createStorageSpace(User $user): StorageSpace
+    public function linkStorageSpaceToUser(User $user): StorageSpace
     {
-        $storageSpace = new StorageSpace();
-        $storageSpace->setName(self::NAME_STORAGE_SPACE);
-        $storageSpace->setPrice(self::PRICE_STORAGE_SPACE);
-        $storageSpace->setStorageCapacity(self::CAPACITY_STORAGE_SPACE);
+        // Get the store space (by the name)
+        $storageSpaceRepository = $this->entityManagerInterface->getRepository(StorageSpace::class);
+        $storageSpace = $storageSpaceRepository->findOneBy(['name' => self::NAME_STORAGE_SPACE]);
+        if (!$storageSpace) {
+            throw new InvalidArgumentException('Aucun abonnement correspondant trouvé.');
+        }
+
+        // Link the storage space to the user
         $storageSpace->addUser($user);
 
         try {
             $this->saveEntity($storageSpace);
         } catch (InvalidArgumentException $e) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 'La validation de l\'abonnement a échoué: ' . $e->getMessage()
             );
         }
@@ -119,7 +123,7 @@ class RegisterService
     }
 
     /**
-     * Check if the data number_street is valid
+     * Check if the data number_street is valid (ex 3bis or 3)
      *
      * @param string|null $numberStreet
      */
@@ -129,6 +133,42 @@ class RegisterService
             throw new InvalidArgumentException(
                 'Le numéro de rue doit contenir uniquement des lettres et des chiffres.'
             );
+        }
+    }
+
+    /**
+     * Check if the zipcode is french and has 5 numbers
+     *
+     * @param string $country
+     * @param string $zipcode
+     * @return void
+     */
+    private function validateFrenchZipcode(string $country, string $zipcode): void
+    {
+        if ($country === "France") {
+            if (!preg_match('/^\d{5}$/', $zipcode)) {
+                throw new InvalidArgumentException(
+                    'Le code postal doit contenir 5 chiffres.'
+                );
+            }
+        }
+    }
+
+    /**
+     * Check if the phone number is french and has 10 numbers
+     *
+     * @param string $country
+     * @param string $phone
+     * @return void
+     */
+    private function validateFrenchPhone(string $country, string $phone): void
+    {
+        if ($country === "France") {
+            if (!preg_match('/^\d{10}$/', $phone)) {
+                throw new InvalidArgumentException(
+                    'Le numéro de téléphone doit contenir 10 chiffres.'
+                );
+            }
         }
     }
 
