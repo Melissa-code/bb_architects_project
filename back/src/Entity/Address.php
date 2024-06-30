@@ -20,12 +20,12 @@ class Address
     private ?string $numberStreet = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message:"Veuillez renseigner L'adresse.")]
+    #[Assert\NotBlank(message:"Veuillez renseigner la rue.")]
     #[Assert\Length(
         min: 3,
         max: 255,
-        minMessage: 'L\'adresse doit comporter au minimum {{ limit }} caractères.',
-        maxMessage: 'L\'adresse doit comporter au maximum {{ limit }} caractères.')
+        minMessage: 'La rue doit comporter au minimum {{ limit }} caractères.',
+        maxMessage: 'La rue doit comporter au maximum {{ limit }} caractères.')
     ]
     #[Assert\Regex(
         pattern: '/^[\p{L}0-9\s\'\-]+$/u',

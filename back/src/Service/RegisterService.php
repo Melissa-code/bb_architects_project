@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Address;
+use App\Entity\StorageSpace;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,12 +11,17 @@ use Doctrine\ORM\Exception\ORMException;
 use RuntimeException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use InvalidArgumentException;
 
 class RegisterService
 {
     private EntityManagerInterface $entityManagerInterface;
     private UserPasswordHasherInterface $passwordHasher;
     private ValidatorInterface $validator;
+
+    const NAME_STORAGE_SPACE = "Abonnement de 20 Go à 20 €";
+    const PRICE_STORAGE_SPACE = "20.00";
+    const CAPACITY_STORAGE_SPACE = 20;
 
     public function __construct(
         EntityManagerInterface $entityManagerInterface,
@@ -47,9 +53,9 @@ class RegisterService
         try {
             $this->validateEntity($address);
             $this->saveEntity($address);
-        } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException(
-                'La validation de l\'adresse a echoué: ' . $e->getMessage()
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException(
+                'La validation de l\'adresse a échoué: ' . $e->getMessage()
             );
         }
 
@@ -57,7 +63,7 @@ class RegisterService
     }
 
     /**
-     * Create a new user
+     * Create a new user (linked to an address)
      *
      * @param array $data
      * @param Address $address
@@ -78,13 +84,38 @@ class RegisterService
         try {
             $this->validateEntity($user);
             $this->saveEntity($user);
-        } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException(
-                'La validation de l\'utilisateur a echoué: ' . $e->getMessage()
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException(
+                'La validation de l\'utilisateur a échoué: ' . $e->getMessage()
             );
         }
 
         return $user;
+    }
+
+    /**
+     * Create a new storage space (linked to a user)
+     *
+     * @param User $user
+     * @return StorageSpace
+     */
+    public function createStorageSpace(User $user): StorageSpace
+    {
+        $storageSpace = new StorageSpace();
+        $storageSpace->setName(self::NAME_STORAGE_SPACE);
+        $storageSpace->setPrice(self::PRICE_STORAGE_SPACE);
+        $storageSpace->setStorageCapacity(self::CAPACITY_STORAGE_SPACE);
+        $storageSpace->addUser($user);
+
+        try {
+            $this->saveEntity($storageSpace);
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException(
+                'La validation de l\'abonnement a échoué: ' . $e->getMessage()
+            );
+        }
+
+        return $storageSpace;
     }
 
     /**
@@ -95,7 +126,9 @@ class RegisterService
     private function validateNumberStreet(?string $numberStreet): void
     {
         if ($numberStreet !== null && !preg_match('/^[a-zA-Z0-9]+$/', $numberStreet)) {
-            throw new \InvalidArgumentException('Le numéro de rue doit contenir uniquement des lettres et des chiffres.');
+            throw new InvalidArgumentException(
+                'Le numéro de rue doit contenir uniquement des lettres et des chiffres.'
+            );
         }
     }
 
@@ -103,7 +136,7 @@ class RegisterService
      * Validate or return error message
      *
      * @param object $entity
-     * @throws \InvalidArgumentException if the error of validation exist
+     * @throws InvalidArgumentException if the error of validation exist
      */
     private function validateEntity(object $entity): void
     {
@@ -114,7 +147,7 @@ class RegisterService
             foreach ($violations as $violation) {
                 $errorMessages[] = $violation->getMessage();
             }
-            throw new \InvalidArgumentException(json_encode(['errors' => $errorMessages]));
+            throw new InvalidArgumentException(json_encode(['errors' => $errorMessages]));
         }
     }
 
@@ -123,14 +156,14 @@ class RegisterService
      *
      * @param Object $entity
      */
-    public function saveEntity(Object $entity): void
+    private function saveEntity(Object $entity): void
     {
         try {
             $this->entityManagerInterface->persist($entity);
             $this->entityManagerInterface->flush();
         } catch (ORMException $e) {
             throw new RuntimeException(
-                '[Inscription]: Erreur lors de la persistance de l\'entité.' . $entity,
+                '[Inscription]: Erreur lors de la persistance de l\'entité:' . $entity,
                 0, $e
             );
         }
