@@ -9,32 +9,49 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use RuntimeException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RegisterService
 {
     private EntityManagerInterface $entityManagerInterface;
     private UserPasswordHasherInterface $passwordHasher;
-    public function __construct(EntityManagerInterface $entityManagerInterface, UserPasswordHasherInterface $passwordHasher)
-    {
+    private ValidatorInterface $validator;
+
+    public function __construct(
+        EntityManagerInterface $entityManagerInterface,
+        UserPasswordHasherInterface $passwordHasher,
+        ValidatorInterface $validator
+    ) {
         $this->entityManagerInterface = $entityManagerInterface;
         $this->passwordHasher = $passwordHasher;
+        $this->validator = $validator;
     }
 
     /**
      * Create a new address
      *
      * @param array $data
-     * @return Address|null
+     * @return Address
      */
-    public function createAddress(array $data): Address|null {
-        $numberStreet = $data['number_street'] ?? null;
+    public function createAddress(array $data): Address
+    {
+        $this->validateNumberStreet($data['number_street'] ?? null);
 
         $address = new Address();
-        $address->setNumberStreet($numberStreet );
+        $address->setNumberStreet($data['number_street'] ?? null);
         $address->setStreet($data['street']);
         $address->setZipcode($data['zipcode']);
         $address->setCity($data['city']);
         $address->setCountry($data['country']);
+
+        try {
+            $this->validateEntity($address);
+            $this->saveEntity($address);
+        } catch (\InvalidArgumentException $e) {
+            throw new \InvalidArgumentException(
+                'La validation de l\'adresse a echoué: ' . $e->getMessage()
+            );
+        }
 
         return $address;
     }
@@ -44,9 +61,9 @@ class RegisterService
      *
      * @param array $data
      * @param Address $address
-     * @return User|null
+     * @return User
      */
-    public function createUser(array $data, Address $address): User|null
+    public function createUser(array $data, Address $address): User
     {
         $user = new User();
         $user->setFirstname($data['firstname']);
@@ -58,24 +75,62 @@ class RegisterService
         $user->setCreatedAt(new DateTimeImmutable());
         $user->setAddress($address);
 
+        try {
+            $this->validateEntity($user);
+            $this->saveEntity($user);
+        } catch (\InvalidArgumentException $e) {
+            throw new \InvalidArgumentException(
+                'La validation de l\'utilisateur a echoué: ' . $e->getMessage()
+            );
+        }
+
         return $user;
     }
 
     /**
-     * Save the entities in the database (address user)
+     * Check if the data number_street is valid
      *
-     * @param array $entities
+     * @param string|null $numberStreet
      */
-    public function saveEntities(array $entities): void
+    private function validateNumberStreet(?string $numberStreet): void
+    {
+        if ($numberStreet !== null && !preg_match('/^[a-zA-Z0-9]+$/', $numberStreet)) {
+            throw new \InvalidArgumentException('Le numéro de rue doit contenir uniquement des lettres et des chiffres.');
+        }
+    }
+
+    /**
+     * Validate or return error message
+     *
+     * @param object $entity
+     * @throws \InvalidArgumentException if the error of validation exist
+     */
+    private function validateEntity(object $entity): void
+    {
+        $violations = $this->validator->validate($entity);
+
+        if (count($violations) > 0) {
+            $errorMessages = [];
+            foreach ($violations as $violation) {
+                $errorMessages[] = $violation->getMessage();
+            }
+            throw new \InvalidArgumentException(json_encode(['errors' => $errorMessages]));
+        }
+    }
+
+    /**
+     * Save the entity in the database (address / user)
+     *
+     * @param Object $entity
+     */
+    public function saveEntity(Object $entity): void
     {
         try {
-            foreach ($entities as $entity) {
-                $this->entityManagerInterface->persist($entity);
-            }
+            $this->entityManagerInterface->persist($entity);
             $this->entityManagerInterface->flush();
         } catch (ORMException $e) {
             throw new RuntimeException(
-                '[Inscription] Erreur lors de la persistance des entités.',
+                '[Inscription]: Erreur lors de la persistance de l\'entité.' . $entity,
                 0, $e
             );
         }

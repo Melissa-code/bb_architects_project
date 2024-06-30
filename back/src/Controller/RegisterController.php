@@ -12,13 +12,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RegisterController extends AbstractController
 {
-    /**
-     * Registration
-     *
-     * @param Request $request
-     * @param RegisterService $registerService
-     * @return JsonResponse
-     */
     #[Route('/api/register', name: 'api_register', methods: ['POST'])]
     public function register(
         Request $request,
@@ -26,35 +19,18 @@ class RegisterController extends AbstractController
         ValidatorInterface $validator,
         LoggerInterface $logger
     ): JsonResponse {
-        // Get data inputs from the register form and put them in an array
-        $data = json_decode($request->getContent(), true);
-
-        $address = $registerService->createAddress($data);
-        $user = $registerService->createUser($data, $address);
-
-        // Validate address
-        $addressErrors = $validator->validate($address);
-        if (count($addressErrors) > 0) {
-            $errorMessages = [];
-            foreach ($addressErrors as $error) {
-                $errorMessages[] = $error->getMessage();
-            }
-            return new JsonResponse(['errors' => $errorMessages], 400);
-        }
-
-        // Validate user
-        $userErrors = $validator->validate($user);
-        if (count($userErrors) > 0) {
-            $errorMessages = [];
-            foreach ($userErrors as $error) {
-                $errorMessages[] = $error->getMessage();
-            }
-            return new JsonResponse(['errors' => $errorMessages], 400);
-        }
-
         try {
-            $registerService->saveEntities([$address, $user]);
+            $data = json_decode($request->getContent(), true);
+            if (!is_array($data)) {
+                return new JsonResponse(['error' => 'Les données sont invalides.'], 400);
+            }
+
+            $address = $registerService->createAddress($data);
+            $registerService->createUser($data, $address);
+
             return new JsonResponse(['message' => 'Nouveau compte utilisateur créé avec succès.'], 201);
+        } catch (\InvalidArgumentException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 400);
         } catch (\Exception $e) {
             $logger->error('Exception encountered: ' . $e->getMessage());
             return new JsonResponse(['message' => 'Erreur interne du serveur.'], 500);

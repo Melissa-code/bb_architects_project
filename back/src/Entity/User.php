@@ -23,6 +23,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(message : "Veuillez renseigner une adresse email.")]
+    #[Assert\Length(
+        min: 5,
+        max: 200,
+        minMessage: 'L\'email doit comporter au minimum {{ limit }} caractères',
+        maxMessage: 'L\'email doit comporter au maximum {{ limit }} caractères')
+    ]
+    #[Assert\Email(message : "L'email '{{ value }}' n'est pas valide.")]
     private ?string $email = null;
 
     /**
@@ -36,30 +43,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     #[Assert\NotBlank(message : "Veuillez renseigner un mot de passe.")]
+    #[Assert\Length(
+        min: 8,
+        max: 200,
+        minMessage: 'Le mot de passe doit comporter au minimum {{ limit }} caractères',
+        maxMessage: 'Le mot de passe doit comporter au maximum {{ limit }} caractères')
+    ]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message : "Veuillez renseigner un prénom.")]
     #[Assert\Length(
         min: 2,
         max: 100,
         minMessage: 'Le prénom doit comporter au minimum {{ limit }} caractères',
         maxMessage: 'Le prénom doit comporter au maximum {{ limit }} caractères')
     ]
-    #[Assert\NotBlank(allowNull : false)]
+    #[Assert\Regex(
+        pattern: "/^[\p{L}\s\-']+$/u",
+        message: 'Le prénom doit contenir uniquement des lettres, des espaces, des tirets et des apostrophes.'
+    )]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message : "Veuillez renseigner un nom.")]
     #[Assert\Length(
         min: 2,
         max: 100,
         minMessage: 'Le nom doit comporter au minimum {{ limit }} caractères.',
         maxMessage: 'Le nom doit comporter au maximum {{ limit }} caractères.')
     ]
-    #[Assert\NotBlank(allowNull : false)]
+    #[Assert\Regex(
+        pattern: "/^[\p{L}\s\-']+$/u",
+        message: 'Le nom doit contenir uniquement des lettres, des espaces, des tirets et des apostrophes.'
+    )]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message : "Veuillez renseigner votre numéro de téléphone.")]
+    #[Assert\NotBlank(message : "Veuillez renseigner un numéro de téléphone.")]
+    #[Assert\Regex(
+        pattern: "/^\d+$/",
+        message: 'Le numéro de téléphone doit contenir uniquement des chiffres.'
+    )]
     private ?string $phone = null;
 
     #[ORM\Column]
