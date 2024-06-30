@@ -12,9 +12,12 @@ This is a website to upload files.
 A list of technologies used within the project :
 
 - Symfony 
+- API Plateform
 - WAMP Server (Windows, Apache, MySQL, PHP)
 - React 
 
+To see the logs in Symfony (dev mode), open Powershell, go to the project and run:
+`Get-Content -Path "var/log/dev.log" -Wait`
 
 ## 3-Installation
 
@@ -40,6 +43,9 @@ Create all the entities :
 Create a migration
 `php bin/console make:migration`
 `php bin/console doctrine:migrations:migrate`
+
+### Install API Plateform
+`composer require api`
 
 ## 4-Run
 
