@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\File;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,6 +16,35 @@ class FileRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, File::class);
     }
+
+    /**
+     * Find all the files of the user sorted by createdAt
+     */
+    public function findByUserSortedByDate(User $user, string $sortOrder = 'DESC'): array
+    {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('f.createdAt', $sortOrder)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find all the files of the user sorted by weight
+     */
+    public function findByUserSortedByWeight(User $user, string $sortOrder = 'DESC'): array
+    {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('f.weight', $sortOrder)
+            ->getQuery()
+            ->getResult();
+    }
+
+
+
 
     //    /**
     //     * @return File[] Returns an array of File objects
