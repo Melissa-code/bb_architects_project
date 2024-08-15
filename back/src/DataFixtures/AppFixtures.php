@@ -8,18 +8,22 @@ use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Exception;
 
 class AppFixtures extends Fixture
 {
     private ObjectManager $manager;
     private array $categoryEntities = [];
 
+    /**
+     * @throws Exception
+     */
     public function load(ObjectManager $manager): void
     {
         $this->manager = $manager;
 
-        $this->loadCategory();
-        $this->loadFile();
+        //$this->loadCategory();
+        //$this->loadFile();
 
         $manager->flush();
     }
@@ -40,6 +44,7 @@ class AppFixtures extends Fixture
 
     /**
      * Load files
+     * @throws Exception
      */
     public function loadFile(): void
     {
@@ -47,10 +52,10 @@ class AppFixtures extends Fixture
         $users = $this->manager->getRepository(User::class)->findAll();
 
         if (empty($users)) {
-            throw new \Exception('Aucun utilisateur trouvé en base de données.');
+            throw new Exception('Aucun utilisateur trouvé en base de données.');
         }
         if (empty($this->categoryEntities)) {
-            throw new \Exception('Aucune catégorie trouvée en base de données.');
+            throw new Exception('Aucune catégorie trouvée en base de données.');
         }
 
         foreach ($users as $user) {
