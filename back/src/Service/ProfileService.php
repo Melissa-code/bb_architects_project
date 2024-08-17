@@ -12,7 +12,7 @@ class ProfileService
     public function getProfileData(UserInterface $user, LoggerInterface $logger): array
     {
         if (!$user instanceof User) {
-            throw new InvalidArgumentException('L\'instance: App\Entity\User');
+            throw new InvalidArgumentException('L\'instance doit être de type App\Entity\User');
         }
 
         try {

@@ -2,9 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
-use App\Repository\FileRepository;
-use InvalidArgumentException;
+use App\Service\FileService;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,51 +20,26 @@ class FileController extends AbstractController
     #[Route('/files', name: 'app_file', methods: ['GET'])]
     public function getAllFiles(
         #[CurrentUser] ?UserInterface $user,
-        FileRepository $fileRepository,
-        Request $request
+        Request $request,
+        FileService $fileService,
+        LoggerInterface $logger,
     ): JsonResponse {
         if (!$user) {
             return new JsonResponse(['message' => 'Utilisateur non connecté.'], 401);
         }
-        if (!$user instanceof User) {
-            throw new InvalidArgumentException('L\'instance: App\Entity\User');
+
+        try {
+            $fileData = $fileService->getAllFilesOfUser($user, $logger, $request);
+
+            return new JsonResponse($fileData , 200);
+
+        } catch (Exception $e) {
+            $logger->error('Erreur lors de la récupération des fichiers de '. $user . $e->getMessage());
+
+            return new JsonResponse([
+                'message' => 'Une erreur est survenue lors de la récupération des des fichiers de: '. $user,
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        // Get the sort by the user
-        $sortField = $request->query->get('sortField', 'createdAt');
-        $sortOrder = $request->query->get('sortOrder', 'DESC');
-
-        if ($sortField === 'createdAt') {
-            $files = $fileRepository->findByUserSortedByDate($user, $sortOrder);
-        } elseif ($sortField === 'weight') {
-            $files = $fileRepository->findByUserSortedByWeight($user, $sortOrder);
-        } else {
-            $files = $fileRepository->findByUserSortedByDate($user, $sortOrder); // default value (date DESC)
-        }
-
-        $fileData = array_map(function($file) use ($user) {
-            return [
-                'id' => $file->getId(),
-                'fileName' => $file->getName(),
-                'fileWeight' => $file->getWeight(),
-                'fileFormat' => $file->getFormat(),
-                'filePath' => $file->getPath(),
-                'fileCreatedAt' => $file->getCreatedAt(),
-                'user' => [
-                    'userId' => $user->getId(),
-                    'firstname' => $user->getFirstname(),
-                    'lastname' => $user->getLastname(),
-                ],
-                'category' =>  [
-                    'categoryId' => $file->getCategory()->getId(),
-                    'name' => $file->getCategory()->getName(),
-                ],
-            ];
-        }, $files);
-
-        return new JsonResponse([
-            'message' => 'Fichiers récupérés avec succès.',
-            'files' => $fileData,
-        ], 200);
     }
 }

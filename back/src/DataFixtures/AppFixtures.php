@@ -67,7 +67,7 @@ class AppFixtures extends Fixture
                 $file->setCategory($randomCategory);
 
                 $file->setName('Document_' . $i . '_User_' . $user->getId());
-                $file->setWeight(rand(1, 20)); // Go
+                $file->setWeight(rand(1, 10)); // Go
                 $file->setFormat('pdf');
                 $file->setPath('/documents/document_' . $i . '_user_' . $user->getId() . '.pdf');
                 $file->setCreatedAt($now);
