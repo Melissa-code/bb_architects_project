@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Service\FileService;
 use Exception;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,30 +16,67 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class FileController extends AbstractController
 {
+    private FileService $fileService;
+    private LoggerInterface $logger;
+
+    public function __construct(FileService $fileService, LoggerInterface $logger)
+    {
+        $this->fileService = $fileService;
+        $this->logger = $logger;
+    }
+
     /**
      * Get all the files of the user
      */
     #[Route('/files', name: 'app_file', methods: ['GET'])]
-    public function getAllFiles(
-        #[CurrentUser] ?UserInterface $user,
-        Request $request,
-        FileService $fileService,
-        LoggerInterface $logger,
-    ): JsonResponse {
+    public function getAllFiles(#[CurrentUser] ?UserInterface $user, Request $request): JsonResponse
+    {
+        if (!$user instanceof User) {
+            throw new InvalidArgumentException('L\'instance doit être de type App\Entity\User');
+        }
+
+        try {
+            $fileData = $this->fileService->getAllFilesOfUser($user, $request);
+
+            return new JsonResponse($fileData , 200);
+
+        } catch (Exception $e) {
+            $this->logger->error('Erreur lors de la récupération des fichiers de '. $user->getFirstname().' '
+                .$user->getLastname() . $e->getMessage());
+
+            return new JsonResponse([
+                'message' => 'Une erreur est survenue lors de la récupération des fichiers de: '. $user->getFirstname()
+                    .' ' .$user->getLastname(),
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a file by id (int)
+     */
+    #[Route('/file/{id}', name: 'app_file_details', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function getFileById(#[CurrentUser] ?UserInterface $user, int $id): JsonResponse
+    {
         if (!$user) {
             return new JsonResponse(['message' => 'Utilisateur non connecté.'], 401);
         }
 
         try {
-            $fileData = $fileService->getAllFilesOfUser($user, $logger, $request);
+            $fileData = $this->fileService->getFileById($id);
 
-            return new JsonResponse($fileData , 200);
+            // Check if the file owns to the logged user
+            if ($fileData['user']['userId'] !== $user->getId()) {
+                return new JsonResponse(['message' => 'Accès interdit: ce fichier ne vous appartient pas.'], 403);
+            }
 
-        } catch (Exception $e) {
-            $logger->error('Erreur lors de la récupération des fichiers de '. $user . $e->getMessage());
+            return new JsonResponse($fileData, 200);
+
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la récupération du fichier n°'. $id . ': ' . $e->getMessage());
 
             return new JsonResponse([
-                'message' => 'Une erreur est survenue lors de la récupération des des fichiers de: '. $user,
+                'message' => 'Une erreur est survenue lors de la récupération du fichier n°' . $id,
                 'error' => $e->getMessage(),
             ], 500);
         }

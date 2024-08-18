@@ -22,3 +22,8 @@ app_file:
     path: /api/files
     controller: App\Controller\FileController::getAllFiles
     methods: [GET]
+
+app_file_detail:
+    path: /api/file/{id}
+    controller: App\Controller\FileController::getFileById
+    methods: [GET]

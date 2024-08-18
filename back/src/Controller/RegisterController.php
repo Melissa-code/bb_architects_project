@@ -30,6 +30,9 @@ class RegisterController extends AbstractController
             if (!is_array($data)) {
                 return new JsonResponse(['error' => 'Les données sont invalides.'], 400);
             }
+            if ($data['password'] !== $data['confirmPassword']) {
+                return new JsonResponse(['error' => 'Les mots de passe ne correspondent pas.'], 400);
+            }
             if (!isset($data['storage_space']) || !$data['storage_space']) {
                 return new JsonResponse(['error' => 'Veuillez accepter de souscrire à l\'abonnement.'], 400);
             }
