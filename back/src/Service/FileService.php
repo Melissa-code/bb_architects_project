@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Repository\FileRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -15,11 +17,16 @@ class FileService
 {
     private FileRepository $fileRepository;
     private LoggerInterface $logger;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(FileRepository $fileRepository, LoggerInterface $logger)
-    {
+    public function __construct(
+        FileRepository $fileRepository,
+        LoggerInterface $logger,
+        EntityManagerInterface $entityManager,
+    ){
         $this->fileRepository = $fileRepository;
         $this->logger = $logger;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -111,6 +118,37 @@ class FileService
 
             return [
                 'message' => 'Une erreur est survenue lors de la récupération du fichier '. $id,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Delete a file
+     */
+    public function deleteFileById(int $id): array
+    {
+        try {
+            $file = $this->fileRepository->find($id);
+            if (!$file) {
+                return [
+                    'message' => 'Fichier non trouvé.',
+                    'error' => 'Fichier non trouvé.',
+                ];
+            }
+
+            // Remove the file in the database
+            $this->entityManager->remove($file);
+            $this->entityManager->flush();
+
+            return [
+                'message' => 'Fichier supprimé avec succès.',
+            ];
+
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la suppression du fichier ' . $id . ': ' . $e->getMessage());
+            return [
+                'message' => 'Une erreur est survenue lors de la suppression du fichier ' . $id,
                 'error' => $e->getMessage(),
             ];
         }

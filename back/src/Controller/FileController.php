@@ -81,4 +81,29 @@ class FileController extends AbstractController
             ], 500);
         }
     }
+
+    /**
+     * Delete a file by id (int)
+     */
+    #[Route('/api/file/delete/{id}', name: 'api_file_delete', methods: ['DELETE'])]
+    public function deleteFile(int $id, Request $request, #[CurrentUser] ?UserInterface $user): JsonResponse
+    {
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non connecté.'], 401);
+        }
+        $fileData = $this->fileService->getFileById($id);
+
+        // Check if the file owns to the logged user
+        if ($fileData['user']['userId'] !== $user->getId()) {
+            return new JsonResponse(['message' => 'Accès interdit: ce fichier ne vous appartient pas.'], 403);
+        }
+
+        $result = $this->fileService->deleteFileById($id, $user);
+
+        if (isset($result['error'])) {
+            return new JsonResponse($result, 400);
+        }
+
+        return new JsonResponse($result, 200);
+    }
 }

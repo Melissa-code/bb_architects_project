@@ -27,3 +27,8 @@ app_file_detail:
     path: /api/file/{id}
     controller: App\Controller\FileController::getFileById
     methods: [GET]
+
+api_file_delete:
+    path: /api/file/delete/{id}
+    controller: App\Controller\FileController::deleteFile
+    methods: [DELETE]
