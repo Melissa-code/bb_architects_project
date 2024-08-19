@@ -25,6 +25,9 @@ class File
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
+    // Attribute not mapped to the database
+    private ?File $pathFile = null;
+
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -85,6 +88,18 @@ class File
     public function setPath(string $path): static
     {
         $this->path = $path;
+
+        return $this;
+    }
+
+    public function getPathFile(): ?File
+    {
+        return $this->pathFile;
+    }
+
+    public function setPathFile(?File $pathFile): static
+    {
+        $this->pathFile = $pathFile;
 
         return $this;
     }

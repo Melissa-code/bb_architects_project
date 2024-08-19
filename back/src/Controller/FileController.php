@@ -28,7 +28,7 @@ class FileController extends AbstractController
     /**
      * Get all the files of the user
      */
-    #[Route('/files', name: 'app_file', methods: ['GET'])]
+    #[Route('/api/files', name: 'app_file', methods: ['GET'])]
     public function getAllFiles(#[CurrentUser] ?UserInterface $user, Request $request): JsonResponse
     {
         if (!$user instanceof User) {
@@ -55,7 +55,7 @@ class FileController extends AbstractController
     /**
      * Get a file by id (int)
      */
-    #[Route('/file/{id}', name: 'app_file_details', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[Route('/api/file/{id}', name: 'app_file_details', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function getFileById(#[CurrentUser] ?UserInterface $user, int $id): JsonResponse
     {
         if (!$user) {
@@ -83,9 +83,35 @@ class FileController extends AbstractController
     }
 
     /**
+     * Create a new file
+     */
+    #[Route('/api/file/create_file', name: 'app_file_create', methods: ['POST'])]
+    public function createFile(#[CurrentUser] ?UserInterface $user, Request $request): JsonResponse {
+        if (!$user instanceof User) {
+            throw new InvalidArgumentException('L\'instance doit être de type App\Entity\User');
+        }
+
+        try {
+            $data = json_decode($request->getContent(), true);
+            if (!is_array($data)) {
+                return new JsonResponse(['error' => 'Les données sont invalides.'], 400);
+            }
+
+            $this->fileService->createFile($data, $user);
+
+            return new JsonResponse(['message' => 'Nouveau document téléchargé avec succès.'], 201);
+        } catch (\InvalidArgumentException $e) {
+            return new JsonResponse(['error : ' => $e->getMessage()], 400);
+        } catch (\Exception $e) {
+            $this->logger->error('Exception levée : ' . $e->getMessage());
+            return new JsonResponse(['message' => 'Erreur interne du serveur.'], 500);
+        }
+    }
+
+    /**
      * Delete a file by id (int)
      */
-    #[Route('/api/file/delete/{id}', name: 'api_file_delete', methods: ['DELETE'])]
+    #[Route('/api/file/delete/{id}', name: 'app_file_delete', methods: ['DELETE'])]
     public function deleteFile(int $id, Request $request, #[CurrentUser] ?UserInterface $user): JsonResponse
     {
         if (!$user) {
@@ -98,7 +124,7 @@ class FileController extends AbstractController
             return new JsonResponse(['message' => 'Accès interdit: ce fichier ne vous appartient pas.'], 403);
         }
 
-        $result = $this->fileService->deleteFileById($id, $user);
+        $result = $this->fileService->deleteFileById($id);
 
         if (isset($result['error'])) {
             return new JsonResponse($result, 400);

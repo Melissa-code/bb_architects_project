@@ -2,13 +2,17 @@
 
 namespace App\Service;
 
+use App\Entity\File;
 use App\Entity\User;
+use App\Repository\CategoryRepository;
 use App\Repository\FileRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -16,15 +20,18 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class FileService
 {
     private FileRepository $fileRepository;
+    private CategoryRepository $categoryRepository;
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
 
     public function __construct(
         FileRepository $fileRepository,
+        CategoryRepository $categoryRepository,
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
     ){
         $this->fileRepository = $fileRepository;
+        $this->categoryRepository = $categoryRepository;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
     }
@@ -93,7 +100,6 @@ class FileService
     {
         try {
             $file = $this->fileRepository->find($id);
-
             if (!$file) {
                 return new JsonResponse(['message' => 'Fichier non trouvé.'], 404);
             }
@@ -121,6 +127,40 @@ class FileService
                 'error' => $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Add a new file (in server and in database)
+     */
+    public function createFile(array $data, User $user): File
+    {
+        // Get the category
+        $categoryId = $data['categoryId'];
+        $category = $this->categoryRepository->find($categoryId);
+        if (!$category) {
+            throw new InvalidArgumentException('Catégorie non trouvée.');
+        }
+
+        // Create the file
+        $file = new File();
+        $file->setName($data['name']);
+        $file->setWeight($data['weight']);
+        $file->setFormat($data['format']);
+        $file->setPath($data['path']);
+        $file->setCategory($category);
+        $file->setCreatedAt(new DateTimeImmutable());
+        $file->setUser($user);
+
+        try {
+            //$this->validateEntity($file);
+            $this->saveEntity($file);
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException(
+                'L\'ajout du nouveau fichier a échoué: ' . $e->getMessage()
+            );
+        }
+
+        return $file;
     }
 
     /**
@@ -192,5 +232,21 @@ class FileService
         $availableStorageSpace = $totalStorageCapacity - $totalWeight;
 
         return [$totalWeight, $totalStorageCapacity, $availableStorageSpace];
+    }
+
+    /**
+     * Save the entity in the database (file)
+     *
+     * @param Object $entity
+     */
+    private function saveEntity(Object $entity): void
+    {
+        try {
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
+        } catch (ORMException $e) {
+            throw new RuntimeException(
+                '[Inscription]: Erreur lors de la persistance de l\'entité:' . $entity, 0, $e);
+        }
     }
 }
