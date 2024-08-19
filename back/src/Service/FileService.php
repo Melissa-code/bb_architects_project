@@ -13,9 +13,11 @@ use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FileService
 {
@@ -23,17 +25,20 @@ class FileService
     private CategoryRepository $categoryRepository;
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
+    private SluggerInterface $slugger;
 
     public function __construct(
         FileRepository $fileRepository,
         CategoryRepository $categoryRepository,
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
+        SluggerInterface $slugger,
     ){
         $this->fileRepository = $fileRepository;
         $this->categoryRepository = $categoryRepository;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
+        $this->slugger = $slugger;
     }
 
     /**
@@ -130,9 +135,9 @@ class FileService
     }
 
     /**
-     * Add a new file (in server and in database)
+     * Add a new file (in the server and path in the database)
      */
-    public function createFile(array $data, User $user): File
+    public function createFile(array $data, User $user, $documentsDirectory): File
     {
         // Get the category
         $categoryId = $data['categoryId'];
@@ -141,15 +146,32 @@ class FileService
             throw new InvalidArgumentException('Catégorie non trouvée.');
         }
 
-        // Create the file
+        // Create the new file
         $file = new File();
         $file->setName($data['name']);
         $file->setWeight($data['weight']);
         $file->setFormat($data['format']);
-        $file->setPath($data['path']);
         $file->setCategory($category);
         $file->setCreatedAt(new DateTimeImmutable());
         $file->setUser($user);
+
+        $uploadedFile = $data['pathFile']; // UploadedFile object
+        if ($uploadedFile) {
+            // Get the name without the extension
+            $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+            // Reformate the name
+            $safeFilename = $this->slugger->slug($originalFilename);
+            // Create a name with a unique id and the extension
+            $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
+            try {
+                $uploadedFile->move($documentsDirectory, $newFilename);
+            } catch (FileException $e) {
+                throw new RuntimeException('Échec du téléchargement du fichier : ' . $e->getMessage());
+            }
+            $file->setPath('documents/' . $newFilename);
+        } else {
+            throw new InvalidArgumentException('Aucun fichier n\'a été téléchargé.');
+        }
 
         try {
             //$this->validateEntity($file);
@@ -185,7 +207,7 @@ class FileService
                 'message' => 'Fichier supprimé avec succès.',
             ];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error('Erreur lors de la suppression du fichier ' . $id . ': ' . $e->getMessage());
             return [
                 'message' => 'Une erreur est survenue lors de la suppression du fichier ' . $id,

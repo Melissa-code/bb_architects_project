@@ -8,6 +8,7 @@ use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -92,12 +93,32 @@ class FileController extends AbstractController
         }
 
         try {
-            $data = json_decode($request->getContent(), true);
-            if (!is_array($data)) {
-                return new JsonResponse(['error' => 'Les données sont invalides.'], 400);
+            //$data = json_decode($request->getContent(), true);
+            //if (!is_array($data)) {
+            //    return new JsonResponse(['error' => 'Les données sont invalides.'], 400);
+            //}
+            //$documentsDirectory = $this->getParameter('directory_documents_files');
+            //$this->fileService->createFile($data, $user, $documentsDirectory);
+
+            // Get the data from the form
+            $name = $request->request->get('name');
+            $weight = $request->request->get('weight');
+            $format = $request->request->get('format');
+            $categoryId = $request->request->get('categoryId');
+            // Get the uploaded file (form-data in Postman)
+            $uploadedFile = $request->files->get('pathFile');
+            if (!$uploadedFile instanceof UploadedFile) {
+                return new JsonResponse(['error' => 'Aucun fichier valide n\'a été téléchargé.'], 400);
             }
 
-            $this->fileService->createFile($data, $user);
+            $documentsDirectory = $this->getParameter('directory_documents_files');
+            $this->fileService->createFile([
+                'name' => $name,
+                'weight' => $weight,
+                'format' => $format,
+                'categoryId' => $categoryId,
+                'pathFile' => $uploadedFile
+            ], $user, $documentsDirectory);
 
             return new JsonResponse(['message' => 'Nouveau document téléchargé avec succès.'], 201);
         } catch (\InvalidArgumentException $e) {
