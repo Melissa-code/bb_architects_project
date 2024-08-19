@@ -199,6 +199,17 @@ class FileService
                 ];
             }
 
+            // Remove the file in the server
+            $filePath = $file->getPath();
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            } else {
+                $this->logger->error('Fichier non trouvé sur le serveur: ' . $filePath);
+                return [
+                    'message' => 'Fichier non trouvé sur le serveur.',
+                    'error' => 'Fichier non trouvé sur le serveur.',
+                ];
+            }
             // Remove the file in the database
             $this->entityManager->remove($file);
             $this->entityManager->flush();

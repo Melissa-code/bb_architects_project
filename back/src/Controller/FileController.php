@@ -84,7 +84,7 @@ class FileController extends AbstractController
     }
 
     /**
-     * Create a new file
+     * Create & upload a new file
      */
     #[Route('/api/file/create_file', name: 'app_file_create', methods: ['POST'])]
     public function createFile(#[CurrentUser] ?UserInterface $user, Request $request): JsonResponse {
@@ -93,13 +93,6 @@ class FileController extends AbstractController
         }
 
         try {
-            //$data = json_decode($request->getContent(), true);
-            //if (!is_array($data)) {
-            //    return new JsonResponse(['error' => 'Les données sont invalides.'], 400);
-            //}
-            //$documentsDirectory = $this->getParameter('directory_documents_files');
-            //$this->fileService->createFile($data, $user, $documentsDirectory);
-
             // Get the data from the form
             $name = $request->request->get('name');
             $weight = $request->request->get('weight');
@@ -121,9 +114,9 @@ class FileController extends AbstractController
             ], $user, $documentsDirectory);
 
             return new JsonResponse(['message' => 'Nouveau document téléchargé avec succès.'], 201);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return new JsonResponse(['error : ' => $e->getMessage()], 400);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error('Exception levée : ' . $e->getMessage());
             return new JsonResponse(['message' => 'Erreur interne du serveur.'], 500);
         }
@@ -138,6 +131,7 @@ class FileController extends AbstractController
         if (!$user) {
             return new JsonResponse(['message' => 'Utilisateur non connecté.'], 401);
         }
+
         $fileData = $this->fileService->getFileById($id);
 
         // Check if the file owns to the logged user
