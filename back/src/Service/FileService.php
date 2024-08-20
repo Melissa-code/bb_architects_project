@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FileService
 {
@@ -26,6 +27,7 @@ class FileService
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
     private SluggerInterface $slugger;
+    private ValidatorInterface $validator;
 
     public function __construct(
         FileRepository $fileRepository,
@@ -33,12 +35,14 @@ class FileService
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger,
+        ValidatorInterface $validator,
     ){
         $this->fileRepository = $fileRepository;
         $this->categoryRepository = $categoryRepository;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
         $this->slugger = $slugger;
+        $this->validator = $validator;
     }
 
     /**
@@ -149,32 +153,57 @@ class FileService
         // Create the new file
         $file = new File();
         $file->setName($data['name']);
-        $file->setWeight($data['weight']);
-        $file->setFormat($data['format']);
         $file->setCategory($category);
         $file->setCreatedAt(new DateTimeImmutable());
         $file->setUser($user);
 
         $uploadedFile = $data['pathFile']; // UploadedFile object
         if ($uploadedFile) {
+            // Convert the weight : octets to Mo (1 Go is equal to 1024 Mo)
+            $fileSizeInBytes = $uploadedFile->getSize(); //octets
+            $fileSizeInMb = $fileSizeInBytes / (1024 * 1024);
+            $weight = ceil($fileSizeInMb); // round to the next int
+
+            $maxFileSizeInMb = 2; // 2 Mo in php.ini de Wamp (upload_max_filesize = 2M line 856)
+            $totalSpaces = $this->calculateAvailableStorageSpace($user);
+            $availableStorageSpaceInGo = $totalSpaces[2];
+            $availableStorageSpaceInMb = $availableStorageSpaceInGo * 1024;
+            if ($weight > $maxFileSizeInMb) {
+                throw new InvalidArgumentException('Le fichier dépasse la taille maximale autorisée de '
+                    . $maxFileSizeInMb . ' Mo.');
+            }
+            if ($weight > $availableStorageSpaceInMb) {
+                throw new InvalidArgumentException('Le fichier dépasse la taille restante disponible '
+                . 'dans votre abonnement');
+            }
+
             // Get the name without the extension
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
             // Reformate the name
             $safeFilename = $this->slugger->slug($originalFilename);
             // Create a name with a unique id and the extension
             $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
+
+            $allowedFormats = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'mp4', 'avi', 'mkv', 'mov', 'zip', 'rar', 'tar.gz'];
+            $fileFormat = $uploadedFile->guessExtension();
+            if (!in_array($fileFormat, $allowedFormats)) {
+                throw new InvalidArgumentException('Format de fichier non pris en charge.');
+            }
+
             try {
                 $uploadedFile->move($documentsDirectory, $newFilename);
             } catch (FileException $e) {
                 throw new RuntimeException('Échec du téléchargement du fichier : ' . $e->getMessage());
             }
             $file->setPath('documents/' . $newFilename);
+            $file->setFormat($fileFormat);
+            $file->setWeight($weight);
         } else {
             throw new InvalidArgumentException('Aucun fichier n\'a été téléchargé.');
         }
 
         try {
-            //$this->validateEntity($file);
+            $this->validateEntity($file);
             $this->saveEntity($file);
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
@@ -251,8 +280,10 @@ class FileService
      */
     private function calculateAvailableStorageSpace(User $user): array
     {
-        // Total weight of the files
-        $totalWeight = $this->fileRepository->sumWeightByUser($user);
+        // Total weight of the files in Mo
+        $totalWeightInMo = $this->fileRepository->sumWeightByUser($user);
+        // Convert Mo to Go (1 Go = 1024 Mo)
+        $totalWeightInGo = $totalWeightInMo / 1024;
 
         // Sum of the storage_space capacities bought by the user
         $storageSpaces = $user->getStorageSpaces();
@@ -262,9 +293,28 @@ class FileService
         }
 
         // Difference between total storageSpace and total weight of files
-        $availableStorageSpace = $totalStorageCapacity - $totalWeight;
+        $availableStorageSpace = $totalStorageCapacity - $totalWeightInGo;
 
-        return [$totalWeight, $totalStorageCapacity, $availableStorageSpace];
+        return [$totalWeightInGo, $totalStorageCapacity, $availableStorageSpace];
+    }
+
+    /**
+     * Validate or return error message
+     *
+     * @param object $entity
+     * @throws InvalidArgumentException if the error of validation exist
+     */
+    private function validateEntity(object $entity): void
+    {
+        $violations = $this->validator->validate($entity);
+
+        if (count($violations) > 0) {
+            $errorMessages = [];
+            foreach ($violations as $violation) {
+                $errorMessages[] = $violation->getMessage();
+            }
+            throw new InvalidArgumentException(json_encode(['errors' => $errorMessages]));
+        }
     }
 
     /**

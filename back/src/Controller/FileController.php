@@ -96,7 +96,6 @@ class FileController extends AbstractController
             // Get the data from the form
             $name = $request->request->get('name');
             $weight = $request->request->get('weight');
-            $format = $request->request->get('format');
             $categoryId = $request->request->get('categoryId');
             // Get the uploaded file (form-data in Postman)
             $uploadedFile = $request->files->get('pathFile');
@@ -108,7 +107,6 @@ class FileController extends AbstractController
             $this->fileService->createFile([
                 'name' => $name,
                 'weight' => $weight,
-                'format' => $format,
                 'categoryId' => $categoryId,
                 'pathFile' => $uploadedFile
             ], $user, $documentsDirectory);

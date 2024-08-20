@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\FileRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
 class File
@@ -14,15 +15,29 @@ class File
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message : "Veuillez renseigner un nom de fichier.")]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: 'Le nom du fichier doit comporter au minimum {{ limit }} caractères',
+        maxMessage: 'Le nom du fichier doit comporter au maximum {{ limit }} caractères')
+    ]
+    #[Assert\Regex(
+        pattern: "/^[\p{L}\d\s\-']+$/u",
+        message: 'Le nom doit contenir uniquement des lettres, des chiffres, des espaces, des tirets et des apostrophes.'
+    )]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Assert\PositiveOrZero(message : "Veuillez renseigner un nombre positif.")]
     private ?int $weight = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message : "Veuillez renseigner un format de fichier.")]
     private ?string $format = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $path = null;
 
     // Attribute not mapped to the database
