@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Category;
 use App\Entity\File;
 use App\Entity\User;
 use App\Repository\CategoryRepository;
@@ -144,38 +145,17 @@ class FileService
     public function createFile(array $data, User $user, $documentsDirectory): File
     {
         // Get the category
-        $categoryId = $data['categoryId'];
-        $category = $this->categoryRepository->find($categoryId);
-        if (!$category) {
-            throw new InvalidArgumentException('Catégorie non trouvée.');
-        }
-
+        $category = $this->getCategory($data['categoryId']);
         // Create the new file
-        $file = new File();
-        $file->setName($data['name']);
-        $file->setCategory($category);
-        $file->setCreatedAt(new DateTimeImmutable());
-        $file->setUser($user);
+        $file = $this->initializeFile($data, $user, $category);
+        // UploadedFile object
+        $uploadedFile = $data['pathFile'];
 
-        $uploadedFile = $data['pathFile']; // UploadedFile object
         if ($uploadedFile) {
             // Convert the weight : octets to Mo (1 Go is equal to 1024 Mo)
-            $fileSizeInBytes = $uploadedFile->getSize(); //octets
-            $fileSizeInMb = $fileSizeInBytes / (1024 * 1024);
-            $weight = ceil($fileSizeInMb); // round to the next int
-
-            $maxFileSizeInMb = 2; // 2 Mo in php.ini de Wamp (upload_max_filesize = 2M line 856)
-            $totalSpaces = $this->calculateAvailableStorageSpace($user);
-            $availableStorageSpaceInGo = $totalSpaces[2];
-            $availableStorageSpaceInMb = $availableStorageSpaceInGo * 1024;
-            if ($weight > $maxFileSizeInMb) {
-                throw new InvalidArgumentException('Le fichier dépasse la taille maximale autorisée de '
-                    . $maxFileSizeInMb . ' Mo.');
-            }
-            if ($weight > $availableStorageSpaceInMb) {
-                throw new InvalidArgumentException('Le fichier dépasse la taille restante disponible '
-                . 'dans votre abonnement');
-            }
+            $weight = $this->calculateFileWeight($uploadedFile);
+            // 2 Mo Max in php.ini de Wamp (upload_max_filesize = 2M line 856)
+            $this->validateFileSize($weight, $user);
 
             // Get the name without the extension
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -183,12 +163,8 @@ class FileService
             $safeFilename = $this->slugger->slug($originalFilename);
             // Create a name with a unique id and the extension
             $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
-
-            $allowedFormats = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'mp4', 'avi', 'mkv', 'mov', 'zip', 'rar', 'tar.gz'];
-            $fileFormat = $uploadedFile->guessExtension();
-            if (!in_array($fileFormat, $allowedFormats)) {
-                throw new InvalidArgumentException('Format de fichier non pris en charge.');
-            }
+            // Validate the format (ex: pdf txt ...)
+            $fileFormat = $this->validateFileFormat($uploadedFile);
 
             try {
                 $uploadedFile->move($documentsDirectory, $newFilename);
@@ -213,6 +189,7 @@ class FileService
 
         return $file;
     }
+
 
     /**
      * Delete a file
@@ -296,6 +273,76 @@ class FileService
         $availableStorageSpace = $totalStorageCapacity - $totalWeightInGo;
 
         return [$totalWeightInGo, $totalStorageCapacity, $availableStorageSpace];
+    }
+
+    /**
+     * Find category
+     */
+    private function getCategory(int $categoryId): Category
+    {
+        $category = $this->categoryRepository->find($categoryId);
+        if (!$category) {
+            throw new InvalidArgumentException('Catégorie non trouvée.');
+        }
+        return $category;
+    }
+
+    /**
+     * Initialize a new file
+     */
+    private function initializeFile(array $data, User $user, Category $category): File
+    {
+        $file = new File();
+        $file->setName($data['name']);
+        $file->setCategory($category);
+        $file->setCreatedAt(new DateTimeImmutable());
+        $file->setUser($user);
+
+        return $file;
+    }
+
+    /**
+     * Calculate the weight of the file in Mo
+     */
+    private function calculateFileWeight($uploadedFile): int
+    {
+        $fileSizeInBytes = $uploadedFile->getSize(); // octets
+        $fileSizeInMb = $fileSizeInBytes / (1024 * 1024);
+        return ceil($fileSizeInMb); // round to the next int (Mo)
+    }
+
+    /**
+     * Validate the weight of the file
+     */
+    private function validateFileSize(int $weight, User $user): void
+    {
+        // 2 Mo in php.ini de Wamp (upload_max_filesize = 2M line 856)
+        $maxFileSizeInMb = 2;
+        $availableStorageSpaceInMb = $this->calculateAvailableStorageSpace($user)[2] * 1024;
+
+        if ($weight > $maxFileSizeInMb) {
+            throw new InvalidArgumentException('Le fichier dépasse la taille maximale autorisée de '
+                . $maxFileSizeInMb . ' Mo.');
+        }
+        if ($weight > $availableStorageSpaceInMb) {
+            throw new InvalidArgumentException('Le fichier dépasse la taille restante disponible dans '
+                . 'votre abonnement.');
+        }
+    }
+
+    /**
+     * Validate the format of the file
+     */
+    private function validateFileFormat($uploadedFile): mixed
+    {
+        $allowedFormats = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'mp4', 'avi', 'mkv', 'mov', 'zip', 'rar', 'tar.gz'];
+        $fileFormat = $uploadedFile->guessExtension();
+
+        if (!in_array($fileFormat, $allowedFormats)) {
+            throw new InvalidArgumentException('Format de fichier non pris en charge.');
+        }
+
+        return $fileFormat;
     }
 
     /**
