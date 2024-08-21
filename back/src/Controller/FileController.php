@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\File;
 use App\Entity\User;
 use App\Service\FileService;
 use Exception;
@@ -87,33 +88,39 @@ class FileController extends AbstractController
      * Create & upload a new file
      */
     #[Route('/api/file/create_file', name: 'app_file_create', methods: ['POST'])]
-    public function createFile(#[CurrentUser] ?UserInterface $user, Request $request): JsonResponse {
+    #[Route('/api/file/update_file/{id}', name: 'app_file_update', methods: ['POST'])]
+    public function createOrUpdate(#[CurrentUser] ?UserInterface $user, Request $request, ?File $file = null): JsonResponse {
         if (!$user instanceof User) {
-            throw new InvalidArgumentException('L\'instance doit être de type App\Entity\User');
+            return new JsonResponse(['error' => 'L\'instance doit être de type App\Entity\User'], 400);
         }
-
         try {
-            // Get the data from the form
             $name = $request->request->get('name');
-            $weight = $request->request->get('weight');
             $categoryId = $request->request->get('categoryId');
-            // Get the uploaded file (form-data in Postman)
             $uploadedFile = $request->files->get('pathFile');
+            if (!$name) {
+                return new JsonResponse(['error' => 'Le champ "name" est requis.'], 400);
+            }
+            if (!$categoryId) {
+                return new JsonResponse(['error' => 'Le champ "categoryId" est requis.'], 400);
+            }
             if (!$uploadedFile instanceof UploadedFile) {
                 return new JsonResponse(['error' => 'Aucun fichier valide n\'a été téléchargé.'], 400);
             }
 
             $documentsDirectory = $this->getParameter('directory_documents_files');
-            $this->fileService->createFile([
+            $isUpdating = $file !== null;
+            $this->fileService->createOrUpdateFile($file, [
                 'name' => $name,
-                'weight' => $weight,
                 'categoryId' => $categoryId,
                 'pathFile' => $uploadedFile
             ], $user, $documentsDirectory);
 
-            return new JsonResponse(['message' => 'Nouveau document téléchargé avec succès.'], 201);
+            return new JsonResponse([
+                'message' => $isUpdating ? 'Document mis à jour avec succès.' : 'Nouveau document téléchargé avec succès.'
+            ], $isUpdating ? 200 : 201);
+
         } catch (InvalidArgumentException $e) {
-            return new JsonResponse(['error : ' => $e->getMessage()], 400);
+            return new JsonResponse(['error' => $e->getMessage()], 400);
         } catch (Exception $e) {
             $this->logger->error('Exception levée : ' . $e->getMessage());
             return new JsonResponse(['message' => 'Erreur interne du serveur.'], 500);

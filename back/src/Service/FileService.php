@@ -140,40 +140,57 @@ class FileService
     }
 
     /**
-     * Add a new file (in the server and path in the database)
+     * Add a new file
+     * or Update it (in the server and path in the database)
      */
-    public function createFile(array $data, User $user, $documentsDirectory): File
+    public function createOrUpdateFile(?File $file, array $data, User $user, $documentsDirectory): File
     {
-        // Get the category
+        // If the file doesn't exist, create a new File
+        if (!$file) {
+            $file = new File();
+            $file->setCreatedAt(new DateTimeImmutable());
+            $file->setUser($user);
+            $this->logger->info('Création d\'un nouveau fichier.');
+        } else {
+            $this->logger->info('Mise à jour d\'un fichier existant.');
+        }
+
+        $isUpdated = $file->getId() !== null;
+        $oldFilePath = $documentsDirectory . '/' . $file->getPath();
+        $file->setName($data['name']);
         $category = $this->getCategory($data['categoryId']);
-        // Create the new file
-        $file = $this->initializeFile($data, $user, $category);
+        $file->setCategory($category);
+
         // UploadedFile object
         $uploadedFile = $data['pathFile'];
-
         if ($uploadedFile) {
-            // Convert the weight : octets to Mo (1 Go is equal to 1024 Mo)
+            // Convert file size and validate
             $weight = $this->calculateFileWeight($uploadedFile);
-            // 2 Mo Max in php.ini de Wamp (upload_max_filesize = 2M line 856)
             $this->validateFileSize($weight, $user);
 
-            // Get the name without the extension
+            // Generate unique filename
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            // Reformate the name
             $safeFilename = $this->slugger->slug($originalFilename);
-            // Create a name with a unique id and the extension
-            $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
-            // Validate the format (ex: pdf txt ...)
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->guessExtension();
+
+            // Validate file format
             $fileFormat = $this->validateFileFormat($uploadedFile);
 
+            // Move uploaded file to destination directory
             try {
                 $uploadedFile->move($documentsDirectory, $newFilename);
             } catch (FileException $e) {
                 throw new RuntimeException('Échec du téléchargement du fichier : ' . $e->getMessage());
             }
+
             $file->setPath('documents/' . $newFilename);
             $file->setFormat($fileFormat);
             $file->setWeight($weight);
+
+            // Delete the old file if this is updated
+            if ($isUpdated && file_exists($oldFilePath)) {
+                unlink($oldFilePath);
+            }
         } else {
             throw new InvalidArgumentException('Aucun fichier n\'a été téléchargé.');
         }
@@ -183,13 +200,12 @@ class FileService
             $this->saveEntity($file);
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
-                'L\'ajout du nouveau fichier a échoué: ' . $e->getMessage()
+                'L\'ajout ou la modification du fichier a échoué: ' . $e->getMessage()
             );
         }
 
         return $file;
     }
-
 
     /**
      * Delete a file

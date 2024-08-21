@@ -33,6 +33,11 @@ app_file_detail:
     controller: App\Controller\FileController::getFileById
     methods: [GET]
 
+app_file_update:
+    path: /api/file/update_file/{id}
+    controller: App\Controller\FileController::createOrUpdate
+    methods: [POST]
+
 app_file_delete:
     path: /api/file/delete/{id}
     controller: App\Controller\FileController::deleteFile
@@ -40,5 +45,6 @@ app_file_delete:
 
 app_file_create:
     path: /api/file/create_file
-    controller: App\Controller\FileController::createFile
+    controller: App\Controller\FileController::createOrUpdate
     methods: [POST]
+
