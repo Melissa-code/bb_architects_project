@@ -48,3 +48,7 @@ app_file_create:
     controller: App\Controller\FileController::createOrUpdate
     methods: [POST]
 
+app_client:
+    path: /api/client
+    controller: App\Controller\ClientController::getAllClients
+    methods: [GET]

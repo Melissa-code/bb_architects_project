@@ -33,6 +33,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * Sort all the users by alphabetical lastname & role_user
+     */
+    public function findUsersByRoleAndOrderByLastname(string $excludedRole = 'ROLE_ADMIN'): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.roles NOT LIKE :excludedRole')
+            ->setParameter('excludedRole', '%"'.$excludedRole.'"%')
+            ->orderBy('u.lastname', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */
