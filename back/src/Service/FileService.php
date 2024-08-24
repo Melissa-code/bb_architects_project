@@ -271,7 +271,7 @@ class FileService
      * Calculate available storage space of the user
      * return array of int
      */
-    private function calculateAvailableStorageSpace(User $user): array
+    public function calculateAvailableStorageSpace(User $user): array
     {
         // Total weight of the files in Mo
         $totalWeightInMo = $this->fileRepository->sumWeightByUser($user);
@@ -301,20 +301,6 @@ class FileService
             throw new InvalidArgumentException('Catégorie non trouvée.');
         }
         return $category;
-    }
-
-    /**
-     * Initialize a new file
-     */
-    private function initializeFile(array $data, User $user, Category $category): File
-    {
-        $file = new File();
-        $file->setName($data['name']);
-        $file->setCategory($category);
-        $file->setCreatedAt(new DateTimeImmutable());
-        $file->setUser($user);
-
-        return $file;
     }
 
     /**

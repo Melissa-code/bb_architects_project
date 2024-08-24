@@ -9,11 +9,13 @@ use Psr\Log\LoggerInterface;
 class ClientService
 {
     private UserRepository $userRepository;
+    private FileService $fileService;
     private LoggerInterface $logger;
 
-    public function __construct(UserRepository $userRepository, LoggerInterface $logger)
+    public function __construct(UserRepository $userRepository, FileService $fileService, LoggerInterface $logger)
     {
         $this->userRepository = $userRepository;
+        $this->fileService = $fileService;
         $this->logger = $logger;
     }
 
@@ -26,6 +28,7 @@ class ClientService
             $clients = $this->userRepository->findUsersByRoleAndOrderByLastname();
 
             $clientData = array_map(function ($client) {
+                $storageSpaceOfUser = $this->fileService->calculateAvailableStorageSpace($client);
                 return [
                     'id' => $client->getId(),
                     'firstname' => $client->getLastname(),
@@ -40,6 +43,11 @@ class ClientService
                         'zipcode' => $client->getAddress()->getZipcode(),
                         'city' => $client->getAddress()->getCity(),
                         'country' => $client->getAddress()->getCountry(),
+                    ],
+                    'storageSpaceOfUser' => [
+                        'totalWeightInGo' => $storageSpaceOfUser[0],
+                        'totalStorageCapacity' => $storageSpaceOfUser[1],
+                        'availableStorageSpace' => $storageSpaceOfUser[2],
                     ],
                 ];
             }, $clients);
