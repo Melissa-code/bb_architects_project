@@ -121,10 +121,10 @@ class ClientController extends AbstractController
     /**
      * Admin
      * Download the file of the client (ex: http://127.0.0.1:8000/api/client/file/download/54)
+     * Postman : Send & Download
      */
     #[Route('/api/client/file/download/{id}', name: 'app_client_file_download', requirements: ['id' => '\d+'], methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN')]
-    /*
     public function downloadFile(int $id, FileRepository $fileRepository): Response
     {
         $file = $fileRepository->find($id);
@@ -140,33 +140,9 @@ class ClientController extends AbstractController
             return new JsonResponse(['message' => 'Fichier non trouvé sur le serveur.'], 404);
         }
 
-        return new BinaryFileResponse($fullPath);
-    }*/
-    public function downloadFile(int $id, FileRepository $fileRepository): Response
-    {
-        $file = $fileRepository->find($id);
-
-        if (!$file) {
-            return new JsonResponse(['message' => 'Fichier non trouvé.'], 404);
-        }
-
-        $filePath = $file->getPath();
-        $fullPath = $this->getParameter('kernel.project_dir').'/public/'.$filePath;
-
-        if (!file_exists($fullPath)) {
-            return new JsonResponse(['message' => 'Fichier non trouvé sur le serveur.'], 404);
-        }
-
-        // Créer la réponse binaire
         $response = new BinaryFileResponse($fullPath);
-        // Ajouter l'en-tête pour forcer le téléchargement
-        $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            basename($fullPath) // Nom du fichier dans le téléchargement
-        );
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, basename($fullPath));
 
         return $response;
     }
-
-
 }
