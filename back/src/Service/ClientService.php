@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Repository\FileRepository;
 use App\Repository\UserRepository;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -9,18 +10,26 @@ use Psr\Log\LoggerInterface;
 class ClientService
 {
     private UserRepository $userRepository;
+    private FileRepository $fileRepository;
     private FileService $fileService;
     private LoggerInterface $logger;
 
-    public function __construct(UserRepository $userRepository, FileService $fileService, LoggerInterface $logger)
+    public function __construct(
+        UserRepository $userRepository,
+        FileRepository $fileRepository,
+        FileService $fileService,
+        LoggerInterface $logger
+    )
     {
         $this->userRepository = $userRepository;
+        $this->fileRepository = $fileRepository;
         $this->fileService = $fileService;
         $this->logger = $logger;
     }
 
     /**
      * Get all clients
+     * return array[] of clients (users : role_user)
      */
     public function getAllClients(): array
     {
@@ -65,5 +74,12 @@ class ClientService
                 'error' => $e->getMessage(),
             ];
         }
+    }
+
+    public function getStatistics(): int
+    {
+        $totalFiles = $this->fileRepository->countTotalFiles();
+
+        return $totalFiles;
     }
 }

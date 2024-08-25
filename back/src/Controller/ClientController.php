@@ -121,7 +121,7 @@ class ClientController extends AbstractController
     /**
      * Admin
      * Download the file of the client (ex: http://127.0.0.1:8000/api/client/file/download/54)
-     * Postman : Send & Download
+     * Postman : click on Send & Download
      */
     #[Route('/api/client/file/download/{id}', name: 'app_client_file_download', requirements: ['id' => '\d+'], methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN')]
@@ -144,5 +144,28 @@ class ClientController extends AbstractController
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, basename($fullPath));
 
         return $response;
+    }
+
+    /**
+     * Admin
+     * Get the total files number
+     */
+    #[Route('/api/client/statistics', name: 'app_client_statistics', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function getStatitics(): JsonResponse
+    {
+        try {
+            $statisticsData = $this->clientService->getStatistics();
+
+            return new JsonResponse($statisticsData, 200);
+
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la récupération des statistiques : ' . $e->getMessage());
+
+            return new JsonResponse([
+                'message' => 'Une erreur est survenue lors de la récupération des statistiques : ',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

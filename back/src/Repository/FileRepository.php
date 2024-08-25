@@ -44,7 +44,7 @@ class FileRepository extends ServiceEntityRepository
     }
 
     /**
-     * Sum the weight of the files of the user
+     * Sum of the weight of the files of the user
      */
     public function sumWeightByUser(User $user): int
     {
@@ -52,6 +52,17 @@ class FileRepository extends ServiceEntityRepository
             ->select('SUM(f.weight)')
             ->where('f.user = :user')
             ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Sum of the number of the total files in the table
+     */
+    public function countTotalFiles(): int
+    {
+        return (int) $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
             ->getQuery()
             ->getSingleScalarResult();
     }
