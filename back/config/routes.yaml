@@ -43,6 +43,21 @@ app_file_delete:
     controller: App\Controller\FileController::deleteFile
     methods: [DELETE]
 
+app_client_file:
+    path: /api/client/files/{id}
+    controller: App\Controller\ClientController::getFilesOfClient
+    methods: [GET]
+
+app_client_file_details:
+    path: /api/client/file/{id}
+    controller: App\Controller\ClientController::getFileOfClientById
+    methods: [GET]
+
+app_client_file_download:
+    path: /api/client/file/download/{id}
+    controller: App\Controller\ClientController::downloadFile
+    methods: [GET]
+
 app_file_create:
     path: /api/file/create_file
     controller: App\Controller\FileController::createOrUpdate

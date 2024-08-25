@@ -15,14 +15,14 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class FileService
 {
+    private string $baseUrl;
     private FileRepository $fileRepository;
     private CategoryRepository $categoryRepository;
     private LoggerInterface $logger;
@@ -31,6 +31,7 @@ class FileService
     private ValidatorInterface $validator;
 
     public function __construct(
+        ParameterBagInterface $params,
         FileRepository $fileRepository,
         CategoryRepository $categoryRepository,
         LoggerInterface $logger,
@@ -38,24 +39,22 @@ class FileService
         SluggerInterface $slugger,
         ValidatorInterface $validator,
     ){
+        $this->baseUrl = $params->get('BASE_URL');
         $this->fileRepository = $fileRepository;
         $this->categoryRepository = $categoryRepository;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
         $this->slugger = $slugger;
         $this->validator = $validator;
+        $this->logger->error($this->baseUrl);
     }
 
     /**
      * Get all the files of the user
      * return fileData[]
      */
-    public function getAllFilesOfUser(UserInterface $user, $request): array
+    public function getAllFilesOfUser(User $user, $request): array
     {
-        if (!$user instanceof User) {
-            throw new InvalidArgumentException('L\'instance doit être de type App\Entity\User');
-        }
-
         try {
             // Sort files by weight or createdAt
             $files = $this->getSortedFiles($user, $request);
@@ -106,19 +105,21 @@ class FileService
      * Get a file by id
      * return fileData[]
      */
-    public function getFileById(int $id): array|JsonResponse
+    public function getFileById(int $id): ?array
     {
         try {
             $file = $this->fileRepository->find($id);
             if (!$file) {
-                return new JsonResponse(['message' => 'Fichier non trouvé.'], 404);
+                return null;
             }
+            //$baseUrl = 'http://127.0.0.1:8000/';
 
             return [
                 'id' => $file->getId(),
                 'fileName' => $file->getName(),
                 'fileWeight' => $file->getWeight(),
                 'fileFormat' => $file->getFormat(),
+                'fileUrl' => $this->baseUrl . $file->getPath(),
                 'filePath' => $file->getPath(),
                 'fileCreatedAt' => $file->getCreatedAt()->format('d-m-Y H:i:s'),
                 'category' => [
@@ -130,12 +131,8 @@ class FileService
                 ],
             ];
         } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la récupération du fichier '. $id . ': ' . $e->getMessage());
-
-            return [
-                'message' => 'Une erreur est survenue lors de la récupération du fichier '. $id,
-                'error' => $e->getMessage(),
-            ];
+            $this->logger->error('Erreur lors de la récupération du fichier n°'. $id . ': ' . $e->getMessage());
+            throw $e;
         }
     }
 

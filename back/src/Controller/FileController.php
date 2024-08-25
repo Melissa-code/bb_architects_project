@@ -67,6 +67,9 @@ class FileController extends AbstractController
         try {
             $fileData = $this->fileService->getFileById($id);
 
+            if (!$fileData) {
+                return new JsonResponse(['message' => 'Fichier non trouvé.'], 404);
+            }
             // Check if the file owns to the logged user
             if ($fileData['user']['userId'] !== $user->getId()) {
                 return new JsonResponse(['message' => 'Accès interdit: ce fichier ne vous appartient pas.'], 403);
