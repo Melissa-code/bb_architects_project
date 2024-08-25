@@ -50,12 +50,8 @@ class FileService
      * Get all the files of the user
      * return fileData[]
      */
-    public function getAllFilesOfUser(UserInterface $user, $request): array
+    public function getAllFilesOfUser(User $user, $request): array
     {
-        if (!$user instanceof User) {
-            throw new InvalidArgumentException('L\'instance doit être de type App\Entity\User');
-        }
-
         try {
             // Sort files by weight or createdAt
             $files = $this->getSortedFiles($user, $request);

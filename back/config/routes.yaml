@@ -52,3 +52,8 @@ app_client:
     path: /api/client
     controller: App\Controller\ClientController::getAllClients
     methods: [GET]
+
+app_client_file:
+    path: /api/client/files/{id}
+    controller: App\Controller\ClientController::getFilesOfClient
+    methods: [GET]
