@@ -35,7 +35,7 @@ class ClientService
                     'lastname' => $client->getFirstname(),
                     'email' => $client->getEmail(),
                     'phone' => $client->getPhone(),
-                    'userCreatedAt' => $client->getCreatedAt()->format('d/m/Y H:i:s'),
+                    'userCreatedAt' => $client->getCreatedAt()->format('d-m-Y H:i:s'),
                     'address' => [
                         'addressId' => $client->getAddress()->getId(),
                         'number_street' => $client->getAddress()->getNumberStreet(),

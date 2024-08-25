@@ -3,15 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\FileRepository;
 use App\Repository\UserRepository;
 use App\Service\ClientService;
 use App\Service\FileService;
 use Exception;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -31,6 +35,7 @@ class ClientController extends AbstractController
     }
 
     /**
+     * Admin
      * Get all clients (role_user)
      */
     #[Route('/api/client', name: 'app_client', methods: ['GET'])]
@@ -57,6 +62,7 @@ class ClientController extends AbstractController
     }
 
     /**
+     * Admin
      * Get all the files of a client (id_user in URL)
      */
     #[Route('/api/client/files/{id}', name: 'app_client_file', requirements: ['id' => '\d+'], methods: ['GET'])]
@@ -84,4 +90,83 @@ class ClientController extends AbstractController
             ], 500);
         }
     }
+
+    /**
+     * Admin
+     * Get a file of a client by id (int)
+     */
+    #[Route('/api/client/file/{id}', name: 'app_client_file_details', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function getFileOfClientById(int $id): JsonResponse
+    {
+        try {
+            $fileData = $this->fileService->getFileById($id);
+
+            if (!$fileData) {
+                return new JsonResponse(['message' => 'Fichier non trouvé.'], 404);
+            }
+
+            return new JsonResponse($fileData, 200);
+
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la récupération du fichier n°'. $id . ': ' . $e->getMessage());
+
+            return new JsonResponse([
+                'message' => 'Une erreur est survenue lors de la récupération du fichier n°' . $id,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Admin
+     * Download the file of the client (ex: http://127.0.0.1:8000/api/client/file/download/54)
+     */
+    #[Route('/api/client/file/download/{id}', name: 'app_client_file_download', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    /*
+    public function downloadFile(int $id, FileRepository $fileRepository): Response
+    {
+        $file = $fileRepository->find($id);
+
+        if (!$file) {
+            return new JsonResponse(['message' => 'Fichier non trouvé.'], 404);
+        }
+
+        $filePath = $file->getPath();
+        $fullPath = $this->getParameter('kernel.project_dir').'/public/'.$filePath;
+
+        if (!file_exists($fullPath)) {
+            return new JsonResponse(['message' => 'Fichier non trouvé sur le serveur.'], 404);
+        }
+
+        return new BinaryFileResponse($fullPath);
+    }*/
+    public function downloadFile(int $id, FileRepository $fileRepository): Response
+    {
+        $file = $fileRepository->find($id);
+
+        if (!$file) {
+            return new JsonResponse(['message' => 'Fichier non trouvé.'], 404);
+        }
+
+        $filePath = $file->getPath();
+        $fullPath = $this->getParameter('kernel.project_dir').'/public/'.$filePath;
+
+        if (!file_exists($fullPath)) {
+            return new JsonResponse(['message' => 'Fichier non trouvé sur le serveur.'], 404);
+        }
+
+        // Créer la réponse binaire
+        $response = new BinaryFileResponse($fullPath);
+        // Ajouter l'en-tête pour forcer le téléchargement
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            basename($fullPath) // Nom du fichier dans le téléchargement
+        );
+
+        return $response;
+    }
+
+
 }
