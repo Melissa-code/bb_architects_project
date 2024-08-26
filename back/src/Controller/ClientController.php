@@ -171,8 +171,7 @@ class ClientController extends AbstractController
     }
 
     /**
-     * Search a file
-     * by name
+     * Search a file by name
      */
     #[Route('/api/client/search_file', name: 'api_file_search', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN')]

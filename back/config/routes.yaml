@@ -23,6 +23,11 @@ app_category:
     controller: App\Controller\CategoryController::getAllCategories
     methods: [GET]
 
+api_search_file:
+    path: /api/file/search_file
+    controller: App\Controller\FileController::searchFile
+    methods: [GET]
+
 app_file:
     path: /api/files
     controller: App\Controller\FileController::getAllFiles
