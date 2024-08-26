@@ -77,15 +77,15 @@ class ClientController extends AbstractController
         try {
             $fileData = $this->fileService->getAllFilesOfUser($user, $request);
 
-            return new JsonResponse($fileData , 200);
+            return new JsonResponse($fileData, 200);
 
         } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la récupération des fichiers de '. $user->getFirstname().' '
-                .$user->getLastname() . $e->getMessage());
+            $this->logger->error('Erreur lors de la récupération des fichiers de ' . $user->getFirstname() . ' '
+                . $user->getLastname() . $e->getMessage());
 
             return new JsonResponse([
-                'message' => 'Une erreur est survenue lors de la récupération des fichiers de: '. $user->getFirstname()
-                    .' ' .$user->getLastname(),
+                'message' => 'Une erreur est survenue lors de la récupération des fichiers de: ' . $user->getFirstname()
+                    . ' ' . $user->getLastname(),
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -109,7 +109,7 @@ class ClientController extends AbstractController
             return new JsonResponse($fileData, 200);
 
         } catch (\Exception $e) {
-            $this->logger->error('Erreur lors de la récupération du fichier n°'. $id . ': ' . $e->getMessage());
+            $this->logger->error('Erreur lors de la récupération du fichier n°' . $id . ': ' . $e->getMessage());
 
             return new JsonResponse([
                 'message' => 'Une erreur est survenue lors de la récupération du fichier n°' . $id,
@@ -134,7 +134,7 @@ class ClientController extends AbstractController
         }
 
         $filePath = $file->getPath();
-        $fullPath = $this->getParameter('kernel.project_dir').'/public/'.$filePath;
+        $fullPath = $this->getParameter('kernel.project_dir') . '/public/' . $filePath;
 
         if (!file_exists($fullPath)) {
             return new JsonResponse(['message' => 'Fichier non trouvé sur le serveur.'], 404);
@@ -152,7 +152,7 @@ class ClientController extends AbstractController
      */
     #[Route('/api/client/statistics', name: 'app_client_statistics', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function getStatitics(): JsonResponse
+    public function getStatistics(): JsonResponse
     {
         try {
             $statisticsData = $this->clientService->getNumbersForStatistics();
@@ -160,12 +160,27 @@ class ClientController extends AbstractController
             return new JsonResponse($statisticsData, 200);
 
         } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la récupération des totaux pour les statistiques : ' . $e->getMessage());
+            $this->logger->error('Erreur lors de la récupération des totaux pour les statistiques : '
+                . $e->getMessage());
 
             return new JsonResponse([
                 'message' => 'Une erreur est survenue lors de la récupération des totaux pour les statistiques : ',
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Search a file
+     * by name
+     */
+    #[Route('/api/client/search_file', name: 'api_file_search', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function searchFile(Request $request, FileService $fileService): JsonResponse
+    {
+        $name = $request->query->get('name');
+        $files = $fileService->searchFile($name);
+
+        return new JsonResponse($files);
     }
 }

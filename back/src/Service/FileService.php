@@ -112,7 +112,6 @@ class FileService
             if (!$file) {
                 return null;
             }
-            //$baseUrl = 'http://127.0.0.1:8000/';
 
             return [
                 'id' => $file->getId(),
@@ -244,6 +243,37 @@ class FileService
                 'error' => $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Search a file
+     * return array
+     */
+    public function searchFile(string $name): array
+    {
+        $files = $this->fileRepository->findByName($name);
+
+        $result = [];
+        foreach ($files as $file) {
+            $result[] = [
+                'fileId' => $file->getId(),
+                'fileName' => $file->getName(),
+                'fileWeight' => $file->getWeight(),
+                'fileFormat' => $file->getFormat(),
+                'fileUrl' => $this->baseUrl . $file->getPath(),
+                'filePath' => $file->getPath(),
+                'fileCreatedAt' => $file->getCreatedAt()->format('d-m-Y H:i:s'),
+                'category' => [
+                    'categoryId' => $file->getCategory()->getId(),
+                    'name' => $file->getCategory()->getName(),
+                ],
+                'user' => [
+                    'userId' => $file->getUser()->getId(),
+                ],
+            ];
+        }
+
+        return $result;
     }
 
     /**

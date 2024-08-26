@@ -70,5 +70,10 @@ app_client:
 
 app_client_statistics:
     path: /api/client/statistics
-    controller: App\Controller\ClientController::getStatitics
+    controller: App\Controller\ClientController::getStatistics
+    methods: [GET]
+
+api_file_search:
+    path: /api/client/search_file
+    controller: App\Controller\ClientController::searchFile
     methods: [GET]
