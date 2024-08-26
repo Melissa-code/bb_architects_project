@@ -72,8 +72,9 @@ class FileRepository extends ServiceEntityRepository
      * Sum of the number of the total files uploaded today
      * During all the day (be careful to the hour)
      */
-    public function countTotalFilesUploadedToday($today): int
+    public function countTotalFilesUploadedToday(): int
     {
+        $today = new DateTimeImmutable();
         $startOfDay = $today->setTime(0, 0, 0);
         $endOfDay = $today->setTime(23, 59, 59);
 
@@ -84,6 +85,19 @@ class FileRepository extends ServiceEntityRepository
             ->setParameter('end', $endOfDay)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Sum of the number of the total files per client
+     */
+    public function countTotalFilesPerUsers(): array
+    {
+        return $this->createQueryBuilder('f')
+            ->join('f.user', 'u')
+            ->select('u.id as user_id, COUNT(f.id) as file_count')
+            ->groupBy('u.id')
+            ->getQuery()
+            ->getResult();
     }
 
     //    /**

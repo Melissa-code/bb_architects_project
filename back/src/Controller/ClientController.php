@@ -159,11 +159,11 @@ class ClientController extends AbstractController
 
             return new JsonResponse($statisticsData, 200);
 
-        } catch (\Exception $e) {
-            $this->logger->error('Erreur lors de la récupération des statistiques : ' . $e->getMessage());
+        } catch (Exception $e) {
+            $this->logger->error('Erreur lors de la récupération des totaux pour les statistiques : ' . $e->getMessage());
 
             return new JsonResponse([
-                'message' => 'Une erreur est survenue lors de la récupération des statistiques : ',
+                'message' => 'Une erreur est survenue lors de la récupération des totaux pour les statistiques : ',
                 'error' => $e->getMessage(),
             ], 500);
         }

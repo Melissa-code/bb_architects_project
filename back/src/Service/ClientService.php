@@ -79,21 +79,32 @@ class ClientService
 
     /**
      * Get the numbers (total) for statistics
-     * return array[] of int
+     * return array[]
      */
-    public function getNumbersForStatistics(): int
+    public function getNumbersForStatistics(): array
     {
         // Get the total number of the files
         $countTotalFiles = $this->fileRepository->countTotalFiles();
 
         // Get the total number of the files uploaded today
-        $today = new DateTimeImmutable();
-        $countTotalFilesUploadedToday = $this->fileRepository->countTotalFilesUploadedToday($today);
+        $countTotalFilesUploadedToday = $this->fileRepository->countTotalFilesUploadedToday();
+
+        $statistics = [
+            'total_files' => $countTotalFiles,
+            'total_files_uploaded_today' => $countTotalFilesUploadedToday,
+            'files_per_user' => []
+        ];
 
         // Get the total number of the files per client
+        $filesPerUsers = $this->fileRepository->countTotalFilesPerUsers();
 
+        foreach ($filesPerUsers as $result) {
+            $statistics['files_per_user'][] = [
+                'user_id' => $result['user_id'],
+                'file_count' => $result['file_count']
+            ];
+        }
 
-        //return $countTotalFiles;
-        return $countTotalFilesUploadedToday;
+        return $statistics;
     }
 }
