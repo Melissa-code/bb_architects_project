@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Repository\FileRepository;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Exception;
 use Psr\Log\LoggerInterface;
 
@@ -76,10 +77,23 @@ class ClientService
         }
     }
 
-    public function getStatistics(): int
+    /**
+     * Get the numbers (total) for statistics
+     * return array[] of int
+     */
+    public function getNumbersForStatistics(): int
     {
-        $totalFiles = $this->fileRepository->countTotalFiles();
+        // Get the total number of the files
+        $countTotalFiles = $this->fileRepository->countTotalFiles();
 
-        return $totalFiles;
+        // Get the total number of the files uploaded today
+        $today = new DateTimeImmutable();
+        $countTotalFilesUploadedToday = $this->fileRepository->countTotalFilesUploadedToday($today);
+
+        // Get the total number of the files per client
+
+
+        //return $countTotalFiles;
+        return $countTotalFilesUploadedToday;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\File;
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -63,6 +64,24 @@ class FileRepository extends ServiceEntityRepository
     {
         return (int) $this->createQueryBuilder('f')
             ->select('COUNT(f.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Sum of the number of the total files uploaded today
+     * During all the day (be careful to the hour)
+     */
+    public function countTotalFilesUploadedToday($today): int
+    {
+        $startOfDay = $today->setTime(0, 0, 0);
+        $endOfDay = $today->setTime(23, 59, 59);
+
+        return (int) $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->where('f.createdAt BETWEEN :start AND :end')
+            ->setParameter('start', $startOfDay)
+            ->setParameter('end', $endOfDay)
             ->getQuery()
             ->getSingleScalarResult();
     }

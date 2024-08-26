@@ -148,14 +148,14 @@ class ClientController extends AbstractController
 
     /**
      * Admin
-     * Get the total files number
+     * Get the total files number for statistics
      */
     #[Route('/api/client/statistics', name: 'app_client_statistics', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN')]
     public function getStatitics(): JsonResponse
     {
         try {
-            $statisticsData = $this->clientService->getStatistics();
+            $statisticsData = $this->clientService->getNumbersForStatistics();
 
             return new JsonResponse($statisticsData, 200);
 
