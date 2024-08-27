@@ -22,8 +22,8 @@ class AppFixtures extends Fixture
     {
         $this->manager = $manager;
 
-        //$this->loadCategory();
-        //$this->loadFile();
+        $this->loadCategory();
+        $this->loadFile();
 
         $manager->flush();
     }
