@@ -1,4 +1,4 @@
-const endpoint = 'http://127.0.0.1:8001/api'
+const endpoint = import.meta.env.VITE_API_URL
 
 export async function fetchLogin(data) {
     const response = await fetch(`${endpoint}/login_check`, {
