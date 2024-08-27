@@ -24,7 +24,7 @@ app_category:
     methods: [GET]
 
 api_search_file:
-    path: /api/file/search_file
+    path: /api/files/search_file
     controller: App\Controller\FileController::searchFile
     methods: [GET]
 

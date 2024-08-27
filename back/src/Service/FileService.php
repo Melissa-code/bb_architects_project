@@ -249,9 +249,9 @@ class FileService
      * Search a file
      * return array
      */
-    public function searchFile(string $name): array
+    public function searchFile(string $name, ?string $format = null): array
     {
-        $files = $this->fileRepository->findByName($name);
+        $files = $this->fileRepository->findByName($name, $format);
 
         $result = [];
         foreach ($files as $file) {

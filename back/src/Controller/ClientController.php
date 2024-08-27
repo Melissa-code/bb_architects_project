@@ -178,7 +178,10 @@ class ClientController extends AbstractController
     public function searchFile(Request $request, FileService $fileService): JsonResponse
     {
         $name = $request->query->get('name');
-        $files = $fileService->searchFile($name);
+        $format = $request->query->get('format');
+        $format = trim($format);
+
+        $files = $this->fileService->searchFile($name, $format);
 
         return new JsonResponse($files);
     }

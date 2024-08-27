@@ -159,11 +159,14 @@ class FileController extends AbstractController
     /**
      * Search a file by name
      */
-    #[Route('/api/file/search_file', name: 'api_search_file', methods: ['GET'])]
+    #[Route('/api/files/search_file', name: 'api_search_file', methods: ['GET'])]
     public function searchFile(Request $request): JsonResponse
     {
         $name = $request->query->get('name');
-        $files = $this->fileService->searchFile($name);
+        $format = $request->query->get('format');
+        $format = trim($format);
+
+        $files = $this->fileService->searchFile($name, $format);
 
         return new JsonResponse($files);
     }

@@ -103,13 +103,18 @@ class FileRepository extends ServiceEntityRepository
     /**
      * Find a file by name
      */
-    public function findByName(?string $name)
+    public function findByName(?string $name, ?string $format = null)
     {
-        return $this->createQueryBuilder('f')
+        $qb = $this->createQueryBuilder('f')
             ->andWhere('f.name LIKE :name')
-            ->setParameter('name', '%' . $name . '%')
-            ->getQuery()
-            ->getResult();
+            ->setParameter('name', '%' . $name . '%');
+
+        if ($format) {
+            $qb->andWhere('f.format = :format')
+                ->setParameter('format', $format);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     //    /**
