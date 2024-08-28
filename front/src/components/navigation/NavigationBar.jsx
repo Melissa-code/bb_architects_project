@@ -15,11 +15,13 @@ import GroupIcon from '@mui/icons-material/Group'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
-import {Link, ListItem} from '@mui/material'
+import {ListItem} from '@mui/material'
+import {useNavigate} from 'react-router-dom'
 
 export default function NavigationBar() {
     const [selectedIndex, setSelectedIndex] = React.useState(1)
     const [open, setOpen] = React.useState(true)
+    const navigate = useNavigate()
 
     const handleClick = () => {
         setOpen(!open)
@@ -30,6 +32,7 @@ export default function NavigationBar() {
 
     const handleDisconnect = () => {
         localStorage.removeItem('BBStorage_token')
+        navigate('/connect/login')
     }
 
     return (
@@ -82,10 +85,7 @@ export default function NavigationBar() {
                 </Collapse>
                 <Divider />
 
-                <ListItemButton
-                    component={Link}
-                    to={'/connect/login'}
-                    onClick={handleDisconnect}>
+                <ListItemButton onClick={handleDisconnect}>
                     <ListItemIcon>
                         <MeetingRoomIcon color="error" />
                     </ListItemIcon>
