@@ -39,6 +39,7 @@ export async function fetchGetProfile(token) {
     const response = await fetch(`${endpoint}/profile`, {
         method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
             Authentication: `Bearer ${token}`,
         },
     })
@@ -48,4 +49,21 @@ export async function fetchGetProfile(token) {
     } else {
         throw new Error(`Erreur d'accès au profil. Veuillez réessayer.`)
     }
+}
+
+export async function fetchGetFiles(token) {
+    const response = await fetch(
+        `${endpoint}/files?sortField=createdAt&sortOrder=ASC`,
+        {
+            headers: {
+                Authentication: `Bearer ${token}`,
+            },
+        }
+    )
+
+    if (!response.ok) {
+        throw new Error(`Erreur récupréation des fichiers. Veuillez réessayer`)
+    }
+
+    return response.json()
 }
