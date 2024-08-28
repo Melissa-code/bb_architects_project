@@ -15,7 +15,7 @@ import GroupIcon from '@mui/icons-material/Group'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
-import {ListItem} from '@mui/material'
+import {Link, ListItem} from '@mui/material'
 
 export default function NavigationBar() {
     const [selectedIndex, setSelectedIndex] = React.useState(1)
@@ -26,6 +26,10 @@ export default function NavigationBar() {
     }
     const handleListItemClick = (event, index) => {
         setSelectedIndex(index)
+    }
+
+    const handleDisconnect = () => {
+        localStorage.removeItem('BBStorage_token')
     }
 
     return (
@@ -78,7 +82,10 @@ export default function NavigationBar() {
                 </Collapse>
                 <Divider />
 
-                <ListItemButton onClick={() => alert('Deconnexion')}>
+                <ListItemButton
+                    component={Link}
+                    to={'/connect/login'}
+                    onClick={handleDisconnect}>
                     <ListItemIcon>
                         <MeetingRoomIcon color="error" />
                     </ListItemIcon>
