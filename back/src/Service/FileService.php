@@ -53,7 +53,7 @@ class FileService
      * Get all the files of the user
      * return fileData[]
      */
-    public function getAllFilesOfUser(User $user, $request): array
+    public function getAllFilesOfUser(User $user, Request $request): array
     {
         try {
             // Sort files by weight or createdAt
