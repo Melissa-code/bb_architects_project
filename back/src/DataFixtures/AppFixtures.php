@@ -4,6 +4,8 @@ namespace App\DataFixtures;
 
 use App\Entity\Category;
 use App\Entity\File;
+use App\Entity\OrderStatus;
+use App\Entity\PaymentMode;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -22,8 +24,10 @@ class AppFixtures extends Fixture
     {
         $this->manager = $manager;
 
-        $this->loadCategory();
-        $this->loadFile();
+        //$this->loadCategory();
+        //$this->loadFile();
+        $this->loadPaymentModes();
+        $this->loadOrderStatus();
 
         $manager->flush();
     }
@@ -74,6 +78,32 @@ class AppFixtures extends Fixture
 
                 $this->manager->persist($file);
             }
+        }
+    }
+
+    /**
+     * Load the payment modes
+     */
+    public function loadPaymentModes(): void
+    {
+        $paymentModes = ['Carte bancaire', 'Paypal', 'Carte prépayée'];
+        foreach ($paymentModes as $paymentModeName) {
+            $paymentMode = new PaymentMode();
+            $paymentMode->setName($paymentModeName);
+            $this->manager->persist($paymentMode);
+        }
+    }
+
+    /**
+     * Load the order status
+     */
+    public function loadOrderStatus(): void
+    {
+        $orderStatus = ['Payée', 'En cours', 'Annulée', 'Remboursée'];
+        foreach ($orderStatus  as $orderStatusName) {
+            $orderStatus = new OrderStatus();
+            $orderStatus ->setName($orderStatusName);
+            $this->manager->persist($orderStatus);
         }
     }
 }

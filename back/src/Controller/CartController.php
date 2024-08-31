@@ -41,8 +41,16 @@ class CartController extends AbstractController
             if (!is_array($data)) {
                 return new JsonResponse(['error' => 'Les données sont invalides.'], 400);
             }
-
-            $cart = $this->cartService->createCart($user, $data);
+            // Check if the data (is_validated) of cart is a boolean
+            $isValidated = $this->cartService->validateIsValidated($data['is_validated']);
+            if (!$isValidated) {
+                // Save the cart in the database
+                $cart = $this->cartService->createCart($user, $data);
+            } else {
+                // Create the order in the database
+                $cart = $this->cartService->createCart($user, $data);
+                $order = $this->cartService->createOrder($cart, $user);
+            }
 
             return new JsonResponse([
                 'message' => 'Le panier a bien été sauvegardé.',

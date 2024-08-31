@@ -3,30 +3,37 @@
 namespace App\Service;
 
 use App\Entity\Cart;
+use App\Entity\PaymentMode;
+use App\Entity\QuantityCartStorage;
 use App\Entity\StorageSpace;
 use App\Entity\User;
 use App\Repository\CartRepository;
+use App\Repository\PaymentModeRepository;
 use App\Repository\StorageSpaceRepository;
 use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class CartService
 {
     private CartRepository $cartRepository;
     private StorageSpaceRepository $storageSpaceRepository;
     private ValidateSaveEntityService $validateSaveEntityService;
+    private PaymentModeRepository $paymentModeRepository;
     private LoggerInterface $logger;
 
     public function __construct(
         CartRepository $cartRepository,
         StorageSpaceRepository $storageSpaceRepository,
         ValidateSaveEntityService $validateSaveEntityService,
+        PaymentModeRepository $paymentModeRepository,
         LoggerInterface $logger,
     ) {
         $this->cartRepository = $cartRepository;
         $this->storageSpaceRepository = $storageSpaceRepository;
         $this->validateSaveEntityService = $validateSaveEntityService;
+        $this->paymentModeRepository = $paymentModeRepository;
         $this->logger = $logger;
     }
 
@@ -41,6 +48,8 @@ class CartService
 
         // Get the storage_space (Abonnement de 20Go à 20€)
         $storageSpace = $this->checkStorageSpace($data['storage_space_id']);
+
+        // Create the cart
         $cart = new Cart();
         $cart->setUser($user);
         $isValidated = $this->validateIsValidated($data['is_validated']);
@@ -51,13 +60,17 @@ class CartService
 
         try {
             $this->validateSaveEntityService->validateEntity($cart);
-            $cart->setValidated((bool)$data['is_validated']);
             $this->validateSaveEntityService->saveEntity($cart);
+
+            // Create the quantity cart storage
+            $quantityCartStorage = $this->createQuantityCartStorage($cart, $quantity, $storageSpace);
+            $this->validateSaveEntityService->saveEntity($quantityCartStorage);
+
         } catch (Exception $e) {
             $this->logger->error('Erreur lors de la création du panier : ' . $e->getMessage(), [
                 'exception' => $e,
             ]);
-            throw new \RuntimeException('Une erreur est survenue lors de la création du panier.', 0, $e);
+            throw new RuntimeException('Une erreur est survenue lors de la création du panier.', 0, $e);
         }
 
         return [
@@ -75,6 +88,82 @@ class CartService
                 'lastname' => $user->getLastname(),
             ],
         ];
+    }
+
+    /**
+     * Create the quantity cart storage
+     */
+    private function createQuantityCartStorage(
+        Cart $cart,
+        int $quantity,
+        StorageSpace $storageSpace
+    ): QuantityCartStorage {
+        $quantityCartStorage = new QuantityCartStorage();
+        $quantityCartStorage->setCart($cart);
+        $quantityCartStorage->setQuantity($quantity);
+        $quantityCartStorage->setStorageSpace($storageSpace);
+
+        return $quantityCartStorage;
+    }
+
+    /**
+     * Create an order
+     * cart_id user_id payment_mode_id order_status_id created_at date_delivery
+     */
+    public function createOrder(User $user, Cart $cart)//: array
+    {
+        // Get the payment_mode
+        //$paymentMode = $this->paymentModeRepository->find();
+
+
+       /*
+        $cart = new Cart();
+        $cart->setUser($user);
+        $isValidated = $this->validateIsValidated($data['is_validated']);
+        $cart->setValidated($isValidated);
+        $quantity = $this->validateQuantity($data['quantity']);
+        $totalPrice = $this->calculateTotalPrice($quantity, $storageSpace);
+        $cart->setTotalPrice((string)$totalPrice);
+
+        try {
+            $this->validateSaveEntityService->validateEntity($cart);
+            $cart->setValidated((bool)$data['is_validated']);
+            $this->validateSaveEntityService->saveEntity($cart);
+        } catch (Exception $e) {
+            $this->logger->error('Erreur lors de la création du panier : ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+            throw new RuntimeException('Une erreur est survenue lors de la création du panier.', 0, $e);
+        }
+
+        return [
+            'quantity' => $quantity,
+            'total_price' => $cart->getTotalPrice(),
+            'is_validated' => $cart->isValidated(),
+            'storage_space' => [
+                'id' => $storageSpace->getId(),
+                'name' => $storageSpace->getName(),
+                'price' => $storageSpace->getPrice(),
+            ],
+            'user' => [
+                'id' => $user->getId(),
+                'firstname' => $user->getFirstname(),
+                'lastname' => $user->getLastname(),
+            ],
+        ];
+        */
+    }
+
+    /**
+     * Check if the value is a boolean
+     */
+    public function validateIsValidated($value): bool
+    {
+        if (!is_bool($value)) {
+            throw new InvalidArgumentException('La valeur doit être un booléen.');
+        }
+
+        return $value;
     }
 
     /**
@@ -107,18 +196,6 @@ class CartService
         }
 
         return $storageSpace;
-    }
-
-    /**
-     * Check if the value is a boolean
-     */
-    private function validateIsValidated($value): bool
-    {
-        if (!is_bool($value)) {
-            throw new InvalidArgumentException('La valeur doit être un booléen.');
-        }
-
-        return $value;
     }
 
     /**
