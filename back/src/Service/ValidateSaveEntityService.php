@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
+use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -22,6 +23,23 @@ class ValidateSaveEntityService
         $this->entityManagerInterface = $entityManagerInterface;
         $this->passwordHasher = $passwordHasher;
         $this->validator = $validator;
+    }
+
+    /**
+     * Validate or return error message
+     */
+    public function validateEntity(object $entity): void
+    {
+        $violations = $this->validator->validate($entity);
+
+        if (count($violations) > 0) {
+            $errorMessages = [];
+            foreach ($violations as $violation) {
+                $errorMessages[] = $violation->getMessage();
+            }
+
+            throw new InvalidArgumentException(json_encode($errorMessages));
+        }
     }
 
     /**

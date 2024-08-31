@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Service\CartService;
 use Exception;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CartController extends AbstractController
 {
@@ -36,15 +38,25 @@ class CartController extends AbstractController
 
         try {
             $data = json_decode($request->getContent(), true);
-
             if (!is_array($data)) {
                 return new JsonResponse(['error' => 'Les données sont invalides.'], 400);
             }
 
-            $cartData = $this->cartService->createCart($user, $data);
+            $cart = $this->cartService->createCart($user, $data);
 
-            return new JsonResponse($cartData, 200);
+            return new JsonResponse([
+                'message' => 'Le panier a bien été sauvegardé.',
+                'cart' => $cart
+            ], 200);
 
+        } catch (InvalidArgumentException $e) {
+            // Error messages
+            $errorMessage = json_decode($e->getMessage(), true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return new JsonResponse(['errors' => $errorMessage], 400);
+            } else {
+                return new JsonResponse(['error' => $e->getMessage()], 400);
+            }
         } catch (Exception $e) {
             return new JsonResponse(['error' => 'Une erreur est survenue lors de la création du panier.'], 500);
         }

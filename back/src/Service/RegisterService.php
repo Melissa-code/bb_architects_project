@@ -114,7 +114,7 @@ class RegisterService
         try {
             $this->saveEntity($storageSpace);
         } catch (InvalidArgumentException $e) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'La validation de l\'abonnement a échoué: ' . $e->getMessage()
             );
         }

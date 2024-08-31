@@ -82,3 +82,8 @@ api_file_search:
     path: /api/client/search_file
     controller: App\Controller\ClientController::searchFile
     methods: [GET]
+
+app_cart_create:
+    path: /api/cart/create
+    controller: App\Controller\CartController::createCart
+    methods: [POST]
