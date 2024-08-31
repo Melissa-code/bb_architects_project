@@ -3,13 +3,16 @@
 namespace App\Service;
 
 use App\Entity\Cart;
-use App\Entity\PaymentMode;
+use App\Entity\Order;
 use App\Entity\QuantityCartStorage;
 use App\Entity\StorageSpace;
 use App\Entity\User;
 use App\Repository\CartRepository;
+use App\Repository\OrderStatusRepository;
 use App\Repository\PaymentModeRepository;
 use App\Repository\StorageSpaceRepository;
+use DateTime;
+use DateTimeImmutable;
 use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -19,6 +22,7 @@ class CartService
 {
     private CartRepository $cartRepository;
     private StorageSpaceRepository $storageSpaceRepository;
+    private OrderStatusRepository $orderStatusRepository;
     private ValidateSaveEntityService $validateSaveEntityService;
     private PaymentModeRepository $paymentModeRepository;
     private LoggerInterface $logger;
@@ -26,12 +30,14 @@ class CartService
     public function __construct(
         CartRepository $cartRepository,
         StorageSpaceRepository $storageSpaceRepository,
+        OrderStatusRepository $orderStatusRepository,
         ValidateSaveEntityService $validateSaveEntityService,
         PaymentModeRepository $paymentModeRepository,
         LoggerInterface $logger,
     ) {
         $this->cartRepository = $cartRepository;
         $this->storageSpaceRepository = $storageSpaceRepository;
+        $this->orderStatusRepository = $orderStatusRepository;
         $this->validateSaveEntityService = $validateSaveEntityService;
         $this->paymentModeRepository = $paymentModeRepository;
         $this->logger = $logger;
@@ -110,48 +116,44 @@ class CartService
      * Create an order
      * cart_id user_id payment_mode_id order_status_id created_at date_delivery
      */
-    public function createOrder(User $user, Cart $cart)//: array
+    public function createOrder(User $user, Cart $cart): array
     {
-        // Get the payment_mode
-        //$paymentMode = $this->paymentModeRepository->find();
+        //Future feature: Choose a payment mode & edit the order status
+        $creditCard = $this->paymentModeRepository->find(1);
+        $paid = $this->orderStatusRepository->find(1);
+        $totalPrice = $cart->getTotalPrice();
 
-
-       /*
-        $cart = new Cart();
-        $cart->setUser($user);
-        $isValidated = $this->validateIsValidated($data['is_validated']);
-        $cart->setValidated($isValidated);
-        $quantity = $this->validateQuantity($data['quantity']);
-        $totalPrice = $this->calculateTotalPrice($quantity, $storageSpace);
-        $cart->setTotalPrice((string)$totalPrice);
+        $order = new Order();
+        $order->setCart($cart);
+        $order->setUser($user);
+        $order->setPaymentMode($creditCard);
+        $order->setOrderStatus($paid);
+        $order->setCreatedAt(new DateTimeImmutable());
+        $order->setDateDelivery(new DateTime());
 
         try {
-            $this->validateSaveEntityService->validateEntity($cart);
-            $cart->setValidated((bool)$data['is_validated']);
-            $this->validateSaveEntityService->saveEntity($cart);
+            //this->validateSaveEntityService->validateEntity($cart);
+            $this->validateSaveEntityService->saveEntity($order);
         } catch (Exception $e) {
-            $this->logger->error('Erreur lors de la création du panier : ' . $e->getMessage(), [
+            $this->logger->error('Erreur lors de la création de la commande : ' . $e->getMessage(), [
                 'exception' => $e,
             ]);
-            throw new RuntimeException('Une erreur est survenue lors de la création du panier.', 0, $e);
+            throw new RuntimeException('Une erreur est survenue lors de la création de la commande.', 0, $e);
         }
 
         return [
-            'quantity' => $quantity,
-            'total_price' => $cart->getTotalPrice(),
-            'is_validated' => $cart->isValidated(),
-            'storage_space' => [
-                'id' => $storageSpace->getId(),
-                'name' => $storageSpace->getName(),
-                'price' => $storageSpace->getPrice(),
-            ],
+            'order_id' => $order->getId(),
+            'payment_mode' => $order->getPaymentMode(),
+            'order_status' => $order->getOrderStatus(),
+            'created_at' => $order->getCreatedAt()->format('d-m-Y H:i:s'),
+            'date_delivery' => $order->getDateDelivery()->format('d-m-Y'),
+            'total_price' => $totalPrice,
             'user' => [
                 'id' => $user->getId(),
                 'firstname' => $user->getFirstname(),
                 'lastname' => $user->getLastname(),
             ],
         ];
-        */
     }
 
     /**
