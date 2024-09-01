@@ -7,6 +7,7 @@ use App\Entity\File;
 use App\Entity\User;
 use App\Repository\CategoryRepository;
 use App\Repository\FileRepository;
+use App\Repository\UserStoragePurchaseRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
@@ -24,6 +25,7 @@ class FileService
 {
     private string $baseUrl;
     private FileRepository $fileRepository;
+    private UserStoragePurchaseRepository $userStoragePurchaseRepository;
     private CategoryRepository $categoryRepository;
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
@@ -34,6 +36,7 @@ class FileService
         ParameterBagInterface $params,
         FileRepository $fileRepository,
         CategoryRepository $categoryRepository,
+        UserStoragePurchaseRepository $userStoragePurchaseRepository,
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger,
@@ -42,6 +45,7 @@ class FileService
         $this->baseUrl = $params->get('BASE_URL');
         $this->fileRepository = $fileRepository;
         $this->categoryRepository = $categoryRepository;
+        $this->userStoragePurchaseRepository = $userStoragePurchaseRepository;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
         $this->slugger = $slugger;
@@ -83,8 +87,8 @@ class FileService
 
             return [
                 'message' => 'Fichiers récupérés avec succès.',
-                'total_weight_files' => $storageSpace[0], // sum weight of the files
-                'total_storage_capacity' => $storageSpace[1], // sum storage_space bought by the user
+                'total_weight_files' => $storageSpace[0], // sum of weight of the files
+                'total_storage_capacity' => $storageSpace[1], // sum of storage_space bought by the user
                 'available_storage_space' => $storageSpace[2], // difference between storage_space & weight
                 'files' => $fileData,
             ];
@@ -306,11 +310,7 @@ class FileService
         $totalWeightInGo = $totalWeightInMo / 1024;
 
         // Sum of the storage_space capacities bought by the user
-        $storageSpaces = $user->getStorageSpaces();
-        $totalStorageCapacity = 0;
-        foreach ($storageSpaces as $storageSpace) {
-            $totalStorageCapacity += $storageSpace->getStorageCapacity();
-        }
+        $totalStorageCapacity = $this->userStoragePurchaseRepository->getTotalStorageCapacityForUser($user->getId());
 
         // Difference between total storageSpace and total weight of files
         $availableStorageSpace = $totalStorageCapacity - $totalWeightInGo;

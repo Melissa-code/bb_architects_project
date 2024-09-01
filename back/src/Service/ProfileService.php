@@ -11,10 +11,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class ProfileService
 {
     private UserStoragePurchaseRepository $userStoragePurchaseRepository;
+    private FileService $fileService;
 
-    public function __construct(UserStoragePurchaseRepository $userStoragePurchaseRepository)
+    public function __construct(UserStoragePurchaseRepository $userStoragePurchaseRepository, FileService $fileService)
     {
         $this->userStoragePurchaseRepository = $userStoragePurchaseRepository;
+        $this->fileService = $fileService;
     }
 
     public function getProfileData(UserInterface $user, LoggerInterface $logger): array
@@ -27,10 +29,9 @@ class ProfileService
             $address = $user->getAddress();
             $files = $user->getFiles();
             $filesNumber = count($files);
-            $userId = $user->getId();
 
-            // Calculate the storage space of the user
-            $totalStorageCapacity = $this->userStoragePurchaseRepository->getTotalStorageCapacityForUser($userId);
+            // Calculate the available storage space
+            $storageSpace = $this->fileService->calculateAvailableStorageSpace($user);
 
             return [
                 'message' => 'Bonjour ' . $user->getFirstname() . ', ravi de vous retrouver !',
@@ -48,7 +49,9 @@ class ProfileService
                         'country' => $address ? $address->getCountry() : null,
                     ],
                     'filesNumber' => $filesNumber,
-                    'total_storage_capacity' => $totalStorageCapacity,
+                    'total_weight_files' => $storageSpace[0], // sum of weight of the files
+                    'total_storage_capacity' => $storageSpace[1], // sum of storage_space bought by the user
+                    'available_storage_space' => $storageSpace[2], // available storage space
                 ],
             ];
 
