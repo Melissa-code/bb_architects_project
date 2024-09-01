@@ -27,29 +27,29 @@ class FileService
     private FileRepository $fileRepository;
     private UserStoragePurchaseRepository $userStoragePurchaseRepository;
     private CategoryRepository $categoryRepository;
+    private ValidateSaveEntityService $validateSaveEntityService;
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
     private SluggerInterface $slugger;
-    private ValidatorInterface $validator;
 
     public function __construct(
         ParameterBagInterface $params,
         FileRepository $fileRepository,
         CategoryRepository $categoryRepository,
         UserStoragePurchaseRepository $userStoragePurchaseRepository,
+        ValidateSaveEntityService $validateSaveEntityService,
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger,
-        ValidatorInterface $validator,
     ){
         $this->baseUrl = $params->get('BASE_URL');
         $this->fileRepository = $fileRepository;
         $this->categoryRepository = $categoryRepository;
         $this->userStoragePurchaseRepository = $userStoragePurchaseRepository;
+        $this->validateSaveEntityService = $validateSaveEntityService;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
         $this->slugger = $slugger;
-        $this->validator = $validator;
         $this->logger->error($this->baseUrl);
     }
 
@@ -196,8 +196,8 @@ class FileService
         }
 
         try {
-            $this->validateEntity($file);
-            $this->saveEntity($file);
+            $this->validateSaveEntityService->validateEntity($file);
+            $this->validateSaveEntityService->saveEntity($file);
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
                 'L\'ajout ou la modification du fichier a échoué: ' . $e->getMessage()
@@ -372,40 +372,5 @@ class FileService
         }
 
         return $fileFormat;
-    }
-
-    /**
-     * Validate or return error message
-     *
-     * @param object $entity
-     * @throws InvalidArgumentException if the error of validation exist
-     */
-    private function validateEntity(object $entity): void
-    {
-        $violations = $this->validator->validate($entity);
-
-        if (count($violations) > 0) {
-            $errorMessages = [];
-            foreach ($violations as $violation) {
-                $errorMessages[] = $violation->getMessage();
-            }
-            throw new InvalidArgumentException(json_encode(['errors' => $errorMessages]));
-        }
-    }
-
-    /**
-     * Save the entity in the database (file)
-     *
-     * @param Object $entity
-     */
-    private function saveEntity(Object $entity): void
-    {
-        try {
-            $this->entityManager->persist($entity);
-            $this->entityManager->flush();
-        } catch (ORMException $e) {
-            throw new RuntimeException(
-                '[Inscription]: Erreur lors de la persistance de l\'entité:' . $entity, 0, $e);
-        }
     }
 }

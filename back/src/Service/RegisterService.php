@@ -20,20 +20,20 @@ class RegisterService
     private EntityManagerInterface $entityManagerInterface;
     private CartService $cartService;
     private UserPasswordHasherInterface $passwordHasher;
-    private ValidatorInterface $validator;
+    private ValidateSaveEntityService $validateSaveEntityService;
 
     const NAME_STORAGE_SPACE = "Abonnement de 20 Go à 20 €";
 
     public function __construct(
         EntityManagerInterface $entityManagerInterface,
         CartService $cartService,
+        ValidateSaveEntityService $validateSaveEntityService,
         UserPasswordHasherInterface $passwordHasher,
-        ValidatorInterface $validator
     ) {
         $this->entityManagerInterface = $entityManagerInterface;
         $this->cartService = $cartService;
+        $this->validateSaveEntityService = $validateSaveEntityService;
         $this->passwordHasher = $passwordHasher;
-        $this->validator = $validator;
     }
 
     /**
@@ -55,8 +55,8 @@ class RegisterService
         $address->setCountry($data['country']);
 
         try {
-            $this->validateEntity($address);
-            $this->saveEntity($address);
+            $this->validateSaveEntityService->validateEntity($address);
+            $this->validateSaveEntityService->saveEntity($address);
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
                 'La validation de l\'adresse a échoué: ' . $e->getMessage()
@@ -87,8 +87,8 @@ class RegisterService
         $user->setAddress($address);
 
         try {
-            $this->validateEntity($user);
-            $this->saveEntity($user);
+            $this->validateSaveEntityService->validateEntity($user);
+            $this->validateSaveEntityService->saveEntity($user);
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
                 'La validation de l\'utilisateur a échoué: ' . $e->getMessage()
@@ -115,7 +115,7 @@ class RegisterService
         $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
 
         try {
-            $this->saveEntity($storageSpace);
+            $this->validateSaveEntityService->saveEntity($storageSpace);
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
                 'La validation de l\'abonnement a échoué: ' . $e->getMessage()
@@ -172,43 +172,6 @@ class RegisterService
                     'Le numéro de téléphone doit contenir 10 chiffres.'
                 );
             }
-        }
-    }
-
-    /**
-     * Validate or return error message
-     *
-     * @param object $entity
-     * @throws InvalidArgumentException if the error of validation exist
-     */
-    private function validateEntity(object $entity): void
-    {
-        $violations = $this->validator->validate($entity);
-
-        if (count($violations) > 0) {
-            $errorMessages = [];
-            foreach ($violations as $violation) {
-                $errorMessages[] = $violation->getMessage();
-            }
-            throw new InvalidArgumentException(json_encode(['errors' => $errorMessages]));
-        }
-    }
-
-    /**
-     * Save the entity in the database (address / user)
-     *
-     * @param Object $entity
-     */
-    private function saveEntity(Object $entity): void
-    {
-        try {
-            $this->entityManagerInterface->persist($entity);
-            $this->entityManagerInterface->flush();
-        } catch (ORMException $e) {
-            throw new RuntimeException(
-                '[Inscription]: Erreur lors de la persistance de l\'entité:' . $entity,
-                0, $e
-            );
         }
     }
 }
