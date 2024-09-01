@@ -44,7 +44,7 @@ class CartController extends AbstractController
             if (!is_array($data)) {
                 return new JsonResponse(['error' => 'Les données sont invalides.'], 400);
             }
-            // Check if the data (is_validated) of cart is a boolean
+            // Check if the data is_validated of cart is a boolean
             $isValidated = $this->cartService->validateIsValidated($data['is_validated']);
             $userId = $user->getId();
             $cart = $this->cartRepository->findOneBy(['user' => $userId]) ?: null;
@@ -64,6 +64,8 @@ class CartController extends AbstractController
                 $this->logger->error('2e condition: seulement creation commande');
                 $cart = $this->cartRepository->findOneBy(['user' => $userId]);
                 $order = $this->cartService->createOrder($user, $cart);
+                // Create a storage_space to the user
+                $this->cartService->createStorageSpacePurchaseForUser($user, $data);
 
                 return new JsonResponse([
                     'message' => 'Le panier a bien été validé et la commande effectuée.',
@@ -76,6 +78,8 @@ class CartController extends AbstractController
                 $this->cartService->createCart($user, $data);
                 $cart = $this->cartRepository->findOneBy(['user' => $userId]);
                 $order = $this->cartService->createOrder($user, $cart);
+                // Create a storage_space to the user
+                $this->cartService->createStorageSpacePurchaseForUser($user, $data);
 
                 return new JsonResponse([
                     'message' => 'La commande a bien été effectuée.',

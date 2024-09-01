@@ -37,10 +37,17 @@ class StorageSpace
     #[ORM\OneToMany(targetEntity: QuantityCartStorage::class, mappedBy: 'storageSpace')]
     private Collection $quantityCartStorages;
 
+    /**
+     * @var Collection<int, UserStoragePurchase>
+     */
+    #[ORM\OneToMany(targetEntity: UserStoragePurchase::class, mappedBy: 'storageSpace')]
+    private Collection $userStoragePurchases;
+
     public function __construct()
     {
         $this->user = new ArrayCollection();
         $this->quantityCartStorages = new ArrayCollection();
+        $this->userStoragePurchases = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -132,6 +139,36 @@ class StorageSpace
             // set the owning side to null (unless already changed)
             if ($quantityCartStorage->getStorageSpace() === $this) {
                 $quantityCartStorage->setStorageSpace(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserStoragePurchase>
+     */
+    public function getUserStoragePurchases(): Collection
+    {
+        return $this->userStoragePurchases;
+    }
+
+    public function addUserStoragePurchase(UserStoragePurchase $userStoragePurchase): static
+    {
+        if (!$this->userStoragePurchases->contains($userStoragePurchase)) {
+            $this->userStoragePurchases->add($userStoragePurchase);
+            $userStoragePurchase->setStorageSpace($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserStoragePurchase(UserStoragePurchase $userStoragePurchase): static
+    {
+        if ($this->userStoragePurchases->removeElement($userStoragePurchase)) {
+            // set the owning side to null (unless already changed)
+            if ($userStoragePurchase->getStorageSpace() === $this) {
+                $userStoragePurchase->setStorageSpace(null);
             }
         }
 

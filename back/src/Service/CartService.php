@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Cart;
 use App\Entity\Order;
+use App\Entity\UserStoragePurchase;
 use App\Entity\QuantityCartStorage;
 use App\Entity\StorageSpace;
 use App\Entity\User;
@@ -132,7 +133,6 @@ class CartService
         $order->setDateDelivery(new DateTime());
 
         try {
-            //this->validateSaveEntityService->validateEntity($cart);
             $this->validateSaveEntityService->saveEntity($order);
         } catch (Exception $e) {
             $this->logger->error('Erreur lors de la création de la commande : ' . $e->getMessage(), [
@@ -157,6 +157,31 @@ class CartService
                 'id' => $cart->getId(),
             ],
         ];
+    }
+
+    /**
+     * Create a storage space to the user
+     * table storage_space_user
+     */
+    public function createStorageSpacePurchaseForUser(User $user, array $data): void
+    {
+        try {
+            // Get the storage_space (Abonnement de 20Go à 20€)
+            $storageSpace = $this->checkStorageSpace($data['storage_space_id']);
+
+            $purchase = new UserStoragePurchase();
+            $purchase->setStorageSpace($storageSpace);
+            $purchase->setUser($user);
+            $purchase->setPurchaseDate(new DateTime());
+            $this->validateSaveEntityService->saveEntity($purchase);
+
+        } catch (InvalidArgumentException $e) {
+            throw new Exception(
+                "Erreur lors de l'ajout de l'utilisateur à l'espace de stockage : " . $e->getMessage()
+            );
+        } catch (Exception $e) {
+            throw new Exception("Une erreur inattendue s'est produite : " . $e->getMessage());
+        }
     }
 
     /**

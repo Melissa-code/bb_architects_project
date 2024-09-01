@@ -121,12 +121,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Invoice::class, mappedBy: 'user')]
     private Collection $invoices;
 
+    /**
+     * @var Collection<int, UserStoragePurchase>
+     */
+    #[ORM\OneToMany(targetEntity: UserStoragePurchase::class, mappedBy: 'user')]
+    private Collection $userStoragePurchases;
+
     public function __construct()
     {
         $this->files = new ArrayCollection();
         $this->storageSpaces = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->invoices = new ArrayCollection();
+        $this->userStoragePurchases = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -392,6 +399,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($invoice->getUser() === $this) {
                 $invoice->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserStoragePurchase>
+     */
+    public function getUserStoragePurchases(): Collection
+    {
+        return $this->userStoragePurchases;
+    }
+
+    public function addUserStoragePurchase(UserStoragePurchase $userStoragePurchase): static
+    {
+        if (!$this->userStoragePurchases->contains($userStoragePurchase)) {
+            $this->userStoragePurchases->add($userStoragePurchase);
+            $userStoragePurchase->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserStoragePurchase(UserStoragePurchase $userStoragePurchase): static
+    {
+        if ($this->userStoragePurchases->removeElement($userStoragePurchase)) {
+            // set the owning side to null (unless already changed)
+            if ($userStoragePurchase->getUser() === $this) {
+                $userStoragePurchase->setUser(null);
             }
         }
 
