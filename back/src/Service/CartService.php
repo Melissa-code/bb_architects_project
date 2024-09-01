@@ -143,8 +143,8 @@ class CartService
 
         return [
             'order_id' => $order->getId(),
-            'payment_mode' => $order->getPaymentMode(),
-            'order_status' => $order->getOrderStatus(),
+            'payment_mode' => $order->getPaymentMode()->getName(),
+            'order_status' => $order->getOrderStatus()->getName(),
             'created_at' => $order->getCreatedAt()->format('d-m-Y H:i:s'),
             'date_delivery' => $order->getDateDelivery()->format('d-m-Y'),
             'total_price' => $totalPrice,
@@ -152,6 +152,9 @@ class CartService
                 'id' => $user->getId(),
                 'firstname' => $user->getFirstname(),
                 'lastname' => $user->getLastname(),
+            ],
+            'cart' => [
+                'id' => $cart->getId(),
             ],
         ];
     }

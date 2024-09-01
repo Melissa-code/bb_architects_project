@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Cart;
 use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Service\CartService;
@@ -50,9 +49,9 @@ class CartController extends AbstractController
             $userId = $user->getId();
             $cart = $this->cartRepository->findOneBy(['user' => $userId]) ?: null;
 
+            // Save the cart in the database
             if (!$isValidated) {
                 $this->logger->error('1re condition: seulement creation panier');
-                // Save the cart in the database
                 $cart = $this->cartService->createCart($user, $data);
 
                 return new JsonResponse([
@@ -60,43 +59,31 @@ class CartController extends AbstractController
                     'cart' => $cart
                 ], 200);
             }
-            /*else {
-                // Create the order in the database
-                $cart = $this->cartRepository->findOneBy(['user' => $userId]);
-                $order = $this->cartService->createOrder($user, $cart);
-
-                return new JsonResponse([
-                    'message' => 'La commande a bien été sauvegardée.',
-                    'order' =>  $order
-                ], 200);
-            }
-            */
+            // Create the order in the database
             if ($isValidated && $cart !== null) {
                 $this->logger->error('2e condition: seulement creation commande');
-                // Create the order in the database
                 $cart = $this->cartRepository->findOneBy(['user' => $userId]);
                 $order = $this->cartService->createOrder($user, $cart);
 
                 return new JsonResponse([
-                    'message' => 'La commande a bien été sauvegardée.',
+                    'message' => 'Le panier a bien été validé et la commande effectuée.',
                     'order' =>  $order
                 ], 200);
             }
-
+            // Save the cart & create the order in the database
             if ($isValidated && $cart === null) {
                 $this->logger->error('3e condition: creation panier et commande');
-                // Create the cart & order in the database
-                $cart = $this->cartService->createCart($user, $data);
+                $this->cartService->createCart($user, $data);
                 $cart = $this->cartRepository->findOneBy(['user' => $userId]);
-
                 $order = $this->cartService->createOrder($user, $cart);
 
                 return new JsonResponse([
-                    'message' => 'Le panier et la commande ont bien été sauvegardés.',
-                    'cart' => $cart,
+                    'message' => 'La commande a bien été effectuée.',
                     'order' =>  $order
                 ], 200);
             }
+
+            return new JsonResponse(['error' => 'Une condition inattendue a été rencontrée.'], 400);
 
         } catch (InvalidArgumentException $e) {
             // Error messages
@@ -107,7 +94,9 @@ class CartController extends AbstractController
                 return new JsonResponse(['error' => $e->getMessage()], 400);
             }
         } catch (Exception $e) {
-            return new JsonResponse(['error' => 'Une erreur est survenue lors de la création du panier.'], 500);
+            return new JsonResponse(
+                ['error' => 'Une erreur est survenue lors de la création ou la validation du panier.'], 500
+            );
         }
     }
 }
