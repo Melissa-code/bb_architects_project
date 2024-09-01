@@ -5,9 +5,11 @@ namespace App\Service;
 use App\Entity\Address;
 use App\Entity\StorageSpace;
 use App\Entity\User;
+use App\Entity\UserStoragePurchase;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
+use Exception;
 use RuntimeException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -16,6 +18,7 @@ use InvalidArgumentException;
 class RegisterService
 {
     private EntityManagerInterface $entityManagerInterface;
+    private CartService $cartService;
     private UserPasswordHasherInterface $passwordHasher;
     private ValidatorInterface $validator;
 
@@ -23,10 +26,12 @@ class RegisterService
 
     public function __construct(
         EntityManagerInterface $entityManagerInterface,
+        CartService $cartService,
         UserPasswordHasherInterface $passwordHasher,
         ValidatorInterface $validator
     ) {
         $this->entityManagerInterface = $entityManagerInterface;
+        $this->cartService = $cartService;
         $this->passwordHasher = $passwordHasher;
         $this->validator = $validator;
     }
@@ -95,9 +100,6 @@ class RegisterService
 
     /**
      * Create a new storage space (linked to a user)
-     *
-     * @param User $user
-     * @return StorageSpace
      */
     public function linkStorageSpaceToUser(User $user): StorageSpace
     {
@@ -110,6 +112,7 @@ class RegisterService
 
         // Link the storage space to the user
         $storageSpace->addUser($user);
+        $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
 
         try {
             $this->saveEntity($storageSpace);

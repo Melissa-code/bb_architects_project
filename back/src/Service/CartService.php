@@ -163,11 +163,12 @@ class CartService
      * Create a storage space to the user
      * table storage_space_user
      */
-    public function createStorageSpacePurchaseForUser(User $user, array $data): void
+    //public function createStorageSpacePurchaseForUser(User $user, array $data): void
+    public function createStorageSpacePurchaseForUser(User $user, StorageSpace $storageSpace): void
     {
         try {
             // Get the storage_space (Abonnement de 20Go à 20€)
-            $storageSpace = $this->checkStorageSpace($data['storage_space_id']);
+            //$storageSpace = $this->checkStorageSpace($data['storage_space_id']);
 
             $purchase = new UserStoragePurchase();
             $purchase->setStorageSpace($storageSpace);
@@ -197,6 +198,21 @@ class CartService
     }
 
     /**
+     * Check if the storage space exists in the database
+     */
+    public function checkStorageSpace($storageSpaceId): StorageSpace
+    {
+        $storageSpaceId = (int)$storageSpaceId;
+        $storageSpace = $this->storageSpaceRepository->find($storageSpaceId);
+
+        if (!$storageSpace) {
+            throw new InvalidArgumentException('Espace de stockage non trouvé.');
+        }
+
+        return $storageSpace;
+    }
+
+    /**
      * Check if the user has a cart saved in the database
      * A user must have one cart saved only
      */
@@ -211,21 +227,6 @@ class CartService
             ]);
             throw new InvalidArgumentException('Cet utilisateur a déjà un panier.');
         }
-    }
-
-    /**
-     * Check if the storage space exists in the database
-     */
-    private function checkStorageSpace($storageSpaceId): StorageSpace
-    {
-        $storageSpaceId = (int)$storageSpaceId;
-        $storageSpace = $this->storageSpaceRepository->find($storageSpaceId);
-
-        if (!$storageSpace) {
-            throw new InvalidArgumentException('Espace de stockage non trouvé.');
-        }
-
-        return $storageSpace;
     }
 
     /**

@@ -48,6 +48,7 @@ class CartController extends AbstractController
             $isValidated = $this->cartService->validateIsValidated($data['is_validated']);
             $userId = $user->getId();
             $cart = $this->cartRepository->findOneBy(['user' => $userId]) ?: null;
+            $storageSpace = $this->cartService->checkStorageSpace($data['storage_space_id']);
 
             // Save the cart in the database
             if (!$isValidated) {
@@ -65,7 +66,7 @@ class CartController extends AbstractController
                 $cart = $this->cartRepository->findOneBy(['user' => $userId]);
                 $order = $this->cartService->createOrder($user, $cart);
                 // Create a storage_space to the user
-                $this->cartService->createStorageSpacePurchaseForUser($user, $data);
+                $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
 
                 return new JsonResponse([
                     'message' => 'Le panier a bien été validé et la commande effectuée.',
@@ -79,7 +80,7 @@ class CartController extends AbstractController
                 $cart = $this->cartRepository->findOneBy(['user' => $userId]);
                 $order = $this->cartService->createOrder($user, $cart);
                 // Create a storage_space to the user
-                $this->cartService->createStorageSpacePurchaseForUser($user, $data);
+                $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
 
                 return new JsonResponse([
                     'message' => 'La commande a bien été effectuée.',
