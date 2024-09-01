@@ -1,0 +1,25 @@
+{
+    "message": "Catégories récupérées avec succès.",
+    "categories": [
+        {
+            "categoryId": 1,
+            "name": "Plan"
+        },
+        {
+            "categoryId": 2,
+            "name": "Dessin technique"
+        },
+        {
+            "categoryId": 3,
+            "name": "Document légal"
+        },
+        {
+            "categoryId": 4,
+            "name": "Etude technique"
+        },
+        {
+            "categoryId": 5,
+            "name": "Document financier"
+        }
+    ]
+}
