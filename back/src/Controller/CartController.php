@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Service\CartService;
+use App\Service\InvoiceService;
 use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -14,18 +15,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CartController extends AbstractController
 {
     private CartService $cartService;
     private CartRepository $cartRepository;
+    private InvoiceService $invoiceService;
     private LoggerInterface $logger;
 
-    public function __construct(CartService $cartService, CartRepository $cartRepository, LoggerInterface $logger)
+    public function __construct(
+        CartService $cartService,
+        CartRepository $cartRepository,
+        InvoiceService $invoiceService,
+        LoggerInterface $logger
+    )
     {
         $this->cartService = $cartService;
         $this->cartRepository = $cartRepository;
+        $this->invoiceService = $invoiceService;
         $this->logger = $logger;
     }
 
@@ -67,6 +74,8 @@ class CartController extends AbstractController
                 $order = $this->cartService->createOrder($user, $cart);
                 // Create a storage_space to the user
                 $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
+                // Create an invoice
+                $this->invoiceService->createInvoice();
 
                 return new JsonResponse([
                     'message' => 'Le panier a bien été validé et la commande effectuée.',
@@ -81,6 +90,9 @@ class CartController extends AbstractController
                 $order = $this->cartService->createOrder($user, $cart);
                 // Create a storage_space to the user
                 $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
+
+                // Create an invoice
+                $this->invoiceService->createInvoice($user, $order);
 
                 return new JsonResponse([
                     'message' => 'La commande a bien été effectuée.',

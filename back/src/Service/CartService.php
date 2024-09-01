@@ -143,6 +143,7 @@ class CartService
 
         try {
             $this->validateSaveEntityService->saveEntity($order);
+
         } catch (Exception $e) {
             $this->logger->error('Erreur lors de la création de la commande : ' . $e->getMessage(), [
                 'exception' => $e,
@@ -176,9 +177,6 @@ class CartService
     public function createStorageSpacePurchaseForUser(User $user, StorageSpace $storageSpace): void
     {
         try {
-            // Get the storage_space (Abonnement de 20Go à 20€)
-            //$storageSpace = $this->checkStorageSpace($data['storage_space_id']);
-
             $purchase = new UserStoragePurchase();
             $purchase->setStorageSpace($storageSpace);
             $purchase->setUser($user);
