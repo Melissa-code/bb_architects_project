@@ -99,18 +99,26 @@ class CartService
 
     /**
      * Create the quantity cart storage
+     * @throws Exception
      */
     private function createQuantityCartStorage(
         Cart $cart,
         int $quantity,
         StorageSpace $storageSpace
     ): QuantityCartStorage {
-        $quantityCartStorage = new QuantityCartStorage();
-        $quantityCartStorage->setCart($cart);
-        $quantityCartStorage->setQuantity($quantity);
-        $quantityCartStorage->setStorageSpace($storageSpace);
+        try {
+            $quantityCartStorage = new QuantityCartStorage();
+            $quantityCartStorage->setCart($cart);
+            $quantityCartStorage->setQuantity($quantity);
+            $quantityCartStorage->setStorageSpace($storageSpace);
 
-        return $quantityCartStorage;
+            return $quantityCartStorage;
+
+        } catch (InvalidArgumentException $e) {
+            throw new Exception("Erreur de création de QuantityCartStorage : " . $e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception("Une erreur inattendue s'est produite : " . $e->getMessage());
+        }
     }
 
     /**
@@ -123,6 +131,7 @@ class CartService
         $creditCard = $this->paymentModeRepository->find(1);
         $paid = $this->orderStatusRepository->find(1);
         $totalPrice = $cart->getTotalPrice();
+        $cart->setValidated(true);
 
         $order = new Order();
         $order->setCart($cart);

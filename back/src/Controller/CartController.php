@@ -58,7 +58,7 @@ class CartController extends AbstractController
                 return new JsonResponse([
                     'message' => 'Le panier a bien été sauvegardé.',
                     'cart' => $cart
-                ], 200);
+                ], 201);
             }
             // Create the order in the database
             if ($isValidated && $cart !== null) {
@@ -71,7 +71,7 @@ class CartController extends AbstractController
                 return new JsonResponse([
                     'message' => 'Le panier a bien été validé et la commande effectuée.',
                     'order' =>  $order
-                ], 200);
+                ], 201);
             }
             // Save the cart & create the order in the database
             if ($isValidated && $cart === null) {
@@ -85,7 +85,7 @@ class CartController extends AbstractController
                 return new JsonResponse([
                     'message' => 'La commande a bien été effectuée.',
                     'order' =>  $order
-                ], 200);
+                ], 201);
             }
 
             return new JsonResponse(['error' => 'Une condition inattendue a été rencontrée.'], 400);

@@ -16,6 +16,20 @@ class UserStoragePurchaseRepository extends ServiceEntityRepository
         parent::__construct($registry, UserStoragePurchase::class);
     }
 
+    /**
+     * Add the storage spaces of the user
+     */
+    public function getTotalStorageCapacityForUser(int $userId): int
+    {
+        $qb = $this->createQueryBuilder('usp')
+            ->select('SUM(ss.storageCapacity)')
+            ->join('usp.storageSpace', 'ss')
+            ->where('usp.user = :userId')
+            ->setParameter('userId', $userId);
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
     //    /**
     //     * @return UserStoragePurchase[] Returns an array of UserStoragePurchase objects
     //     */

@@ -2,6 +2,7 @@
 
 namespace App\Service;
 use App\Entity\User;
+use App\Repository\UserStoragePurchaseRepository;
 use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -9,6 +10,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class ProfileService
 {
+    private UserStoragePurchaseRepository $userStoragePurchaseRepository;
+
+    public function __construct(UserStoragePurchaseRepository $userStoragePurchaseRepository)
+    {
+        $this->userStoragePurchaseRepository = $userStoragePurchaseRepository;
+    }
+
     public function getProfileData(UserInterface $user, LoggerInterface $logger): array
     {
         if (!$user instanceof User) {
@@ -19,12 +27,10 @@ class ProfileService
             $address = $user->getAddress();
             $files = $user->getFiles();
             $filesNumber = count($files);
-            $storageSpaces = $user->getStorageSpaces();
-            $totalStorageCapacity = 0;
-            // Sum of the storage_space capacities for the user
-            foreach ($storageSpaces as $storageSpace) {
-                $totalStorageCapacity += $storageSpace->getStorageCapacity();
-            }
+            $userId = $user->getId();
+
+            // Calculate the storage space of the user
+            $totalStorageCapacity = $this->userStoragePurchaseRepository->getTotalStorageCapacityForUser($userId);
 
             return [
                 'message' => 'Bonjour ' . $user->getFirstname() . ', ravi de vous retrouver !',
@@ -55,5 +61,4 @@ class ProfileService
             ];
         }
     }
-
 }
