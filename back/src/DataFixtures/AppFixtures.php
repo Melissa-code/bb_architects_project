@@ -29,8 +29,8 @@ class AppFixtures extends Fixture
 
         //$this->loadCategory();
         //$this->loadFile();
-        //$this->loadPaymentModes();
-        //$this->loadOrderStatus();
+        $this->loadPaymentModes();
+        $this->loadOrderStatus();
         $this->loadAddress();
         $this->loadCompany();
 

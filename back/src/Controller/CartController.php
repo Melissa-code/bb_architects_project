@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\CartRepository;
+use App\Repository\OrderRepository;
 use App\Service\CartService;
 use App\Service\InvoiceService;
 use Exception;
@@ -19,20 +20,25 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class CartController extends AbstractController
 {
     private CartService $cartService;
-    private CartRepository $cartRepository;
     private InvoiceService $invoiceService;
+    private CartRepository $cartRepository;
+    private OrderRepository $orderRepository;
     private LoggerInterface $logger;
+
 
     public function __construct(
         CartService $cartService,
-        CartRepository $cartRepository,
         InvoiceService $invoiceService,
-        LoggerInterface $logger
+        CartRepository $cartRepository,
+        OrderRepository $orderRepository,
+        LoggerInterface $logger,
+
     )
     {
         $this->cartService = $cartService;
-        $this->cartRepository = $cartRepository;
         $this->invoiceService = $invoiceService;
+        $this->cartRepository = $cartRepository;
+        $this->orderRepository = $orderRepository;
         $this->logger = $logger;
     }
 
@@ -71,15 +77,21 @@ class CartController extends AbstractController
             if ($isValidated && $cart !== null) {
                 $this->logger->error('2e condition: seulement creation commande');
                 $cart = $this->cartRepository->findOneBy(['user' => $userId]);
-                $order = $this->cartService->createOrder($user, $cart);
+                $orderData = $this->cartService->createOrder($user, $cart);
+                $orderId = $orderData['order_id'];
+                $order = $this->orderRepository->find($orderId);
+                if ($order === null) {
+                    throw new \RuntimeException('La commande n\'a pas été trouvée.');
+                }
+
                 // Create a storage_space to the user
                 $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
                 // Create an invoice
-                $this->invoiceService->createInvoice();
+                $this->invoiceService->createInvoice($user, $order);
 
                 return new JsonResponse([
                     'message' => 'Le panier a bien été validé et la commande effectuée.',
-                    'order' =>  $order
+                    'order' =>  $orderData
                 ], 201);
             }
             // Save the cart & create the order in the database
@@ -87,16 +99,21 @@ class CartController extends AbstractController
                 $this->logger->error('3e condition: creation panier et commande');
                 $this->cartService->createCart($user, $data);
                 $cart = $this->cartRepository->findOneBy(['user' => $userId]);
-                $order = $this->cartService->createOrder($user, $cart);
+                $orderData = $this->cartService->createOrder($user, $cart);
+                $orderId = $orderData['order_id'];
+                $order = $this->orderRepository->find($orderId);
+                if ($order === null) {
+                    throw new \RuntimeException('La commande n\'a pas été trouvée.');
+                }
+
                 // Create a storage_space to the user
                 $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
-
                 // Create an invoice
                 $this->invoiceService->createInvoice($user, $order);
 
                 return new JsonResponse([
                     'message' => 'La commande a bien été effectuée.',
-                    'order' =>  $order
+                    'order' =>  $orderData,
                 ], 201);
             }
 
