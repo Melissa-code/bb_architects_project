@@ -1,23 +1,23 @@
-import Avatar from '@mui/material/Avatar'
-import Link from '@mui/material/Link'
-import Grid from '@mui/material/Grid'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
+import {Button, TextField} from '@mui/material'
+import Avatar from '@mui/material/Avatar'
+import Grid from '@mui/material/Grid'
+import Link from '@mui/material/Link'
 import Typography from '@mui/material/Typography'
-import {Formik, Form} from 'formik'
-import {loginSchema} from '../validation/validation'
-import {TextField, Button} from '@mui/material'
 import {useMutation} from '@tanstack/react-query'
-import {fetchLogin} from '../utils/fetch'
+import {Form, Formik} from 'formik'
 import {useState} from 'react'
-import AlertSuccess from './notification/alerts/AlertSuccess'
+import {useNavigate} from 'react-router-dom'
+import {fetchLogin} from '../utils/fetch'
+import {loginSchema} from '../validation/validation'
 import AlertFail from './notification/alerts/AlertFail'
-import {useLocation} from 'react-router-dom'
+import AlertSuccess from './notification/alerts/AlertSuccess'
 
 function LoginForm() {
     const [openSuccess, setOpenSuccess] = useState(false)
     const [openFailure, setOpenFailure] = useState(false)
-    const location = useLocation()
-    console.log(location.state)
+    //const location = useLocation()
+    const navigate = useNavigate()
 
     const {mutate} = useMutation({
         mutationKey: ['login'],
@@ -25,6 +25,7 @@ function LoginForm() {
         onSuccess: (data) => {
             localStorage.setItem('BBStorage_token', data.token)
             setOpenSuccess(true)
+            navigate('/home')
         },
         onError: (error) => {
             console.log(error)
