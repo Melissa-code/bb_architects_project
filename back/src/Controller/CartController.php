@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Order;
 use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Repository\OrderRepository;
@@ -10,6 +11,7 @@ use App\Service\InvoiceService;
 use Exception;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,10 +81,7 @@ class CartController extends AbstractController
                 $cart = $this->cartRepository->findOneBy(['user' => $userId]);
                 $orderData = $this->cartService->createOrder($user, $cart);
                 $orderId = $orderData['order_id'];
-                $order = $this->orderRepository->find($orderId);
-                if ($order === null) {
-                    throw new \RuntimeException('La commande n\'a pas été trouvée.');
-                }
+                $order = $this->getOrderById($orderId);
 
                 // Create a storage_space to the user
                 $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
@@ -101,10 +100,7 @@ class CartController extends AbstractController
                 $cart = $this->cartRepository->findOneBy(['user' => $userId]);
                 $orderData = $this->cartService->createOrder($user, $cart);
                 $orderId = $orderData['order_id'];
-                $order = $this->orderRepository->find($orderId);
-                if ($order === null) {
-                    throw new \RuntimeException('La commande n\'a pas été trouvée.');
-                }
+                $order = $this->getOrderById($orderId);
 
                 // Create a storage_space to the user
                 $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
@@ -133,4 +129,17 @@ class CartController extends AbstractController
             );
         }
     }
+
+    /**
+     * Get an order by id
+     */
+    private function getOrderById(int $orderId): Order
+    {
+        $order = $this->orderRepository->find($orderId);
+        if ($order === null) {
+            throw new RuntimeException('La commande n\'a pas été trouvée.');
+        }
+        return $order;
+    }
+
 }

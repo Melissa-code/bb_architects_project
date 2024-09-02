@@ -22,7 +22,7 @@ class Order
     private ?\DateTimeInterface $dateDelivery = null;
 
     #[ORM\OneToOne(inversedBy: 'purchaseOrder', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Cart $cart = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
@@ -74,7 +74,7 @@ class Order
         return $this->cart;
     }
 
-    public function setCart(Cart $cart): static
+    public function setCart(?Cart $cart): static
     {
         $this->cart = $cart;
 
