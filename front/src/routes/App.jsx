@@ -1,15 +1,16 @@
 import {
     createBrowserRouter,
-    RouterProvider,
     Route,
+    RouterProvider,
     Routes,
 } from 'react-router-dom'
-import Connexion from '../pages/Connexion'
 import LoginForm from '../components/LoginForm'
 import RegisterForm from '../components/RegisterForm'
 import Navigation from '../components/navigation/Navigation'
 import StorageTable from '../components/storage/StorageTable'
+import Connexion from '../pages/Connexion'
 import FileDataGrid from '../components/table/FileDataGrid'
+
 
 const router = createBrowserRouter([{path: '*', element: <Root />}])
 
@@ -20,7 +21,7 @@ export default function App() {
 function Root() {
     return (
         <Routes>
-            <Route path="connect" element={<Connexion />}>
+            <Route element={<Connexion />}>
                 <Route path="login" element={<LoginForm />} />
                 <Route path="register" element={<RegisterForm />} />
             </Route>
