@@ -37,7 +37,7 @@ class InvoiceService
      * Create an invoice in the database
      * @throws Exception
      */
-    public function createInvoice(User $user, Order $order): void
+    public function createInvoice(User $user, Order $order = null): void
     {
         $company = $this->getCompanyByName();
 

@@ -29,7 +29,7 @@ class Invoice
     private ?Company $company = null;
 
     #[ORM\OneToOne(inversedBy: 'invoice', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Order $commandOrder = null;
 
     public function getId(): ?int
@@ -90,7 +90,7 @@ class Invoice
         return $this->commandOrder;
     }
 
-    public function setCommandOrder(Order $commandOrder): static
+    public function setCommandOrder(?Order $commandOrder): static
     {
         $this->commandOrder = $commandOrder;
 

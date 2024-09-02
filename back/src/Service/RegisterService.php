@@ -100,6 +100,7 @@ class RegisterService
 
     /**
      * Create a new storage space (linked to a user)
+     * @throws Exception
      */
     public function linkStorageSpaceToUser(User $user): StorageSpace
     {
