@@ -1,6 +1,7 @@
 import {Grid} from '@mui/material'
 import NavigationBar from './NavigationBar'
 import DenseAppBar from './AppBar'
+import {Outlet} from 'react-router-dom'
 
 function Navigation() {
     return (
@@ -10,9 +11,7 @@ function Navigation() {
             </Grid>
             <Grid xs={10}>
                 <DenseAppBar />
-                <div className="bg-red-500">
-                    <p className="font-bold text-3xl">Test</p>
-                </div>
+                <Outlet />
             </Grid>
         </Grid>
     )

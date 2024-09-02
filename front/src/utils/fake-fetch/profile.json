@@ -1,0 +1,19 @@
+{
+    "message": "Bonjour Simone, ravi de vous retrouver !",
+    "user": {
+        "id": 4,
+        "firstname": "Simone",
+        "lastname": "Biles",
+        "phone": "0612123433",
+        "email": "simone@gmail.com",
+        "address": {
+            "number_street": "1",
+            "street": "rue de la Boëtie",
+            "zipcode": "75008",
+            "city": "Paris",
+            "country": "France"
+        },
+        "filesNumber": 3,
+        "total_storage_capacity": 20
+    }
+}
