@@ -50,6 +50,9 @@ class InvoiceService
 
         try {
             $this->validateSaveEntityService->saveEntity($invoice);
+
+            $this->downloadInvoiceTxt($invoice);
+
         } catch (Exception $e) {
             $this->logger->error('Erreur lors de la création de la facture : ' . $e->getMessage(), [
                     'exception' => $e,
@@ -72,4 +75,43 @@ class InvoiceService
         }
         return $company;
     }
+
+    /**
+     * Generate a facture .txt
+     */
+    public function generateInvoiceTxt(Invoice $invoice, $price = 20): string
+    {
+        $filename = 'invoice_' . $invoice->getId() . '.txt';
+        $filepath = __DIR__ . '/../../var/invoices/' . $filename;
+
+        $content = "Facture N° : " . $invoice->getId() . "\n";
+        $content .= "Date : " . $invoice->getCreatedAt()->format('d-m-Y') . "\n";
+        $content .= "Objet : " . RegisterService::NAME_STORAGE_SPACE . "\n\n";
+        $content .= "Client : " . $invoice->getUser()->getFirstname() . " " . $invoice->getUser()->getLastname() . "\n";
+        $content .= "Adresse : " . $invoice->getUser()->getAddress() . "\n\n";
+        $content .= "Société : " . $invoice->getCompany()->getName() . "\n";
+        $content .= "Adresse : " . $invoice->getCompany()->getAddress() . "\n";
+        $content .= "SIRET : " . $invoice->getCompany()->getSiret() . "\n\n";
+        $content .= "TVA : " . $invoice->getTVA() . " %\n";
+        $content .= "Montant TTC à régler : " . $price . " €\n";
+
+        file_put_contents($filepath, $content);
+
+        return $filepath;
+    }
+
+    /**
+     * Download the invoice
+     */
+    public function downloadInvoiceTxt(Invoice $invoice): void
+    {
+        $filepath = $this->generateInvoiceTxt($invoice);
+
+        header('Content-Type: text/plain');
+        header('Content-Disposition: attachment; filename="' . basename($filepath) . '"');
+        readfile($filepath);
+
+        exit();
+    }
+
 }
