@@ -6,8 +6,9 @@ import {Outlet} from 'react-router-dom'
 function Navigation() {
     return (
         <Grid container>
+
             <Grid xs={2}>
-                <NavigationBar />
+                 <NavigationBar />
             </Grid>
             <Grid xs={10}>
                 <DenseAppBar />
