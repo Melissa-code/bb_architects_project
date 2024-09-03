@@ -6,17 +6,19 @@ import {useQuery} from '@tanstack/react-query'
 import {useState} from 'react'
 import {fetchGetFiles} from '../../utils/fetch'
 
-function useFileDataGrid() {
+function useUserFileDataGrid() {
     const [rowData, setRowData] = useState({})
     const [open, setOpen] = useState(false)
 
     const token = localStorage.getItem('BBStorage_token')
 
-    const testGetFiles = useQuery({
+    const {data} = useQuery({
         queryKey: ['GetFiles'],
         queryFn: fetchGetFiles(token),
         enabled: !!token,
     })
+
+    console.log(data)
 
     // const {mutate} = useMutation({
     //     mutationKey: ['updateTitle'],
@@ -124,7 +126,7 @@ function useFileDataGrid() {
         },
     ]
 
-    return {open, setOpen, columns, rowData, storagePercentage, testGetFiles}
+    return {open, setOpen, columns, rowData, storagePercentage}
 }
 
-export default useFileDataGrid
+export default useUserFileDataGrid

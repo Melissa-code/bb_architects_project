@@ -1,14 +1,13 @@
 import Box from '@mui/material/Box'
 import {DataGrid} from '@mui/x-data-grid'
 import data from '../../utils/fake-fetch/files.json'
-//import {columns} from './columns'
 import {LinearProgress} from '@mui/material'
 import EditFileForm from '../forms/EditFileForm'
-import useFileDataGrid from './useFileDataGrid'
+import useUserFileDataGrid from './useUserFileDataGrid.jsx'
 
-function FileDataGrid() {
-    const {open, setOpen, columns, rowData, storagePercentage, testGetFiles} =
-        useFileDataGrid()
+function UserFileDataGrid() {
+    const {open, setOpen, columns, rowData, storagePercentage} =
+        useUserFileDataGrid()
 
     return (
         <>
@@ -20,7 +19,7 @@ function FileDataGrid() {
                     variant="determinate"
                 />
                 <DataGrid
-                    rows={data?.files}
+                    rows={data.files}
                     columns={columns}
                     initialState={{
                         pagination: {
@@ -42,12 +41,8 @@ function FileDataGrid() {
                 />
             </Box>
             <EditFileForm open={open} setOpen={setOpen} data={rowData} />
-            Pour Mélissa :{' '}
-            {testGetFiles.isSuccess
-                ? 'Récupération des données réussie !'
-                : 'Erreur avec la récupération des données'}
         </>
     )
 }
 
-export default FileDataGrid
+export default UserFileDataGrid
