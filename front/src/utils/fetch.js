@@ -40,7 +40,7 @@ export async function fetchGetProfile(token) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            Authentication: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
         },
     })
 
@@ -56,7 +56,7 @@ export async function fetchGetFiles(token) {
         `${endpoint}/files?sortField=createdAt&sortOrder=ASC`,
         {
             headers: {
-                Authentication: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }
     )
@@ -73,7 +73,7 @@ export async function fetchCreateFile(data, token) {
         method: 'POST',
         headers: {
             'Content-Type': 'multipart/form-data',
-            Authentication: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(data),
     })
@@ -94,7 +94,7 @@ export async function fetchUpdateFile(data, token) {
             method: 'POST',
             headers: {
                 'Content-Type': 'multipart/form-data',
-                Authentication: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(data),
         }
@@ -114,7 +114,7 @@ export async function fetchDeleteFile(data, token) {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            Authentication: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
         },
     })
 
@@ -130,7 +130,7 @@ export async function fetchDeleteFile(data, token) {
 export async function fetchGetCategories(token) {
     const response = await fetch(`${endpoint}/category`, {
         headers: {
-            Authentication: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
         },
     })
 

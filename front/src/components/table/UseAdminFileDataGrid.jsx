@@ -1,22 +1,19 @@
-import {useState} from 'react'
-import {GridActionsCellItem} from '@mui/x-data-grid'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import Chip from '@mui/material/Chip'
+import Chip from "@mui/material/Chip";
+import {GridActionsCellItem} from "@mui/x-data-grid";
+import {Download, Visibility} from "@mui/icons-material";
 
-function useFileDataGrid() {
-    const [rowData, setRowData] = useState({})
-    const [open, setOpen] = useState(false)
-
-    function handleDeleteClick(id) {
-        //TODO : Mettre une modal de confirmation
-        console.log(`Suppression de l'élément ${id}`)
+function UseAdminFileDataGrid(){
+    function handleDownloadFile(id) {
+        //TODO : Voir pour le téléchargement d'un document
+        console.log(`Téléchargement du document ${id}`)
     }
 
-    function handleEditClick(row) {
-        //TODO : Mettre en place un formulaire d'édition
-        setRowData(row)
-        setOpen(true)
+    function handleShowFile(row) {
+        console.log("Vue du document", row)
+        // window.open(
+        //     import.meta.env.VITE_BACKEND_URL + row.filePath,
+        //     '_blank'
+        // )
     }
 
     const columns = [
@@ -75,21 +72,22 @@ function useFileDataGrid() {
             headerAlign: 'center',
             width: 100,
             cellClassName: 'actions',
-            getActions: ({id, row}) => {
+            getActions: ({id,row}) => {
                 return [
                     <GridActionsCellItem
                         key={id}
-                        icon={<EditIcon />}
-                        label="Edit"
+                        icon={<Visibility />}
+                        label="Show"
                         className="textPrimary"
-                        onClick={() => handleEditClick(row)}
+                        onClick={() => handleShowFile(row)}
                         color="inherit"
                     />,
                     <GridActionsCellItem
                         key={id}
-                        icon={<DeleteIcon />}
-                        label="Delete"
-                        onClick={() => handleDeleteClick(id)}
+                        icon={<Download />}
+                        label="Download"
+                        className="textPrimary"
+                        onClick={() => handleDownloadFile(row)}
                         color="inherit"
                     />,
                 ]
@@ -97,7 +95,7 @@ function useFileDataGrid() {
         },
     ]
 
-    return {open, setOpen, columns, rowData}
+    return {columns}
 }
 
-export default useFileDataGrid
+export default UseAdminFileDataGrid

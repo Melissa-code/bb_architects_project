@@ -7,9 +7,10 @@ import {
 import LoginForm from '../components/LoginForm'
 import RegisterForm from '../components/RegisterForm'
 import Navigation from '../components/navigation/Navigation'
-import StorageTable from '../components/storage/StorageTable'
 import Connexion from '../pages/Connexion'
-import FileDataGrid from '../components/table/FileDataGrid'
+import UserFileDataGrid from '../components/table/UserFileDataGrid.jsx'
+import AdminUserDataGrid from "../components/table/AdminUserDataGrid.jsx";
+import AdminFileDataGrid from "../components/table/AdminFileDataGrid.jsx";
 
 
 const router = createBrowserRouter([{path: '*', element: <Root />}])
@@ -26,9 +27,15 @@ function Root() {
                 <Route path="register" element={<RegisterForm />} />
             </Route>
             <Route element={<Navigation />}>
-                <Route path="home" element={<FileDataGrid />} />
+                <Route path="home" element={<UserFileDataGrid />} />
+                {/**<Route path='profile' element={}/>**/}
+                <Route path="admin">
+                    {/**<Route path='dashboard' element={}/>*/}
+                    {/**<Route path='clients' element={}/>**/}
+                    <Route path='storage/:id' element={<AdminFileDataGrid/>}/>
+                </Route>
             </Route>
-            <Route path="test" element={<StorageTable />} />
+            <Route path="test" element={<AdminUserDataGrid />} />
         </Routes>
     )
 }
