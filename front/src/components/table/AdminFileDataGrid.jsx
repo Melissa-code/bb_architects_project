@@ -3,10 +3,11 @@ import {DataGrid} from "@mui/x-data-grid";
 import data from "../../utils/fake-fetch/files.json";
 import UseAdminFileDataGrid from "./UseAdminFileDataGrid.jsx";
 import {useParams} from "react-router-dom"
+import ModalAdminFileDataGrid from "../modals/ModalAdminFileDataGrid.jsx";
 //TODO : Afficher les détails du fichier
 
 function AdminFileDataGrid(){
-    const {columns} = UseAdminFileDataGrid()
+    const {columns, open, handleClose, handleOpen, rowData, setRowData} = UseAdminFileDataGrid()
     const {id}= useParams()
     return (
         <>
@@ -25,11 +26,12 @@ function AdminFileDataGrid(){
                     pageSizeOptions={[5]}
                     disableRowSelectionOnClick
                     onRowClick={({row}) => {
-                        // * Ouverture des détails du fichier
-                        console.log(row)
+                        setRowData(row)
+                        handleOpen()
                     }}
                 />
             </Box>
+            <ModalAdminFileDataGrid open={open} handleClose={handleClose} data={rowData} />
         </>
     )
 }

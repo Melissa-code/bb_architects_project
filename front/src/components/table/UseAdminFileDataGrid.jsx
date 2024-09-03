@@ -1,8 +1,14 @@
 import Chip from "@mui/material/Chip";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Download, Visibility} from "@mui/icons-material";
+import {useState} from "react";
 
 function UseAdminFileDataGrid(){
+    const [open, setOpen] = useState(false);
+    const [rowData, setRowData] = useState({});
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
     function handleDownloadFile(id) {
         //TODO : Voir pour le téléchargement d'un document
         console.log(`Téléchargement du document ${id}`)
@@ -95,7 +101,7 @@ function UseAdminFileDataGrid(){
         },
     ]
 
-    return {columns}
+    return {columns, open, handleClose, handleOpen, rowData, setRowData}
 }
 
 export default UseAdminFileDataGrid
