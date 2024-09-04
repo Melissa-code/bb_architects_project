@@ -40,6 +40,15 @@ class Order
     #[ORM\OneToOne(mappedBy: 'commandOrder', cascade: ['persist', 'remove'])]
     private ?Invoice $invoice = null;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0)]
+    private ?string $totalPrice = null;
+
+    #[ORM\Column]
+    private ?int $quantity = null;
+
+    #[ORM\ManyToOne(inversedBy: 'orders')]
+    private ?StorageSpace $storageSpace = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -130,6 +139,42 @@ class Order
         }
 
         $this->invoice = $invoice;
+
+        return $this;
+    }
+
+    public function getTotalPrice(): ?string
+    {
+        return $this->totalPrice;
+    }
+
+    public function setTotalPrice(string $totalPrice): static
+    {
+        $this->totalPrice = $totalPrice;
+
+        return $this;
+    }
+
+    public function getQuantity(): ?int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(int $quantity): static
+    {
+        $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function getStorageSpace(): ?StorageSpace
+    {
+        return $this->storageSpace;
+    }
+
+    public function setStorageSpace(?StorageSpace $storageSpace): static
+    {
+        $this->storageSpace = $storageSpace;
 
         return $this;
     }

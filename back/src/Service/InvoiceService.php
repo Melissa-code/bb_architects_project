@@ -39,7 +39,11 @@ class InvoiceService
      */
     public function createInvoice(User $user, Order $order = null): void
     {
+        $totalPrice  = 20;
         $company = $this->getCompanyByName();
+        if ($order !== null) {
+            $totalPrice = $order->getTotalPrice();
+        }
 
         $invoice = new Invoice();
         $invoice->setUser($user);
@@ -50,8 +54,8 @@ class InvoiceService
 
         try {
             $this->validateSaveEntityService->saveEntity($invoice);
-
-            $this->downloadInvoiceTxt($invoice);
+            // Generate an invoice
+            $this->generateInvoiceTxt($invoice, $totalPrice);
 
         } catch (Exception $e) {
             $this->logger->error('Erreur lors de la création de la facture : ' . $e->getMessage(), [
@@ -73,13 +77,14 @@ class InvoiceService
         if ($company === null) {
             throw new Exception("La société " . self::NAME_COMPANY . " n'a pas été trouvée.");
         }
+
         return $company;
     }
 
     /**
-     * Generate a facture .txt
+     * Generate an invoice (format txt)
      */
-    public function generateInvoiceTxt(Invoice $invoice, $price = 20): string
+    public function generateInvoiceTxt(Invoice $invoice, $totalPrice): string
     {
         $filename = 'invoice_' . $invoice->getId() . '.txt';
         $filepath = __DIR__ . '/../../var/invoices/' . $filename;
@@ -93,7 +98,7 @@ class InvoiceService
         $content .= "Adresse : " . $invoice->getCompany()->getAddress() . "\n";
         $content .= "SIRET : " . $invoice->getCompany()->getSiret() . "\n\n";
         $content .= "TVA : " . $invoice->getTVA() . " %\n";
-        $content .= "Montant TTC à régler : " . $price . " €\n";
+        $content .= "Montant TTC à régler : " . $totalPrice . " €\n";
 
         file_put_contents($filepath, $content);
 
@@ -101,7 +106,7 @@ class InvoiceService
     }
 
     /**
-     * Download the invoice
+     * Download the invoice in txt format
      */
     public function downloadInvoiceTxt(Invoice $invoice): void
     {
@@ -113,5 +118,4 @@ class InvoiceService
 
         exit();
     }
-
 }

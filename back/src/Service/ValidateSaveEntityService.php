@@ -52,7 +52,24 @@ class ValidateSaveEntityService
             $this->entityManagerInterface->flush();
         } catch (ORMException $e) {
             throw new RuntimeException(
-                '[Inscription]: Erreur lors de la persistance de l\'entité:' . $entity,
+                'Erreur lors de la persistance de l\'entité:' . $entity,
+                0, $e
+            );
+        }
+    }
+
+    /**
+     * Remove an entity in the database
+     */
+    public function remove(Object $entity): void
+    {
+        try {
+            $this->entityManagerInterface->remove($entity);
+            $this->entityManagerInterface->flush();
+
+        } catch (ORMException $e) {
+            throw new RuntimeException(
+                'Erreur lors de la suppression de l\'entité:' . $entity,
                 0, $e
             );
         }
