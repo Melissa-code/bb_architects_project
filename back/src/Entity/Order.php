@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\OrderRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
@@ -27,26 +28,36 @@ class Order
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message : "Veuillez renseigner un utilisateur.")]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'paymentMode')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message : "Veuillez renseigner un mode de paiement.")]
     private ?PaymentMode $paymentMode = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message : "Veuillez renseigner le statut de la commande.")]
     private ?OrderStatus $orderStatus = null;
 
     #[ORM\OneToOne(mappedBy: 'commandOrder', cascade: ['persist', 'remove'])]
     private ?Invoice $invoice = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[Assert\NotBlank(message: 'Le prix total ne doit pas être vide.')]
+    #[Assert\Regex(
+        pattern: '/^\d+(\.\d{1,2})?$/',
+        message: 'Le prix total doit être un nombre décimal avec jusqu\'à 2 chiffres après la virgule.'
+    )]
     private ?string $totalPrice = null;
 
     #[ORM\Column]
+    #[Assert\PositiveOrZero(message : "Veuillez renseigner un nombre positif.")]
     private ?int $quantity = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
+    #[Assert\NotNull(message : "Veuillez renseigner un abonnement.")]
     private ?StorageSpace $storageSpace = null;
 
     public function getId(): ?int

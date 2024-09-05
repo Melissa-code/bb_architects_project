@@ -41,7 +41,6 @@ class CartService
 
     /**
      * Create an order
-     * cart_id user_id payment_mode_id order_status_id created_at date_delivery
      */
     public function createOrder(User $user, array $data): array
     {
@@ -64,6 +63,7 @@ class CartService
         $order->setStorageSpace($storageSpace);
 
         try {
+            $this->validateSaveEntityService->validateEntity($order);
             $this->validateSaveEntityService->saveEntity($order);
 
         } catch (Exception $e) {
