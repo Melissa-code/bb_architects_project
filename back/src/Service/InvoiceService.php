@@ -69,7 +69,7 @@ class InvoiceService
                     'company_name' => $invoice->getCompany()->getName(),
                     'company_address' => (string)$invoice->getCompany()->getAddress(),
                     'siret' =>  $invoice->getCompany()->getSiret(),
-                    'unit_price'=> self::UNIT_PRICE,
+                    'unit_price' => (string)self::UNIT_PRICE . " €",
                     'quantity' => $quantity,
                     'total_price_HT' => $total['totalPriceHT'] . ' € HT',
                     'TVA' => $total['tva'] . ' €',
@@ -153,6 +153,8 @@ class InvoiceService
         $invoice->setTVA(10);
 
         try {
+            // Check & save the invoice in the database
+            $this->validateSaveEntityService->validateEntity($invoice);
             $this->validateSaveEntityService->saveEntity($invoice);
             // Generate an invoice
             $this->generateInvoiceTxt($invoice, $order);
@@ -215,6 +217,20 @@ class InvoiceService
     }
 
     /**
+     * Find an invoice by ID
+     * @throws Exception
+     */
+    public function findInvoiceById(int $id): Invoice
+    {
+        $invoice = $this->invoiceRepository->find($id);
+        if (!$invoice) {
+            throw new Exception('Aucune facture trouvée pour cet ID : ' . $id);
+        }
+
+        return $invoice;
+    }
+
+    /**
      * Get the name of the company (BB Architects)
      * @throws Exception
      */
@@ -226,20 +242,6 @@ class InvoiceService
         }
 
         return $company;
-    }
-
-    /**
-     * Find an invoice by ID
-     * @throws Exception
-     */
-    private function findInvoiceById(int $id): Invoice
-    {
-        $invoice = $this->invoiceRepository->find($id);
-        if (!$invoice) {
-            throw new Exception('Aucune facture trouvée pour cet ID : ' . $id);
-        }
-
-        return $invoice;
     }
 
     /**

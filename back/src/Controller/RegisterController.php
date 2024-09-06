@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Service\CartService;
 use App\Service\InvoiceService;
 use App\Service\RegisterService;
 use Psr\Log\LoggerInterface;
@@ -15,11 +14,6 @@ class RegisterController extends AbstractController
 {
     /**
      * Registration of a new user
-     *
-     * @param Request $request
-     * @param RegisterService $registerService
-     * @param LoggerInterface $logger
-     * @return JsonResponse
      */
     #[Route('/api/register', name: 'api_register', methods: ['POST'])]
     public function register(

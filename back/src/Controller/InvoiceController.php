@@ -86,4 +86,24 @@ class InvoiceController extends AbstractController
             ], 500);
         }
     }
+
+    /**
+     * Download an invoice (id invoice)
+     */
+    #[Route('/api/download_invoice/{id}', name: 'app_invoice_download', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function downloadInvoiceTxt($id): void
+    {
+        try {
+            $invoice = $this->invoiceService->findInvoiceById($id);
+            if (!$invoice) {
+                throw new Exception('Aucune facture trouvée pour cet ID.');
+            }
+
+            $this->invoiceService->downloadInvoiceTxt($invoice);
+
+        } catch (Exception $e) {
+            $this->logger->error('Erreur lors du téléchargement de la facture n° ' . $id . ': ' . $e->getMessage());
+        }
+    }
 }
+
