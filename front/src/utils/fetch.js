@@ -106,8 +106,8 @@ export async function fetchUpdateFile(data, token) {
     }
 }
 
-export async function fetchDeleteFile(data, token) {
-    const response = await fetch(`${endpoint}/file/delete/${data.fileId}`, {
+export async function fetchDeleteFile(id, token) {
+    const response = await fetch(`${endpoint}/file/delete/${id}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -118,9 +118,7 @@ export async function fetchDeleteFile(data, token) {
     if (response.ok) {
         return response.json()
     } else {
-        // TODO : récupérer l'erreur du backend
-        console.error(response)
-        throw new Error('Erreur de connexion. Veuillez réessayer.')
+        throw new Error(`Erreur lors de la suppression du fichier. Statut : ${response.status}`)
     }
 }
 

@@ -3,9 +3,18 @@ import {DataGrid} from '@mui/x-data-grid'
 import {LinearProgress} from '@mui/material'
 import EditFileForm from '../forms/EditFileForm'
 import useUserFileDataGrid from './useUserFileDataGrid.jsx'
+import DialogUserFileDelete from "../modals/DialogUserFileDelete.jsx";
 
 function UserFileDataGrid() {
-    const {open, setOpen, columns, rowData, storagePercentage, data} =
+    const {
+        open,
+        setOpen,
+        columns,
+        rowData,
+        storagePercentage,
+        data,
+        openDeleteDialog, handleDelete, handleCloseDialogDelete
+    } =
         useUserFileDataGrid()
 
     return (
@@ -30,16 +39,13 @@ function UserFileDataGrid() {
                     pageSizeOptions={[5]}
                     disableRowSelectionOnClick
                     onRowClick={({row}) => {
-                        // * Ouverture du fichier au clic sur la ligne
-                        console.log(row)
-                        // window.open(
-                        //     import.meta.env.VITE_BACKEND_URL + row.filePath,
-                        //     '_blank'
-                        // )
+                        window.open(import.meta.env.VITE_BACKEND_URL + row.filePath, '_blank')
                     }}
                 />
             </Box>
             <EditFileForm open={open} setOpen={setOpen} rowData={rowData}/>
+            <DialogUserFileDelete open={openDeleteDialog} handleClose={handleCloseDialogDelete}
+                                  handleDelete={handleDelete}/>
         </>
     )
 }

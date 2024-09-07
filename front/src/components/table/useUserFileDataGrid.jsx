@@ -2,17 +2,20 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import Chip from '@mui/material/Chip'
 import {GridActionsCellItem} from '@mui/x-data-grid'
-import {useQuery} from '@tanstack/react-query'
+import {useMutation, useQuery} from '@tanstack/react-query'
 import {useState} from 'react'
-import {fetchGetFiles} from '../../utils/fetch'
+import {fetchDeleteFile, fetchGetFiles, fetchUpdateFile} from '../../utils/fetch'
 
 function useUserFileDataGrid() {
     const [rowData, setRowData] = useState({})
     const [open, setOpen] = useState(false)
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+    const [openAlertDelete, setOpenAlertDelete] = useState(false)
+    const [idDelete, setIdDelete] = useState(0)
 
     const token = localStorage.getItem('BBStorage_token')
 
-    const {data, isSuccess, isError, error} = useQuery({
+    const {data, isError, error} = useQuery({
         queryKey: ['GetFiles'],
         queryFn: () => fetchGetFiles(token),
         enabled: !!token,
@@ -21,16 +24,18 @@ function useUserFileDataGrid() {
     isError && (console.error(error?.message))
 
 
-    // const {mutate} = useMutation({
-    //     mutationKey: ['updateTitle'],
-    //     mutationFn: (variables) => fetchUpdateFile(variables),
-    //     onSuccess: () => {
-    //         // TODO : Alert "Document mis à jour"
-    //     },
-    //     onError: (error) => {
-    //         // TODO : Alert "Erreur lors de la mise à jour"
-    //     },
-    // })
+    const deleteFile = useMutation({
+        mutationKey: ['DeleteFile'],
+        mutationFn: (variables) => fetchDeleteFile(variables, token),
+        onSuccess: () => {
+            // TODO : Alert "Document supprimé"
+            alert("Document supprimé")
+        },
+        onError: (error) => {
+            // TODO : Alert "Erreur lors de la suppression"
+            alert(error.message)
+        },
+    })
 
     // TODO : Mettre en place composant pour récupérer les informations de stockage
     let storagePercentage
@@ -43,9 +48,17 @@ function useUserFileDataGrid() {
     }
 
 
-    function handleDeleteClick(id) {
-        //TODO : Mettre une modal de confirmation
-        console.log(`Suppression de l'élément ${id}`)
+    function handleOpenDialogDelete(id) {
+        setIdDelete(id)
+        setOpenDeleteDialog(true)
+    }
+
+    function handleCloseDialogDelete() {
+        setOpenDeleteDialog(false)
+    }
+
+    function handleDelete() {
+        deleteFile.mutate(idDelete)
     }
 
     function handleEditClick(row) {
@@ -124,7 +137,7 @@ function useUserFileDataGrid() {
                         key={id}
                         icon={<DeleteIcon/>}
                         label="Delete"
-                        onClick={() => handleDeleteClick(id)}
+                        onClick={() => handleOpenDialogDelete(id)}
                         color="inherit"
                     />,
                 ]
@@ -132,7 +145,17 @@ function useUserFileDataGrid() {
         },
     ]
 
-    return {open, setOpen, columns, rowData, storagePercentage, data}
+    return {
+        open,
+        setOpen,
+        columns,
+        rowData,
+        storagePercentage,
+        data,
+        openDeleteDialog,
+        handleDelete,
+        handleCloseDialogDelete
+    }
 }
 
 export default useUserFileDataGrid
