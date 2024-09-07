@@ -13,10 +13,13 @@ import {useState} from 'react'
 import AlertSuccess from './notification/alerts/AlertSuccess'
 import AlertFail from './notification/alerts/AlertFail'
 import {useNavigate} from 'react-router-dom'
+import getStripe from "../utils/getStripe.js";
+import StripeButton from "./stripe/StripeButton.jsx";
 
 function RegisterForm() {
     const [openSuccess, setOpenSuccess] = useState(false)
     const [openFailure, setOpenFailure] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
     const navigate = useNavigate()
 
     const {mutate} = useMutation({
@@ -27,6 +30,7 @@ function RegisterForm() {
         },
         onError: (error) => {
             console.log(error)
+            setErrorMessage(error)
             setOpenFailure(true)
         },
     })
@@ -36,10 +40,15 @@ function RegisterForm() {
         setSubmitting(false)
     }
 
+    async function handleCheckout() {
+        const stripe = await getStripe()
+        const {error} = await stripe.redirectToCheckout()
+    }
+
     return (
         <>
             <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
-                <LockOutlinedIcon />
+                <LockOutlinedIcon/>
             </Avatar>
             <Typography component="h1" variant="h5">
                 Inscription
@@ -118,7 +127,7 @@ function RegisterForm() {
                             //TODO : Personnalisation graphique à revoir
                             sx={'margin-top:8px;'}
                         />
-                        <Divider />
+                        <Divider/>
                         <div>
                             <TextField
                                 id="lastname"
@@ -251,6 +260,8 @@ function RegisterForm() {
                             sx={{overflow: 'hidden'}}
                         />
 
+                        <StripeButton email={values.email}/>
+
                         <Button
                             color="primary"
                             variant="contained"
@@ -276,8 +287,9 @@ function RegisterForm() {
                 </Grid>
             </Grid>
             <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} type={"register"}/>
-            <AlertFail open={openFailure} setOpen={setOpenFailure} />
+            <AlertFail open={openFailure} setOpen={setOpenFailure} error={errorMessage}/>
         </>
     )
 }
+
 export default RegisterForm
