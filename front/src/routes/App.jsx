@@ -27,8 +27,10 @@ function Root() {
                 <Route path="register" element={<RegisterForm />} />
             </Route>
             <Route element={<Navigation />}>
-                <Route path="home" element={<UserFileDataGrid />} />
-                {/**<Route path='profile' element={}/>**/}
+                <Route path="user">
+                    <Route path="storage" element={<UserFileDataGrid />} />
+                    {/**<Route path="profile" element={}/>*/}
+                </Route>
                 <Route path="admin">
                     {/**<Route path='dashboard' element={}/>*/}
                     {/**<Route path='clients' element={}/>**/}
