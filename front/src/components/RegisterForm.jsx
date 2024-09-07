@@ -24,7 +24,6 @@ function RegisterForm() {
         mutationFn: (variables) => fetchRegister(variables),
         onSuccess: () => {
             setOpenSuccess(true)
-            navigate('/connect/login')
         },
         onError: (error) => {
             console.log(error)
@@ -271,12 +270,12 @@ function RegisterForm() {
                     </Link>
                 </Grid>
                 <Grid item>
-                    <Link href="/connect/login" variant="body2">
+                    <Link href="/login" variant="body2">
                         {'Déjà un compte ? Connectez-vous'}
                     </Link>
                 </Grid>
             </Grid>
-            <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} />
+            <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} type={"register"}/>
             <AlertFail open={openFailure} setOpen={setOpenFailure} />
         </>
     )

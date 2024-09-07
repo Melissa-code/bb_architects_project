@@ -12,12 +12,14 @@ import {fetchLogin} from '../utils/fetch'
 import {loginSchema} from '../validation/validation'
 import AlertFail from './notification/alerts/AlertFail'
 import AlertSuccess from './notification/alerts/AlertSuccess'
+import useApp from "../routes/useApp.js";
 
 function LoginForm() {
     const [openSuccess, setOpenSuccess] = useState(false)
     const [openFailure, setOpenFailure] = useState(false)
-    //const location = useLocation()
-    const navigate = useNavigate()
+    const [errorMessage, setErrorMessage] = useState('')
+
+
 
     const {mutate} = useMutation({
         mutationKey: ['login'],
@@ -25,10 +27,9 @@ function LoginForm() {
         onSuccess: (data) => {
             localStorage.setItem('BBStorage_token', data.token)
             setOpenSuccess(true)
-            navigate('/home')
         },
         onError: (error) => {
-            console.log(error)
+            setErrorMessage(error)
             setOpenFailure(true)
         },
     })
@@ -102,13 +103,13 @@ function LoginForm() {
                     </Link>
                 </Grid>
                 <Grid item>
-                    <Link href="/connect/register" variant="body2">
+                    <Link href="/register" variant="body2">
                         {'Pas de compte ? Inscrivez-vous'}
                     </Link>
                 </Grid>
             </Grid>
-            <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} />
-            <AlertFail open={openFailure} setOpen={setOpenFailure} />
+            <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} type={"login"} />
+            <AlertFail open={openFailure} setOpen={setOpenFailure} error={errorMessage}/>
         </>
     )
 }
