@@ -5,6 +5,8 @@ import {GridActionsCellItem} from '@mui/x-data-grid'
 import {useMutation, useQuery} from '@tanstack/react-query'
 import {useState} from 'react'
 import {fetchDeleteFile, fetchGetFiles, fetchUpdateFile} from '../../utils/fetch'
+import {chipColor} from "../../utils/chipColors.js";
+
 
 function useUserFileDataGrid() {
     const [rowData, setRowData] = useState({})
@@ -82,7 +84,7 @@ function useUserFileDataGrid() {
             headerAlign: 'center',
             width: 150,
             renderCell: (params) => {
-                return <Chip label={params.value} color="primary"/>
+                return <Chip label={params.value} sx={{backgroundColor: chipColor[params.value], color: "#FFFFFF"}}/>
             },
             align: 'center',
         },
