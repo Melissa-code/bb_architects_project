@@ -45,7 +45,6 @@ function EditFileForm({...props}) {
         p: 4,
     }
 
-    console.log(rowData)
     return (
         <Formik
             initialValues={{
