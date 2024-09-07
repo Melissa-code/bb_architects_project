@@ -11,12 +11,33 @@ import Connexion from '../pages/Connexion'
 import UserFileDataGrid from '../components/table/UserFileDataGrid.jsx'
 import AdminUserDataGrid from "../components/table/AdminUserDataGrid.jsx";
 import AdminFileDataGrid from "../components/table/AdminFileDataGrid.jsx";
-
+import {createTheme, ThemeProvider} from '@mui/material/styles';
 
 const router = createBrowserRouter([{path: '*', element: <Root />}])
+const themeOptions = createTheme({
+    palette: {
+        mode: 'light',
+        primary: {
+            main: '#ffc107',
+        },
+        secondary: {
+            main: '#023e8a',
+            light: '#1e62b8',
+            dark: '#03045e',
+        },
+        text: {
+            primary: 'rgba(33, 33, 33, 1)',
+            secondary: 'rgba(33,33,33,0.6)',
+            disabled: 'rgba(33,33,33,0.38)',
+        },
+    },
+})
 
 export default function App() {
-    return <RouterProvider router={router} />
+
+    return<ThemeProvider theme={themeOptions}>
+            <RouterProvider router={router} />
+            </ThemeProvider>
 }
 
 function Root() {
