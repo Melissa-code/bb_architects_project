@@ -61,11 +61,10 @@ export async function fetchGetFiles(token) {
         }
     )
 
-    if (!response.ok) {
-        throw new Error(`Erreur récupréation des fichiers. Veuillez réessayer`)
+    if (response.ok) {
+        return await response.json()
     }
-
-    return response.json()
+    throw new Error(`Erreur récupération des fichiers. Statut : ${response.status}`)
 }
 
 export async function fetchCreateFile(data, token) {
@@ -103,9 +102,7 @@ export async function fetchUpdateFile(data, token) {
     if (response.ok) {
         return response.json()
     } else {
-        // TODO : récupérer l'erreur du backend
-        console.error(response)
-        throw new Error('Erreur de connexion. Veuillez réessayer.')
+        throw new Error(`Erreur mise à jour du fichier. Statut : ${response.status}`)
     }
 }
 
