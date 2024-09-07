@@ -14,7 +14,7 @@ const style = {
 }
 
 function AlertFail({...props}) {
-    const {open, setOpen} = props
+    const {open, setOpen, error} = props
     const [openModal, setOpenModal] = useState(false)
 
     const handleClose = (event, reason) => {
@@ -62,16 +62,16 @@ function AlertFail({...props}) {
                 aria-describedby="modal-modal-description">
                 <Box sx={style}>
                 <Typography>
-                Une erreur a été rencontrée
+                Une erreur a été rencontrée.
                 </Typography>
                 <Typography>
-                Veuillez trouver le détail de l'erreur ci-dessous :
+                Veuillez trouver le détail de l&apos;erreur ci-dessous
                 </Typography>
                 <Divider/>
                 <Typography>
-                Mettre l'erreur récupérées du serveur
+                    {error.message}
                 </Typography>
-                <Button>
+                <Button onClick={handleClose}>
                 Fermer
                 </Button>
                 </Box>
