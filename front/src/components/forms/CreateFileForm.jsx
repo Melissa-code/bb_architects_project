@@ -1,32 +1,25 @@
 import {Formik, Form} from 'formik'
 import {TextField, Button, MenuItem, Modal, Box} from '@mui/material'
-import categories from '../../utils/fake-fetch/categories.json'
-import {useState} from 'react'
 import {useMutation, useQuery} from '@tanstack/react-query'
 import {fetchCreateFile, fetchGetCategories} from '../../utils/fetch'
 
 function CreateFileForm({...props}) {
     const {open, setOpen} = props
-    // TODO : Récupérer la liste des catégories
-    // TODO : Récupérer les données de la ligne en props
-    // TODO : Changer le label du bouton sumbit selon ajout ou modification
-    /*
-   const token = localStorage.getItem('BBStorage_token')
 
-    const {data, isSuccess} = useQuery({
+    const token = localStorage.getItem('BBStorage_token')
+
+    const {data, isError, error} = useQuery({
         queryKey: ['GetCategories'],
-        queryFn: fetchGetCategories(token),
+        queryFn: () => fetchGetCategories(token),
         enabled: !!token,
     })
 
-    isSuccess && console.log(data)
-    
     const {mutate} = useMutation({
         mutationKey: ['AddingFile'],
         mutationFn: (variables) => fetchCreateFile(variables, token),
-        onSuccess: (data) => {
+        onSuccess: () => {
             // TODO : Mettre une alerte Success
-            alert('Création réussie')
+            alert('Fichier ajouté !')
         },
         onError: (error) => {
             // TODO : Mettre une alerte Erreur
@@ -34,7 +27,7 @@ function CreateFileForm({...props}) {
             alert('Création échouée. Voir console pour détails.')
         },
     })
-*/
+
 
     const style = {
         position: 'absolute',
@@ -49,10 +42,11 @@ function CreateFileForm({...props}) {
     }
     return (
         <Formik
-            initialValues={{name: '', categoryId: '', pathFile: ''}}
+            initialValues={{name: '', categoryId: 1, file: null}}
             validateOnChange={false}
             validateOnBlur={false}
-            onSubmit={(values) => alert(JSON.stringify(values))}>
+            enableReinitialize={true}
+            onSubmit={(values) => console.log(values)}>
             {({values, handleChange, handleBlur, touched, errors}) => (
                 <Modal
                     open={open}
@@ -90,7 +84,7 @@ function CreateFileForm({...props}) {
                                 helperText={
                                     touched.categoryId && errors.categoryId
                                 }>
-                                {categories?.categories.map((category) => (
+                                {data?.categories?.map((category) => (
                                     <MenuItem
                                         key={category.categoryId}
                                         value={category.categoryId}>
@@ -100,8 +94,8 @@ function CreateFileForm({...props}) {
                             </TextField>
                             <TextField
                                 fullWidth
-                                id="pathFile"
-                                name="pathFile"
+                                id="file"
+                                name="file"
                                 type="file"
                                 margin="normal"
                                 value={values.pathFile}
