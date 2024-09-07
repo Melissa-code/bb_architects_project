@@ -37,12 +37,12 @@ export default function NavigationBar() {
             <Box
                 component="img"
                 sx={{
-                    height: 100,
+                    height: 150,
                     justifyContent: 'center',
                     alignSelf:"center"
                 }}
                 alt="BB Storage logo"
-                src="/BBS_logo.png"
+                src="/Logo_bbArchitects.svg"
             />
             <List component="nav" aria-label="user menu">
                 {!roles?.includes("ROLE_ADMIN")?(<>
