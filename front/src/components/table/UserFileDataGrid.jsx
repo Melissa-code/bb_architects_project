@@ -1,12 +1,11 @@
 import Box from '@mui/material/Box'
 import {DataGrid} from '@mui/x-data-grid'
-import data from '../../utils/fake-fetch/files.json'
 import {LinearProgress} from '@mui/material'
 import EditFileForm from '../forms/EditFileForm'
 import useUserFileDataGrid from './useUserFileDataGrid.jsx'
 
 function UserFileDataGrid() {
-    const {open, setOpen, columns, rowData, storagePercentage} =
+    const {open, setOpen, columns, rowData, storagePercentage, data} =
         useUserFileDataGrid()
 
     return (
@@ -19,7 +18,7 @@ function UserFileDataGrid() {
                     variant="determinate"
                 />
                 <DataGrid
-                    rows={data.files}
+                    rows={data?.files}
                     columns={columns}
                     initialState={{
                         pagination: {
@@ -40,7 +39,7 @@ function UserFileDataGrid() {
                     }}
                 />
             </Box>
-            <EditFileForm open={open} setOpen={setOpen} data={rowData} />
+            <EditFileForm open={open} setOpen={setOpen} rowData={rowData}/>
         </>
     )
 }

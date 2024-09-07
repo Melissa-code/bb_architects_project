@@ -12,13 +12,14 @@ function useUserFileDataGrid() {
 
     const token = localStorage.getItem('BBStorage_token')
 
-    const {data} = useQuery({
+    const {data, isSuccess, isError, error} = useQuery({
         queryKey: ['GetFiles'],
-        queryFn: fetchGetFiles(token),
+        queryFn: () => fetchGetFiles(token),
         enabled: !!token,
     })
 
-    console.log(data)
+    isError && (console.error(error?.message))
+
 
     // const {mutate} = useMutation({
     //     mutationKey: ['updateTitle'],
@@ -32,10 +33,15 @@ function useUserFileDataGrid() {
     // })
 
     // TODO : Mettre en place composant pour récupérer les informations de stockage
-    // const {total_weight_files, total_storage_capacity} = data
-    // const storagePercentage =
-    //     (total_weight_files * 100) / total_storage_capacity
-    const storagePercentage = 50
+    let storagePercentage
+    if (data) {
+        const {total_weight_files, total_storage_capacity} = data
+        storagePercentage =
+            (total_weight_files * 100) / total_storage_capacity
+    } else {
+        storagePercentage = null
+    }
+
 
     function handleDeleteClick(id) {
         //TODO : Mettre une modal de confirmation
@@ -63,7 +69,7 @@ function useUserFileDataGrid() {
             headerAlign: 'center',
             width: 150,
             renderCell: (params) => {
-                return <Chip label={params.value} color="primary" />
+                return <Chip label={params.value} color="primary"/>
             },
             align: 'center',
         },
@@ -87,7 +93,7 @@ function useUserFileDataGrid() {
                 return value.name
             },
             renderCell: (params) => {
-                return <Chip label={params.value} variant="outlined" />
+                return <Chip label={params.value} variant="outlined"/>
             },
             align: 'center',
         },
@@ -108,7 +114,7 @@ function useUserFileDataGrid() {
                 return [
                     <GridActionsCellItem
                         key={id}
-                        icon={<EditIcon />}
+                        icon={<EditIcon/>}
                         label="Edit"
                         className="textPrimary"
                         onClick={() => handleEditClick(row)}
@@ -116,7 +122,7 @@ function useUserFileDataGrid() {
                     />,
                     <GridActionsCellItem
                         key={id}
-                        icon={<DeleteIcon />}
+                        icon={<DeleteIcon/>}
                         label="Delete"
                         onClick={() => handleDeleteClick(id)}
                         color="inherit"
@@ -126,7 +132,7 @@ function useUserFileDataGrid() {
         },
     ]
 
-    return {open, setOpen, columns, rowData, storagePercentage}
+    return {open, setOpen, columns, rowData, storagePercentage, data}
 }
 
 export default useUserFileDataGrid
