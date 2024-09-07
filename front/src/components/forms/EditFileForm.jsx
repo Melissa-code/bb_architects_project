@@ -1,42 +1,37 @@
 import {Formik, Form} from 'formik'
 import {TextField, Button, MenuItem, Modal, Box} from '@mui/material'
-import categories from '../../utils/fake-fetch/categories.json'
-import {useState} from 'react'
 import {useMutation, useQuery} from '@tanstack/react-query'
-import {fetchCreateFile, fetchGetCategories} from '../../utils/fetch'
+import {fetchGetCategories, fetchUpdateFile} from '../../utils/fetch'
 
 function EditFileForm({...props}) {
-    const {open, setOpen, data} = props
-    const categoryID = data.category?.categoryId.toString()
+    const {open, setOpen, rowData} = props
 
-    // TODO : Récupérer la liste des catégories
-    // TODO : Récupérer les données de la ligne en props
-    // TODO : Changer le label du bouton sumbit selon ajout ou modification
-    /*
-   const token = localStorage.getItem('BBStorage_token')
+    const categoryID = rowData.category?.categoryId.toString()
 
-    const {data, isSuccess} = useQuery({
+    const token = localStorage.getItem('BBStorage_token')
+
+    const categories = useQuery({
         queryKey: ['GetCategories'],
-        queryFn: fetchGetCategories(token),
+        queryFn: () => fetchGetCategories(token),
         enabled: !!token,
     })
 
-    isSuccess && console.log(data)
-    
     const {mutate} = useMutation({
-        mutationKey: ['AddingFile'],
-        mutationFn: (variables) => fetchCreateFile(variables, token),
+        mutationKey: ['EditFile'],
+        mutationFn: (variables) => {
+            variables.fileId = rowData.id
+            return fetchUpdateFile(variables, token)
+        },
         onSuccess: (data) => {
             // TODO : Mettre une alerte Success
-            alert('Création réussie')
+            alert('Modification réussie')
         },
         onError: (error) => {
             // TODO : Mettre une alerte Erreur
             console.log(error)
-            alert('Création échouée. Voir console pour détails.')
+            alert('Modification échouée.')
         },
     })
-*/
 
     const style = {
         position: 'absolute',
@@ -49,16 +44,18 @@ function EditFileForm({...props}) {
         boxShadow: 24,
         p: 4,
     }
+
+    console.log(rowData)
     return (
         <Formik
             initialValues={{
-                name: data ? data.fileName : 'test',
+                name: rowData ? rowData.fileName : 'Erreur',
                 categoryId: categoryID ? categoryID : '1',
             }}
             enableReinitialize={true}
             validateOnChange={false}
             validateOnBlur={false}
-            onSubmit={(values) => alert(JSON.stringify(values))}>
+            onSubmit={(values) => mutate(values)}>
             {({values, handleChange, handleBlur, touched, errors}) => (
                 <Modal
                     open={open}
@@ -96,7 +93,7 @@ function EditFileForm({...props}) {
                                 helperText={
                                     touched.categoryId && errors.categoryId
                                 }>
-                                {categories.categories.map((category) => (
+                                {categories?.data?.categories?.map((category) => (
                                     <MenuItem
                                         key={category.categoryId}
                                         value={category.categoryId}>
