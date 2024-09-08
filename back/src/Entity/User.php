@@ -100,12 +100,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'user')]
     private Collection $files;
 
-    /**
-     * @var Collection<int, StorageSpace>
-     */
-    #[ORM\ManyToMany(targetEntity: StorageSpace::class, mappedBy: 'user')]
-    private Collection $storageSpaces;
-
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Cart $cart = null;
 
@@ -130,7 +124,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->files = new ArrayCollection();
-        $this->storageSpaces = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->invoices = new ArrayCollection();
         $this->userStoragePurchases = new ArrayCollection();
@@ -296,33 +289,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($file->getUser() === $this) {
                 $file->setUser(null);
             }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, StorageSpace>
-     */
-    public function getStorageSpaces(): Collection
-    {
-        return $this->storageSpaces;
-    }
-
-    public function addStorageSpace(StorageSpace $storageSpace): static
-    {
-        if (!$this->storageSpaces->contains($storageSpace)) {
-            $this->storageSpaces->add($storageSpace);
-            $storageSpace->addUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeStorageSpace(StorageSpace $storageSpace): static
-    {
-        if ($this->storageSpaces->removeElement($storageSpace)) {
-            $storageSpace->removeUser($this);
         }
 
         return $this;

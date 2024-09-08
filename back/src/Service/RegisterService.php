@@ -111,12 +111,10 @@ class RegisterService
             throw new InvalidArgumentException('Aucun abonnement correspondant trouvé.');
         }
 
-        // Link the storage space to the user
-        $storageSpace->addUser($user);
-        $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
-
         try {
-            $this->validateSaveEntityService->saveEntity($storageSpace);
+            // Link the storage space to the user
+            $this->cartService->createStorageSpacePurchaseForUser($user, $storageSpace);
+
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
                 'La validation de l\'abonnement a échoué: ' . $e->getMessage()

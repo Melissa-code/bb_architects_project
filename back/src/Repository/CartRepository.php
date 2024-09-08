@@ -16,18 +16,6 @@ class CartRepository extends ServiceEntityRepository
         parent::__construct($registry, Cart::class);
     }
 
-    /**
-     * Find the cart of the user by user_id
-     */
-    public function findCartByUserId($userId): mixed
-    {
-        return $this->createQueryBuilder('c')
-            ->where('c.user = :userId')
-            ->setParameter('userId', $userId)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
     //    /**
     //     * @return Cart[] Returns an array of Cart objects
     //     */

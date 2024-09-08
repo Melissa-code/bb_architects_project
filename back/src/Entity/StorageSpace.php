@@ -26,12 +26,6 @@ class StorageSpace
     private ?int $storageCapacity = null;
 
     /**
-     * @var Collection<int, User>
-     */
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'storageSpaces')]
-    private Collection $user;
-
-    /**
      * @var Collection<int, QuantityCartStorage>
      */
     #[ORM\OneToMany(targetEntity: QuantityCartStorage::class, mappedBy: 'storageSpace')]
@@ -51,7 +45,6 @@ class StorageSpace
 
     public function __construct()
     {
-        $this->user = new ArrayCollection();
         $this->quantityCartStorages = new ArrayCollection();
         $this->userStoragePurchases = new ArrayCollection();
         $this->orders = new ArrayCollection();
@@ -94,30 +87,6 @@ class StorageSpace
     public function setStorageCapacity(int $storageCapacity): static
     {
         $this->storageCapacity = $storageCapacity;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, User>
-     */
-    public function getUser(): Collection
-    {
-        return $this->user;
-    }
-
-    public function addUser(User $user): static
-    {
-        if (!$this->user->contains($user)) {
-            $this->user->add($user);
-        }
-
-        return $this;
-    }
-
-    public function removeUser(User $user): static
-    {
-        $this->user->removeElement($user);
 
         return $this;
     }
