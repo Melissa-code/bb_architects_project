@@ -17,15 +17,15 @@ function ProfileUserInfoCard({...props}) {
         setOpen(true)
     }
 
-    const address1 = `${data.user.address.number_street} ${data.user.address.street}`
-    const address2 = `${data.user.address.zipcode} ${
-        data.user.address.city
-    } ${data.user.address.country.toUpperCase()}`
-    const fullName = `${data.user.firstname} ${data.user.lastname}`
+    const address1 = `${data?.user?.address?.number_street} ${data?.user?.address?.street}`
+    const address2 = `${data?.user?.address?.zipcode} ${
+        data?.user?.address?.city
+    } ${data?.user?.address?.country.toUpperCase()}`
+    const fullName = `${data?.user?.firstname} ${data?.user?.lastname}`
 
     return (
         <>
-            <Card sx={{minWidth: 275}}>
+            <Card sx={{minWidth: 275, maxWidth: 350}}>
                 <CardHeader
                     title={'Informations personnelles'}
                     subheader={fullName}
@@ -38,7 +38,7 @@ function ProfileUserInfoCard({...props}) {
                         sx={{fontSize: 16}}
                         color="text.secondary"
                         gutterBottom>
-                        {data.user.email}
+                        {data?.user?.email}
                     </Typography>
                     <Typography sx={{fontSize: 16}} color="text.primary">
                         Adresse postale
@@ -59,7 +59,7 @@ function ProfileUserInfoCard({...props}) {
                         sx={{fontSize: 16}}
                         color="text.secondary"
                         gutterBottom>
-                        {data.user.phone}
+                        {data?.user?.phone}
                     </Typography>
                 </CardContent>
                 <CardActions>
@@ -76,7 +76,7 @@ function ProfileUserInfoCard({...props}) {
                 </CardActions>
             </Card>
 
-            <ProfileConfirmDelete open={open} setOpen={setOpen} />
+            <ProfileConfirmDelete open={open} setOpen={setOpen}/>
         </>
     )
 }
