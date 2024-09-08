@@ -20,6 +20,11 @@ function AdminFileDataGrid() {
                                 pageSize: 10,
                             },
                         },
+                        columns: {
+                            columnVisibilityModel: {
+                                id: false
+                            }
+                        }
                     }}
                     pageSizeOptions={[5]}
                     disableRowSelectionOnClick
