@@ -136,4 +136,9 @@ class Company
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->name . ' ' . ', Adresse: ' . ($this->address ? $this->address->__toString() : 'N/A');
+    }
 }

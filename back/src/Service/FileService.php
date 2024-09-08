@@ -7,6 +7,7 @@ use App\Entity\File;
 use App\Entity\User;
 use App\Repository\CategoryRepository;
 use App\Repository\FileRepository;
+use App\Repository\UserStoragePurchaseRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
@@ -24,28 +25,31 @@ class FileService
 {
     private string $baseUrl;
     private FileRepository $fileRepository;
+    private UserStoragePurchaseRepository $userStoragePurchaseRepository;
     private CategoryRepository $categoryRepository;
+    private ValidateSaveEntityService $validateSaveEntityService;
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
     private SluggerInterface $slugger;
-    private ValidatorInterface $validator;
 
     public function __construct(
         ParameterBagInterface $params,
         FileRepository $fileRepository,
         CategoryRepository $categoryRepository,
+        UserStoragePurchaseRepository $userStoragePurchaseRepository,
+        ValidateSaveEntityService $validateSaveEntityService,
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger,
-        ValidatorInterface $validator,
     ){
         $this->baseUrl = $params->get('BASE_URL');
         $this->fileRepository = $fileRepository;
         $this->categoryRepository = $categoryRepository;
+        $this->userStoragePurchaseRepository = $userStoragePurchaseRepository;
+        $this->validateSaveEntityService = $validateSaveEntityService;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
         $this->slugger = $slugger;
-        $this->validator = $validator;
         $this->logger->error($this->baseUrl);
     }
 
@@ -53,7 +57,7 @@ class FileService
      * Get all the files of the user
      * return fileData[]
      */
-    public function getAllFilesOfUser(User $user, $request): array
+    public function getAllFilesOfUser(User $user, Request $request): array
     {
         try {
             // Sort files by weight or createdAt
@@ -83,8 +87,8 @@ class FileService
 
             return [
                 'message' => 'Fichiers récupérés avec succès.',
-                'total_weight_files' => $storageSpace[0], // sum weight of the files
-                'total_storage_capacity' => $storageSpace[1], // sum storage_space bought by the user
+                'total_weight_files' => $storageSpace[0], // sum of weight of the files
+                'total_storage_capacity' => $storageSpace[1], // sum of storage_space bought by the user
                 'available_storage_space' => $storageSpace[2], // difference between storage_space & weight
                 'files' => $fileData,
             ];
@@ -192,8 +196,8 @@ class FileService
         }
 
         try {
-            $this->validateEntity($file);
-            $this->saveEntity($file);
+            $this->validateSaveEntityService->validateEntity($file);
+            $this->validateSaveEntityService->saveEntity($file);
         } catch (InvalidArgumentException $e) {
             throw new InvalidArgumentException(
                 'L\'ajout ou la modification du fichier a échoué: ' . $e->getMessage()
@@ -306,11 +310,7 @@ class FileService
         $totalWeightInGo = $totalWeightInMo / 1024;
 
         // Sum of the storage_space capacities bought by the user
-        $storageSpaces = $user->getStorageSpaces();
-        $totalStorageCapacity = 0;
-        foreach ($storageSpaces as $storageSpace) {
-            $totalStorageCapacity += $storageSpace->getStorageCapacity();
-        }
+        $totalStorageCapacity = $this->userStoragePurchaseRepository->getTotalStorageCapacityForUser($user->getId());
 
         // Difference between total storageSpace and total weight of files
         $availableStorageSpace = $totalStorageCapacity - $totalWeightInGo;
@@ -372,40 +372,5 @@ class FileService
         }
 
         return $fileFormat;
-    }
-
-    /**
-     * Validate or return error message
-     *
-     * @param object $entity
-     * @throws InvalidArgumentException if the error of validation exist
-     */
-    private function validateEntity(object $entity): void
-    {
-        $violations = $this->validator->validate($entity);
-
-        if (count($violations) > 0) {
-            $errorMessages = [];
-            foreach ($violations as $violation) {
-                $errorMessages[] = $violation->getMessage();
-            }
-            throw new InvalidArgumentException(json_encode(['errors' => $errorMessages]));
-        }
-    }
-
-    /**
-     * Save the entity in the database (file)
-     *
-     * @param Object $entity
-     */
-    private function saveEntity(Object $entity): void
-    {
-        try {
-            $this->entityManager->persist($entity);
-            $this->entityManager->flush();
-        } catch (ORMException $e) {
-            throw new RuntimeException(
-                '[Inscription]: Erreur lors de la persistance de l\'entité:' . $entity, 0, $e);
-        }
     }
 }

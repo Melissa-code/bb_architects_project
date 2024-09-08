@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CartRepository::class)]
 class Cart
@@ -17,9 +18,18 @@ class Cart
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\Type(
+        type: 'bool',
+        message: 'La valeur n\'est pas un type boolean.'
+    )]
     private ?bool $isValidated = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[Assert\NotBlank(message: 'Le prix total ne doit pas être vide.')]
+    #[Assert\Regex(
+        pattern: '/^\d+(\.\d{1,2})?$/',
+        message: 'Le prix total doit être un nombre décimal avec jusqu\'à 2 chiffres après la virgule.'
+    )]
     private ?string $totalPrice = null;
 
     #[ORM\OneToOne(inversedBy: 'cart', cascade: ['persist', 'remove'])]

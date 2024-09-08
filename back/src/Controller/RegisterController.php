@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\InvoiceService;
 use App\Service\RegisterService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,16 +14,12 @@ class RegisterController extends AbstractController
 {
     /**
      * Registration of a new user
-     *
-     * @param Request $request
-     * @param RegisterService $registerService
-     * @param LoggerInterface $logger
-     * @return JsonResponse
      */
     #[Route('/api/register', name: 'api_register', methods: ['POST'])]
     public function register(
         Request $request,
         RegisterService $registerService,
+        InvoiceService $invoiceService,
         LoggerInterface $logger
     ): JsonResponse {
         try {
@@ -39,7 +36,12 @@ class RegisterController extends AbstractController
 
             $address = $registerService->createAddress($data);
             $user = $registerService->createUser($data, $address);
+
+            // Link the storage space to the user
             $registerService->linkStorageSpaceToUser($user);
+
+            // Create an invoice
+            $invoiceService->createInvoice($user);
 
             return new JsonResponse(['message' => 'Nouveau compte utilisateur créé avec succès.'], 201);
         } catch (\InvalidArgumentException $e) {

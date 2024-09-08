@@ -179,4 +179,12 @@ class Address
 
         return $this;
     }
+
+    /**
+     * Complete Address string
+     */
+    public function __toString(): string
+    {
+        return $this->numberStreet . ' ' . $this->street . ', ' . $this->zipcode . ' ' . $this->city . ', ' . $this->country;
+    }
 }
