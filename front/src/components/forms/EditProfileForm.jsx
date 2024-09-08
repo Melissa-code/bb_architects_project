@@ -1,24 +1,21 @@
-import Avatar from '@mui/material/Avatar'
-import Link from '@mui/material/Link'
-import Grid from '@mui/material/Grid'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import Typography from '@mui/material/Typography'
-import {Formik, Form} from 'formik'
-import {registerSchema} from '../validation/validation'
-import {TextField, Button, Divider, MenuItem} from '@mui/material'
-import {countries} from '../datas/countries'
-import {useMutation} from '@tanstack/react-query'
-import {fetchRegister} from '../utils/fetch'
-import {useState} from 'react'
-import AlertSuccess from './notification/alerts/AlertSuccess'
-import AlertFail from './notification/alerts/AlertFail'
+import {Form, Formik} from "formik";
+import {registerSchema} from "../../validation/validation.js";
+import {Button, Divider, MenuItem, TextField} from "@mui/material";
+import {countries} from "../../datas/countries.js";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
+import AlertSuccess from "../notification/alerts/AlertSuccess.jsx";
+import AlertFail from "../notification/alerts/AlertFail.jsx";
+import {useState} from "react";
+import {useMutation} from "@tanstack/react-query";
+import {fetchRegister} from "../../utils/fetch.js";
 
-function RegisterForm() {
+const alertSuccessMessage = 'Modification du profil réussie'
+const alertFailMessage = 'Erreur lors de la modification. Veuillez réessayer.'
+
+function EditProfileForm(props) {
     const [openSuccess, setOpenSuccess] = useState(false)
     const [openFailure, setOpenFailure] = useState(false)
-
-    const alertSuccessMessage = "Inscription réussie. Redirection"
-    const alertFailMessage = "Erreur lors de l'inscription. Veuillez réessayer"
 
     const {mutate} = useMutation({
         mutationKey: ['register'],
@@ -37,30 +34,24 @@ function RegisterForm() {
         setSubmitting(false)
     }
 
+    const initialValues={
+        email: props.,
+        password: props.,
+        confirmPassword: props.,
+        firstname: props.,
+        lastname: props.,
+        phone: props.,
+        number_street: props.,
+        street: props.,
+        zipcode: props.,
+        city: props.,
+        country: props.,
+    }
+
     return (
         <>
-            <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
-                <LockOutlinedIcon/>
-            </Avatar>
-            <Typography component="h1" variant="h5">
-                Inscription
-            </Typography>
-
             <Formik
-                initialValues={{
-                    email: '',
-                    password: '',
-                    confirmPassword: '',
-                    firstname: '',
-                    lastname: '',
-                    phone: '',
-                    number_street: 0,
-                    street: '',
-                    zipcode: 0,
-                    city: '',
-                    country: '',
-                    storage_space: true,
-                }}
+                initialValues={initialValues}
                 validateOnChange={false}
                 validateOnBlur={false}
                 validationSchema={registerSchema}
@@ -277,9 +268,9 @@ function RegisterForm() {
                 </Grid>
             </Grid>
             <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} type={"register"} message={alertSuccessMessage}/>
-            <AlertFail open={openFailure} setOpen={setOpenFailure} alert={alertFailMessage}/>
+            <AlertFail open={openFailure} setOpen={setOpenFailure} message={alertFailMessage}/>
         </>
     )
 }
 
-export default RegisterForm
+export default EditProfileForm

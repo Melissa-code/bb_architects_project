@@ -7,19 +7,19 @@ import Typography from '@mui/material/Typography'
 import {useMutation} from '@tanstack/react-query'
 import {Form, Formik} from 'formik'
 import {useState} from 'react'
-import {useNavigate} from 'react-router-dom'
 import {fetchLogin} from '../utils/fetch'
 import {loginSchema} from '../validation/validation'
 import AlertFail from './notification/alerts/AlertFail'
 import AlertSuccess from './notification/alerts/AlertSuccess'
-import useApp from "../routes/useApp.js";
+
 
 function LoginForm() {
     const [openSuccess, setOpenSuccess] = useState(false)
     const [openFailure, setOpenFailure] = useState(false)
     const [errorMessage, setErrorMessage] = useState('')
 
-
+    const successAlertMessage = 'Connexion réussie. Redirection...'
+    const failAlertMessage = 'Connexion échouée. Veuillez réessayer.'
 
     const {mutate} = useMutation({
         mutationKey: ['login'],
@@ -42,7 +42,7 @@ function LoginForm() {
     return (
         <>
             <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
-                <LockOutlinedIcon />
+                <LockOutlinedIcon/>
             </Avatar>
             <Typography component="h1" variant="h5">
                 Connexion
@@ -108,8 +108,8 @@ function LoginForm() {
                     </Link>
                 </Grid>
             </Grid>
-            <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} type={"login"} />
-            <AlertFail open={openFailure} setOpen={setOpenFailure} error={errorMessage}/>
+            <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} type={"login"} message={successAlertMessage}/>
+            <AlertFail open={openFailure} setOpen={setOpenFailure} error={errorMessage} message={failAlertMessage}/>
         </>
     )
 }

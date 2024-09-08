@@ -3,11 +3,11 @@ import Alert from '@mui/material/Alert'
 import useApp from "../../../routes/useApp.js";
 
 function AlertSuccess({...props}) {
-    const {open, setOpen, type} = props
+    const {open, setOpen, type, message} = props
     const {handleRedirection} = useApp()
-    //TODO : Définir en ObjectLiterals
 
-   const handleClose = (event, reason) => {
+
+    const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return
         }
@@ -25,7 +25,7 @@ function AlertSuccess({...props}) {
                     severity="success"
                     variant="filled"
                     sx={{width: '100%'}}>
-                    Réussi !
+                    {message}
                 </Alert>
             </Snackbar>
         </div>

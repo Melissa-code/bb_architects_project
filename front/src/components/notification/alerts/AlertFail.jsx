@@ -1,5 +1,5 @@
-import { Alert, Box, Button, Divider, Modal, Snackbar, Typography } from '@mui/material'
-import { useState } from 'react'
+import {Alert, Box, Button, Divider, Modal, Snackbar, Typography} from '@mui/material'
+import {useState} from 'react'
 
 const style = {
     position: 'absolute',
@@ -14,7 +14,7 @@ const style = {
 }
 
 function AlertFail({...props}) {
-    const {open, setOpen, error} = props
+    const {open, setOpen, error, message} = props
     const [openModal, setOpenModal] = useState(false)
 
     const handleClose = (event, reason) => {
@@ -51,32 +51,32 @@ function AlertFail({...props}) {
                             Détails
                         </Button>
                     }>
-                    Connexion échouée. Veuillez réessayer
+                    {message}
                 </Alert>
             </Snackbar>
             <div>
-            <Modal
-                open={openModal}
-                onClose={handleCloseModal}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description">
-                <Box sx={style}>
-                <Typography>
-                Une erreur a été rencontrée.
-                </Typography>
-                <Typography>
-                Veuillez trouver le détail de l&apos;erreur ci-dessous
-                </Typography>
-                <Divider/>
-                <Typography>
-                    {error.message}
-                </Typography>
-                <Button onClick={handleClose}>
-                Fermer
-                </Button>
-                </Box>
-            </Modal>
-        </div>
+                <Modal
+                    open={openModal}
+                    onClose={handleCloseModal}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description">
+                    <Box sx={style}>
+                        <Typography>
+                            Une erreur a été rencontrée.
+                        </Typography>
+                        <Typography>
+                            Veuillez trouver le détail de l&apos;erreur ci-dessous
+                        </Typography>
+                        <Divider/>
+                        <Typography>
+                            {error?.message}
+                        </Typography>
+                        <Button onClick={handleClose}>
+                            Fermer
+                        </Button>
+                    </Box>
+                </Modal>
+            </div>
         </div>
     )
 }
