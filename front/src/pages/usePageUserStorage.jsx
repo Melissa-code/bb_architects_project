@@ -14,6 +14,8 @@ function usePageUserStorage() {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
     const [openAlertDelete, setOpenAlertDelete] = useState(false)
     const [idDelete, setIdDelete] = useState(0)
+    const [openAlertDeleteOk, setOpenAlertDeleteOk] = useState(false)
+    const [openAlertDeleteKo, setOpenAlertDeleteKo] = useState(false)
 
     const token = localStorage.getItem('BBStorage_token')
 
@@ -38,8 +40,7 @@ function usePageUserStorage() {
         mutationKey: ['DeleteFile'],
         mutationFn: (variables) => fetchDeleteFile(variables, token),
         onSuccess: () => {
-            // TODO : Alert "Document supprimé"
-            alert("Document supprimé")
+            setOpenAlertDeleteOk(true)
         },
         onError: (error) => {
             // TODO : Alert "Erreur lors de la suppression"
@@ -72,7 +73,6 @@ function usePageUserStorage() {
     }
 
     function handleEditClick(row) {
-        //TODO : Mettre en place un formulaire d'édition
         setRowData(row)
         setOpen(true)
     }
@@ -164,7 +164,12 @@ function usePageUserStorage() {
         data,
         openDeleteDialog,
         handleDelete,
-        handleCloseDialogDelete, profile
+        handleCloseDialogDelete,
+        profile,
+        openAlertDeleteKo,
+        openAlertDeleteOk,
+        setOpenAlertDeleteOk,
+        setOpenAlertDeleteKo
     }
 }
 
