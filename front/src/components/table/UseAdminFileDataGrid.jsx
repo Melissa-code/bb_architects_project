@@ -5,6 +5,7 @@ import {useState} from "react";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {useNavigate, useParams} from "react-router-dom";
 import {fetchDownloadFile, fetchGetUserFiles} from "../../utils/fetch.js";
+import {chipColor} from "../../utils/chipColors.js";
 
 function UseAdminFileDataGrid() {
     const [open, setOpen] = useState(false);
@@ -55,7 +56,7 @@ function UseAdminFileDataGrid() {
             headerAlign: 'center',
             width: 150,
             renderCell: (params) => {
-                return <Chip label={params.value} color="primary"/>
+                return <Chip label={params.value} sx={{backgroundColor: chipColor[params.value], color: "#FFFFFF"}}/>
             },
             align: 'center',
         },

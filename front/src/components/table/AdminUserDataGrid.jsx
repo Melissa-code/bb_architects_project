@@ -41,7 +41,7 @@ function AdminUserDataGrid() {
         },
     ]
     return <DataGrid
-        rows={data?.clients}
+        rows={data?.clients || []}
         columns={columns}
         initialState={{
             pagination: {
@@ -51,14 +51,32 @@ function AdminUserDataGrid() {
             },
             columns: {
                 columnVisibilityModel: {
-                    id: false
-                }
-            }
+                    id: false, // Masquer la colonne ID
+                },
+            },
         }}
-        pageSizeOptions={[5]}
+        pageSizeOptions={[5, 10, 25]}
         disableRowSelectionOnClick
         onRowClick={({row}) => {
-            navigate(`/admin/storage/${row.id}`)
+            navigate(`/admin/storage/${row.id}`);
+        }}
+        sx={{
+            '& .MuiDataGrid-root': {
+                border: 'none', // Supprimer la bordure par défaut
+            },
+            '& .MuiDataGrid-cell': {
+                color: 'text.secondary', // Couleur du texte
+                fontSize: 14, // Taille du texte des cellules
+            },
+            '& .MuiDataGrid-columnHeaders': {
+                bgcolor: 'primary.light', // Couleur de fond des en-têtes
+                color: 'primary.contrastText', // Texte blanc dans les en-têtes
+                fontSize: 16,
+                fontWeight: 'bold',
+            },
+            '& .MuiDataGrid-footerContainer': {
+                bgcolor: 'background.default', // Fond de la pagination
+            },
         }}
     />
 }
