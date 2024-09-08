@@ -1,12 +1,47 @@
-import {Formik, Form} from 'formik'
 import {TextField, Button, MenuItem, Modal, Box} from '@mui/material'
 import {useMutation, useQuery} from '@tanstack/react-query'
 import {fetchCreateFile, fetchGetCategories} from '../../utils/fetch'
+import {useState} from "react";
 
 function CreateFileForm({...props}) {
+    const token = localStorage.getItem('BBStorage_token')
+    const [file, setFile] = useState(null);
+
+    const handleFileChange = (e) => {
+        if (e.target.files) {
+            setFile(e.target.files[0]);
+        }
+    };
+
+    const handleUpload = async () => {
+        if (file) {
+            console.log('Uploading file...');
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('name', "TestFront");
+            formData.append('categoryId', 2);
+
+
+            try {
+                const result = await fetch(`${import.meta.env.VITE_API_URL}/file/create_file`, {
+                    method: 'POST',
+                    body: formData, headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                const data = await result.json();
+
+                console.log(data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    }
+
     const {open, setOpen} = props
 
-    const token = localStorage.getItem('BBStorage_token')
 
     const {data, isError, error} = useQuery({
         queryKey: ['GetCategories'],
@@ -28,6 +63,12 @@ function CreateFileForm({...props}) {
         },
     })
 
+    const handleFileUpload = async (event) => {
+        const file = event.target.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+        mutate(formData)
+    }
 
     const style = {
         position: 'absolute',
@@ -41,95 +82,37 @@ function CreateFileForm({...props}) {
         p: 4,
     }
     return (
-        <Formik
-            initialValues={{name: '', categoryId: 1, file: null}}
-            validateOnChange={false}
-            validateOnBlur={false}
-            enableReinitialize={true}
-            onSubmit={(values) => console.log(values)}>
-            {({values, handleChange, handleBlur, touched, errors}) => (
-                <Modal
-                    open={open}
-                    onClose={() => setOpen(false)}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description">
-                    <Box sx={style}>
-                        <Form>
-                            <TextField
-                                fullWidth
-                                id="name"
-                                name="name"
-                                type="text"
-                                margin="normal"
-                                value={values.name}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={touched.name && Boolean(errors.name)}
-                                helperText={touched.name && errors.name}
-                            />
-                            <TextField
-                                fullWidth
-                                id="categoryId"
-                                name="categoryId"
-                                select
-                                label="Catégorie"
-                                margin="normal"
-                                value={values.categoryId}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={
-                                    touched.categoryId &&
-                                    Boolean(errors.categoryId)
-                                }
-                                helperText={
-                                    touched.categoryId && errors.categoryId
-                                }>
-                                {data?.categories?.map((category) => (
-                                    <MenuItem
-                                        key={category.categoryId}
-                                        value={category.categoryId}>
-                                        {category.name}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                            <TextField
-                                fullWidth
-                                id="file"
-                                name="file"
-                                type="file"
-                                margin="normal"
-                                value={values.pathFile}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={
-                                    touched.pathFile && Boolean(errors.pathFile)
-                                }
-                                helperText={touched.pathFile && errors.pathFile}
-                            />
-                            <Box
-                                sx={{
-                                    display: 'grid',
-                                    columnGap: 3,
-                                    gridTemplateColumns: 'repeat(2, 1fr)',
-                                }}>
-                                <Button
-                                    color="error"
-                                    variant="contained"
-                                    onClick={() => setOpen(false)}>
-                                    Annuler
-                                </Button>
-                                <Button
-                                    color="primary"
-                                    variant="contained"
-                                    type="submit">
-                                    Ajouter
-                                </Button>
-                            </Box>
-                        </Form>
-                    </Box>
-                </Modal>
-            )}
-        </Formik>
+        <Modal
+            open={open}
+            onClose={() => {
+                setOpen(false)
+                setFile(null)
+            }}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description">
+            <Box sx={style}>
+
+                <div>
+                    <input id="file" type="file" onChange={handleFileChange}/>
+                </div>
+                {file && (
+                    <section>
+                        File details:
+                        <ul>
+                            <li>Name: {file.name}</li>
+                            <li>Type: {file.type}</li>
+                            <li>Size: {file.size} bytes</li>
+                        </ul>
+                    </section>
+                )}
+
+                {file && (
+                    <button
+                        onClick={handleUpload}
+                    >Upload a file</button>
+                )}
+            </Box>
+        </Modal>
     )
 }
 
