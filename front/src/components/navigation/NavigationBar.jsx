@@ -23,8 +23,9 @@ export default function NavigationBar() {
     const handleClick = () => {
         setOpen(!open)
     }
-    const handleListItemClick = (event, index) => {
+    const handleListItemClick = (event, index, path) => {
         setSelectedIndex(index)
+        navigate(path)
     }
 
     const handleDisconnect = () => {
@@ -33,7 +34,14 @@ export default function NavigationBar() {
     }
 
     return (
-        <Box sx={{width: '100%', bgcolor: 'background.paper', minWidth: 200}}>
+        <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: '100vh',
+            minWidth: 200,
+            background: "primary.main"
+        }}>
             <Box
                 component="img"
                 sx={{
@@ -44,14 +52,14 @@ export default function NavigationBar() {
                 alt="BB Storage logo"
                 src="/Logo_bbArchitects.svg"
             />
-            <List component="nav" aria-label="user menu">
+            <List component="nav" sx={{flexGrow: 1}}>
                 {!roles?.includes("ROLE_ADMIN") ? (<>
                             <ListItem alignItems="center">
                                 <NavigationButtonAdd/>
                             </ListItem>
                             <ListItemButton
                                 selected={selectedIndex === 0}
-                                onClick={(event) => handleListItemClick(event, 0)}>
+                                onClick={(event) => handleListItemClick(event, 0, '/user/storage')}>
                                 <ListItemIcon>
                                     <HomeIcon/>
                                 </ListItemIcon>
@@ -59,7 +67,7 @@ export default function NavigationBar() {
                             </ListItemButton>
                             <ListItemButton
                                 selected={selectedIndex === 1}
-                                onClick={(event) => handleListItemClick(event, 1)}>
+                                onClick={(event) => handleListItemClick(event, 1, '/user/profile')}>
                                 <ListItemIcon>
                                     <PersonIcon/>
                                 </ListItemIcon>
@@ -67,21 +75,21 @@ export default function NavigationBar() {
                             </ListItemButton></>
                     ) :
                     (<><ListItemButton selected={selectedIndex === 2}
-                                       onClick={(event) => handleListItemClick(event, 2)}>
+                                       onClick={(event) => handleListItemClick(event, 2, '/admin/dashboard')}>
                         <ListItemIcon>
                             <DashboardIcon/>
                         </ListItemIcon>
                         <ListItemText primary="Dashboard"/>
                     </ListItemButton>
                         <ListItemButton selected={selectedIndex === 3}
-                                        onClick={(event) => handleListItemClick(event, 3)}>
+                                        onClick={(event) => handleListItemClick(event, 3, '/admin/clients')}>
                             <ListItemIcon>
                                 <GroupIcon/>
                             </ListItemIcon>
                             <ListItemText primary="Comptes"/>
                         </ListItemButton></>)}
 
-                <ListItemButton onClick={handleDisconnect}>
+                <ListItemButton onClick={handleDisconnect} sx={{alignSelf: 'flex-end'}}>
                     <ListItemIcon>
                         <MeetingRoomIcon color="error"/>
                     </ListItemIcon>

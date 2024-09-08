@@ -4,11 +4,11 @@ import {Outlet} from 'react-router-dom'
 
 function Navigation() {
     return (
-        <Grid container>
-            <Grid container lg={2} xl={2}>
+        <Grid container spacing={2} sx={{height: '100vh'}}>
+            <Grid item xs={12} sm={4} md={3} lg={2} xl={2}>
                 <NavigationBar/>
             </Grid>
-            <Grid container lg={10} xl={10} spacing={2}>
+            <Grid item xs={12} sm={8} md={9} lg={10} xl={10}>
                 <Outlet/>
             </Grid>
         </Grid>
