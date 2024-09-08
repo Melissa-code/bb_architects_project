@@ -1,17 +1,14 @@
 import {Grid} from '@mui/material'
 import NavigationBar from './NavigationBar'
 import {Outlet} from 'react-router-dom'
-import BreadCrumb from "./BreadCrumb.jsx";
 
 function Navigation() {
     return (
         <Grid container>
-
-            <Grid xs={2}>
+            <Grid container lg={2} xl={2}>
                 <NavigationBar/>
             </Grid>
-            <Grid xs={10}>
-                <BreadCrumb/>
+            <Grid container lg={10} xl={10} spacing={2}>
                 <Outlet/>
             </Grid>
         </Grid>

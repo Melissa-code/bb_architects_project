@@ -18,7 +18,7 @@ export default function NavigationBar() {
     const [selectedIndex, setSelectedIndex] = React.useState(1)
     const [open, setOpen] = React.useState(true)
     const navigate = useNavigate()
-    const {roles}=getUserRole()
+    const {roles} = getUserRole()
 
     const handleClick = () => {
         setOpen(!open)
@@ -33,57 +33,57 @@ export default function NavigationBar() {
     }
 
     return (
-        <Box sx={{width: '100%', bgcolor: 'background.paper', minWidth:200}}>
+        <Box sx={{width: '100%', bgcolor: 'background.paper', minWidth: 200}}>
             <Box
                 component="img"
                 sx={{
                     height: 150,
                     justifyContent: 'center',
-                    alignSelf:"center"
+                    alignSelf: "center"
                 }}
                 alt="BB Storage logo"
                 src="/Logo_bbArchitects.svg"
             />
             <List component="nav" aria-label="user menu">
-                {!roles?.includes("ROLE_ADMIN")?(<>
-                    <ListItem alignItems="center">
-                    <NavigationButtonAdd/>
-                </ListItem>
-                    <ListItemButton
-                    selected={selectedIndex === 0}
-                onClick={(event) => handleListItemClick(event, 0)}>
-                <ListItemIcon>
-                    <HomeIcon/>
-                </ListItemIcon>
-                <ListItemText primary="Accueil"/>
-            </ListItemButton>
-            <ListItemButton
-                selected={selectedIndex === 1}
-                onClick={(event) => handleListItemClick(event, 1)}>
-                <ListItemIcon>
-                    <PersonIcon/>
-                </ListItemIcon>
-                <ListItemText primary="Compte"/>
-            </ListItemButton></>
-            ):
-            (<><ListItemButton selected={selectedIndex === 2}
-                             onClick={(event) => handleListItemClick(event, 2)}>
-            <ListItemIcon>
-                <DashboardIcon/>
-            </ListItemIcon>
-            <ListItemText primary="Dashboard"/>
-        </ListItemButton>
-            <ListItemButton selected={selectedIndex === 3}
-                            onClick={(event) => handleListItemClick(event, 3)}>
-                <ListItemIcon>
-                    <GroupIcon/>
-                </ListItemIcon>
-                <ListItemText primary="Comptes"/>
-            </ListItemButton></>)}
+                {!roles?.includes("ROLE_ADMIN") ? (<>
+                            <ListItem alignItems="center">
+                                <NavigationButtonAdd/>
+                            </ListItem>
+                            <ListItemButton
+                                selected={selectedIndex === 0}
+                                onClick={(event) => handleListItemClick(event, 0)}>
+                                <ListItemIcon>
+                                    <HomeIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary="Stockage"/>
+                            </ListItemButton>
+                            <ListItemButton
+                                selected={selectedIndex === 1}
+                                onClick={(event) => handleListItemClick(event, 1)}>
+                                <ListItemIcon>
+                                    <PersonIcon/>
+                                </ListItemIcon>
+                                <ListItemText primary="Profil"/>
+                            </ListItemButton></>
+                    ) :
+                    (<><ListItemButton selected={selectedIndex === 2}
+                                       onClick={(event) => handleListItemClick(event, 2)}>
+                        <ListItemIcon>
+                            <DashboardIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary="Dashboard"/>
+                    </ListItemButton>
+                        <ListItemButton selected={selectedIndex === 3}
+                                        onClick={(event) => handleListItemClick(event, 3)}>
+                            <ListItemIcon>
+                                <GroupIcon/>
+                            </ListItemIcon>
+                            <ListItemText primary="Comptes"/>
+                        </ListItemButton></>)}
 
                 <ListItemButton onClick={handleDisconnect}>
                     <ListItemIcon>
-                        <MeetingRoomIcon color="error" />
+                        <MeetingRoomIcon color="error"/>
                     </ListItemIcon>
                     <ListItemText
                         primary="Déconnexion"
