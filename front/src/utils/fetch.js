@@ -67,18 +67,12 @@ export async function fetchGetFiles(token) {
 }
 
 export async function fetchCreateFile(data, token) {
-    console.log("data submitted", data)
-    const formData = new FormData()
-    formData.append('pathFile', data.pathFile)
-    formData.append('name', data.name)
-    formData.append('categoryId', data.categoryId)
-
     const response = await fetch(`${endpoint}/file/create_file`, {
         method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
         },
-        body: formData,
+        body: data,
     })
 
     if (response.ok) {
