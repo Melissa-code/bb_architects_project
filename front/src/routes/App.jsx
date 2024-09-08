@@ -14,6 +14,9 @@ import {createTheme, ThemeProvider} from '@mui/material/styles';
 import RedirectPage from "../components/navigation/RedirectPage.jsx";
 import PageUserStorage from "../pages/PageUserStorage.jsx";
 import PageUserProfile from "../pages/PageUserProfile.jsx";
+import ProtectedRoute from "../components/ProtectedRoute.jsx";
+import PageAdminDashboard from "../pages/PageAdminDashboard.jsx";
+import PageAdminClients from "../pages/PageAdminClients.jsx";
 
 const router = createBrowserRouter([{path: '*', element: <Root/>}])
 const themeOptions = createTheme({
@@ -50,36 +53,18 @@ function Root() {
                 <Route path="register" element={<RegisterForm/>}/>
             </Route>
             <Route element={<Navigation/>}>
-                <Route path="user" handle={{
-                    crumb: () => {
-                        return "Utilisateur"
-                    }
-                }}>
-                    <Route path="storage" element={<PageUserStorage/>} handle={{
-                        crumb: () => {
-                            return "Stockage"
-                        }
-                    }}/>
-                    <Route path="profile" element={<PageUserProfile/>}/>
+                <Route path="user">
+                    <Route path="storage" element={<ProtectedRoute><PageUserStorage/></ProtectedRoute>}/>
+                    <Route path="profile" element={<ProtectedRoute><PageUserProfile/></ProtectedRoute>}/>
                 </Route>
-                <Route path="admin" handle={{
-                    crumb: () => {
-                        return "Administration"
-                    }
-                }}>
-                    {/**<Route path='dashboard' element={}/>*/}
-                    <Route path='clients' element={<AdminUserDataGrid/>} handle={{
-                        crumb: () => {
-                            return "Clients"
-                        }
-                    }}/>
-                    <Route path='storage/:id' element={<AdminFileDataGrid/>} handle={{
-                        crumb: () => {
-                            return "Stockage client"
-                        }
-                    }}/>
+                <Route path="admin">
+                    <Route path='dashboard' element={<ProtectedRoute><PageAdminDashboard/></ProtectedRoute>}/>
+                    <Route path='clients' element={<ProtectedRoute><PageAdminClients/></ProtectedRoute>}/>
+                    <Route path='storage/:id' element={<ProtectedRoute><AdminFileDataGrid/></ProtectedRoute>}
+                    />
                 </Route>
             </Route>
+
             <Route path="download/:id" element={<RedirectPage/>}/>
         </Routes>
     )
