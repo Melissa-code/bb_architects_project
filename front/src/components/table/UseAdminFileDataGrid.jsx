@@ -2,16 +2,34 @@ import Chip from "@mui/material/Chip";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Download, Visibility} from "@mui/icons-material";
 import {useState} from "react";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {useNavigate, useParams} from "react-router-dom";
+import {fetchDownloadFile, fetchGetUserFiles} from "../../utils/fetch.js";
 
-function UseAdminFileDataGrid(){
+function UseAdminFileDataGrid() {
     const [open, setOpen] = useState(false);
     const [rowData, setRowData] = useState({});
+    const {id} = useParams()
+    const navigate = useNavigate()
+    const token = localStorage.getItem("BBStorage_token")
+
+    const {data, isError, error} = useQuery({
+        queryKey: ["GetUser", id],
+        queryFn: () => fetchGetUserFiles(id, token)
+    })
+
+    const {mutate} = useMutation({
+        mutationKey: ["DowloadFile", id],
+        mutationFn: () => fetchDownloadFile(id, token),
+        onSuccess: () => alert("Successfully downloaded"),
+        onError: () => alert("Error encountered")
+    })
+
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    function handleDownloadFile(id) {
-        //TODO : Voir pour le téléchargement d'un document
-        console.log(`Téléchargement du document ${id}`)
+    function handleDownloadFile(row) {
+        mutate()
     }
 
     function handleShowFile(row) {
@@ -37,7 +55,7 @@ function UseAdminFileDataGrid(){
             headerAlign: 'center',
             width: 150,
             renderCell: (params) => {
-                return <Chip label={params.value} color="primary" />
+                return <Chip label={params.value} color="primary"/>
             },
             align: 'center',
         },
@@ -61,7 +79,7 @@ function UseAdminFileDataGrid(){
                 return value.name
             },
             renderCell: (params) => {
-                return <Chip label={params.value} variant="outlined" />
+                return <Chip label={params.value} variant="outlined"/>
             },
             align: 'center',
         },
@@ -78,11 +96,11 @@ function UseAdminFileDataGrid(){
             headerAlign: 'center',
             width: 100,
             cellClassName: 'actions',
-            getActions: ({id,row}) => {
+            getActions: ({id, row}) => {
                 return [
                     <GridActionsCellItem
                         key={id}
-                        icon={<Visibility />}
+                        icon={<Visibility/>}
                         label="Show"
                         className="textPrimary"
                         onClick={() => handleShowFile(row)}
@@ -90,18 +108,18 @@ function UseAdminFileDataGrid(){
                     />,
                     <GridActionsCellItem
                         key={id}
-                        icon={<Download />}
+                        icon={<Download/>}
                         label="Download"
                         className="textPrimary"
                         onClick={() => handleDownloadFile(row)}
                         color="inherit"
-                    />,
+                    />
                 ]
             },
         },
     ]
 
-    return {columns, open, handleClose, handleOpen, rowData, setRowData}
+    return {columns, open, handleClose, handleOpen, rowData, setRowData, data, navigate}
 }
 
 export default UseAdminFileDataGrid
