@@ -37,7 +37,6 @@ export async function fetchRegister(data) {
 
 export async function fetchGetProfile(token) {
     const response = await fetch(`${endpoint}/profile`, {
-        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,

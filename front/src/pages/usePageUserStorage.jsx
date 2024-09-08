@@ -1,16 +1,14 @@
-// A SUPPRIMER
-
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import Chip from '@mui/material/Chip'
 import {GridActionsCellItem} from '@mui/x-data-grid'
 import {useMutation, useQuery} from '@tanstack/react-query'
 import {useState} from 'react'
-import {fetchDeleteFile, fetchGetFiles, fetchUpdateFile} from '../../utils/fetch'
-import {chipColor} from "../../utils/chipColors.js";
+import {fetchDeleteFile, fetchGetFiles, fetchGetProfile} from "../utils/fetch.js";
+import {chipColor} from "../utils/chipColors.js";
 
 
-function useUserFileDataGrid() {
+function usePageUserStorage() {
     const [rowData, setRowData] = useState({})
     const [open, setOpen] = useState(false)
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
@@ -24,6 +22,14 @@ function useUserFileDataGrid() {
         queryFn: () => fetchGetFiles(token),
         enabled: !!token,
     })
+    const userProfile = useQuery({
+        queryKey: ['GetProfile'],
+        queryFn: () => fetchGetProfile(token),
+        enabled: !!token,
+    })
+
+    const profile = userProfile?.data
+
 
     isError && (console.error(error?.message))
 
@@ -46,7 +52,7 @@ function useUserFileDataGrid() {
     if (data) {
         const {total_weight_files, total_storage_capacity} = data
         storagePercentage =
-            (total_weight_files * 100) / total_storage_capacity
+            ((total_weight_files * 100) / total_storage_capacity)
     } else {
         storagePercentage = null
     }
@@ -158,8 +164,8 @@ function useUserFileDataGrid() {
         data,
         openDeleteDialog,
         handleDelete,
-        handleCloseDialogDelete
+        handleCloseDialogDelete, profile
     }
 }
 
-export default useUserFileDataGrid
+export default usePageUserStorage

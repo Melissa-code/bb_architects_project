@@ -1,11 +1,9 @@
 import Box from '@mui/material/Box'
 import {DataGrid} from '@mui/x-data-grid'
-import {LinearProgress} from '@mui/material'
 import EditFileForm from '../forms/EditFileForm'
-import useUserFileDataGrid from './useUserFileDataGrid.jsx'
 import DialogUserFileDelete from "../modals/DialogUserFileDelete.jsx";
 
-function UserFileDataGrid() {
+function UserFileDataGrid({...props}) {
     const {
         open,
         setOpen,
@@ -15,17 +13,11 @@ function UserFileDataGrid() {
         data,
         openDeleteDialog, handleDelete, handleCloseDialogDelete
     } =
-        useUserFileDataGrid()
+        props
 
     return (
         <>
-            <Box sx={{height: 400, width: '100%'}}>
-                <p>{parseInt(storagePercentage)}% du stockage utilisé</p>
-                <LinearProgress
-                    color="primary"
-                    value={storagePercentage}
-                    variant="determinate"
-                />
+            <Box sx={{height: '100%', width: '100%'}}>
                 <DataGrid
                     rows={data?.files}
                     columns={columns}

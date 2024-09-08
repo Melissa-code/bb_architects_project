@@ -8,11 +8,12 @@ import LoginForm from '../components/LoginForm'
 import RegisterForm from '../components/RegisterForm'
 import Navigation from '../components/navigation/Navigation'
 import Connexion from '../pages/Connexion'
-import UserFileDataGrid from '../components/table/UserFileDataGrid.jsx'
 import AdminUserDataGrid from "../components/table/AdminUserDataGrid.jsx";
 import AdminFileDataGrid from "../components/table/AdminFileDataGrid.jsx";
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import RedirectPage from "../components/navigation/RedirectPage.jsx";
+import PageUserStorage from "../pages/PageUserStorage.jsx";
+import PageUserProfile from "../pages/PageUserProfile.jsx";
 
 const router = createBrowserRouter([{path: '*', element: <Root/>}])
 const themeOptions = createTheme({
@@ -54,12 +55,12 @@ function Root() {
                         return "Utilisateur"
                     }
                 }}>
-                    <Route path="storage" element={<UserFileDataGrid/>} handle={{
+                    <Route path="storage" element={<PageUserStorage/>} handle={{
                         crumb: () => {
                             return "Stockage"
                         }
                     }}/>
-                    {/**<Route path="profile" element={}/>*/}
+                    <Route path="profile" element={<PageUserProfile/>}/>
                 </Route>
                 <Route path="admin" handle={{
                     crumb: () => {
