@@ -1,18 +1,18 @@
 import {Grid} from '@mui/material'
 import NavigationBar from './NavigationBar'
-import DenseAppBar from './AppBar'
 import {Outlet} from 'react-router-dom'
+import BreadCrumb from "./BreadCrumb.jsx";
 
 function Navigation() {
     return (
         <Grid container>
 
             <Grid xs={2}>
-                 <NavigationBar />
+                <NavigationBar/>
             </Grid>
             <Grid xs={10}>
-                <DenseAppBar />
-                <Outlet />
+                <BreadCrumb/>
+                <Outlet/>
             </Grid>
         </Grid>
     )

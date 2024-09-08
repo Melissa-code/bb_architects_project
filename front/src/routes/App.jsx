@@ -12,8 +12,9 @@ import UserFileDataGrid from '../components/table/UserFileDataGrid.jsx'
 import AdminUserDataGrid from "../components/table/AdminUserDataGrid.jsx";
 import AdminFileDataGrid from "../components/table/AdminFileDataGrid.jsx";
 import {createTheme, ThemeProvider} from '@mui/material/styles';
+import RedirectPage from "../components/navigation/RedirectPage.jsx";
 
-const router = createBrowserRouter([{path: '*', element: <Root />}])
+const router = createBrowserRouter([{path: '*', element: <Root/>}])
 const themeOptions = createTheme({
     palette: {
         mode: 'light',
@@ -35,30 +36,50 @@ const themeOptions = createTheme({
 
 export default function App() {
 
-    return<ThemeProvider theme={themeOptions}>
-            <RouterProvider router={router} />
-            </ThemeProvider>
+    return <ThemeProvider theme={themeOptions}>
+        <RouterProvider router={router}/>
+    </ThemeProvider>
 }
 
 function Root() {
     return (
         <Routes>
-            <Route element={<Connexion />}>
-                <Route path="login" element={<LoginForm />} />
-                <Route path="register" element={<RegisterForm />} />
+            <Route element={<Connexion/>}>
+                <Route path="login" element={<LoginForm/>}/>
+                <Route path="register" element={<RegisterForm/>}/>
             </Route>
-            <Route element={<Navigation />}>
-                <Route path="user">
-                    <Route path="storage" element={<UserFileDataGrid />} />
+            <Route element={<Navigation/>}>
+                <Route path="user" handle={{
+                    crumb: () => {
+                        return "Utilisateur"
+                    }
+                }}>
+                    <Route path="storage" element={<UserFileDataGrid/>} handle={{
+                        crumb: () => {
+                            return "Stockage"
+                        }
+                    }}/>
                     {/**<Route path="profile" element={}/>*/}
                 </Route>
-                <Route path="admin">
+                <Route path="admin" handle={{
+                    crumb: () => {
+                        return "Administration"
+                    }
+                }}>
                     {/**<Route path='dashboard' element={}/>*/}
-                    {/**<Route path='clients' element={}/>**/}
-                    <Route path='storage/:id' element={<AdminFileDataGrid/>}/>
+                    <Route path='clients' element={<AdminUserDataGrid/>} handle={{
+                        crumb: () => {
+                            return "Clients"
+                        }
+                    }}/>
+                    <Route path='storage/:id' element={<AdminFileDataGrid/>} handle={{
+                        crumb: () => {
+                            return "Stockage client"
+                        }
+                    }}/>
                 </Route>
             </Route>
-            <Route path="test" element={<AdminUserDataGrid />} />
+            <Route path="download/:id" element={<RedirectPage/>}/>
         </Routes>
     )
 }
