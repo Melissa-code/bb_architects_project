@@ -2,8 +2,19 @@
 
 namespace App\Controller;
 
+use App\Repository\FileRepository;
+use App\Repository\InvoiceRepository;
+use App\Repository\OrderRepository;
+use App\Repository\StorageSpaceRepository;
+use App\Repository\UserRepository;
+use App\Repository\UserStoragePurchaseRepository;
+use App\Service\ConfirmationEmailService;
+use App\Service\FileService;
 use App\Service\InvoiceService;
 use App\Service\RegisterService;
+use App\Service\ValidateSaveEntityService;
+use Exception;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +31,8 @@ class RegisterController extends AbstractController
         Request $request,
         RegisterService $registerService,
         InvoiceService $invoiceService,
-        LoggerInterface $logger
+        ConfirmationEmailService $confirmationEmailService,
+        LoggerInterface $logger,
     ): JsonResponse {
         try {
             $data = json_decode($request->getContent(), true);
@@ -43,12 +55,91 @@ class RegisterController extends AbstractController
             // Create an invoice
             $invoiceService->createInvoice($user);
 
+            // Send an email confirmation to the new client
+            $registration = "Confirmation Inscription";
+            $message = "Cher client, nous vous confirmons votre inscription sur la plateforme de gestion de fichiers BB Architects.";
+            $confirmationEmailService->sendConfirmationEmail($registration, $message);
+
             return new JsonResponse(['message' => 'Nouveau compte utilisateur créé avec succès.'], 201);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return new JsonResponse(['error : ' => $e->getMessage()], 400);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $logger->error('Exception levée : ' . $e->getMessage());
             return new JsonResponse(['message' => 'Erreur interne du serveur.'], 500);
         }
+    }
+
+    /**
+     * Delete a user by id and his files
+     */
+    #[Route('/api/delete_user/{id}', name: 'api_delete_user', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    public function deleteUser(
+        int $id,
+        UserRepository $userRepository,
+        FileRepository $fileRepository,
+        UserStoragePurchaseRepository $userStoragePurchaseRepository,
+        StorageSpaceRepository $storageSpaceRepository,
+        InvoiceRepository $invoiceRepository,
+        OrderRepository $orderRepository,
+        FileService $fileService,
+        ValidateSaveEntityService $validateSaveEntityService,
+        LoggerInterface $logger,
+    ): JsonResponse
+    {
+        // Get the user
+        $user = $userRepository->find($id);
+
+        try {
+            // Delete all the files of the user
+            $allFilesOfUser = $fileRepository->findByUserSortedByDate($user);
+            if (empty($allFilesOfUser)) {
+                $logger->error('Aucun fichier trouvé pour l\'utilisateur: ' . $user->getId());
+            }
+            if ($allFilesOfUser) {
+                foreach ($allFilesOfUser as $fileOfUser) {
+                    $fileService->deleteFileById($fileOfUser->getId(), true);
+                    $logger->error('Suppression de tous les fichiers pour l\'utilisateur : ' . $user->getId());
+                }
+            }
+
+            // Delete user_storage_purchase
+            $userStoragePurchases = $userStoragePurchaseRepository->findBy(['user' => $user]);
+            if (count($userStoragePurchases) > 0) {
+                foreach ($userStoragePurchases as $userStoragePurchase) {
+                    $validateSaveEntityService->remove($userStoragePurchase);
+                    $logger->error('Suppression de userStoragePurchase pour l\'utilisateur : ' . $user->getId());
+                }
+            }
+
+            // Delete all the invoices for the user
+            $invoices = $invoiceRepository->findBy(['user' => $user]);
+            if (count($invoices) > 0) {
+                foreach ($invoices as $invoice) {
+                    $validateSaveEntityService->remove($invoice);
+                    $logger->error('Suppression des factures pour l\'utilisateur : ' . $user->getId());
+                }
+            }
+
+            // Delete all the orders for the user
+            $orders = $orderRepository->findBy(['user' => $user]);
+            if (count($orders) > 0) {
+                foreach ($orders as $order) {
+                    $validateSaveEntityService->remove($order);
+                    $logger->error('Suppression des commandes pour l\'utilisateur : ' . $user->getId());
+                }
+            }
+
+            // Delete the user
+            $validateSaveEntityService->remove($user);
+            $logger->error('Suppression de l\'utilisateur : '. $user->getId());
+
+        } catch (InvalidArgumentException $e) {
+            return new JsonResponse(['error : ' => $e->getMessage()], 400);
+        } catch (Exception $e) {
+            $logger->error('Exception levée : ' . $e->getMessage());
+            return new JsonResponse(['message' => 'Erreur interne du serveur.'], 500);
+        }
+
+        return new JsonResponse(['message' => 'Utilisateur supprimé avec succès.'], 200);
     }
 }

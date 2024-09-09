@@ -210,7 +210,7 @@ class FileService
     /**
      * Delete a file
      */
-    public function deleteFileById(int $id): array
+    public function deleteFileById(int $id, $deleteUser = false): ?array
     {
         try {
             $file = $this->fileRepository->find($id);
@@ -236,9 +236,11 @@ class FileService
             $this->entityManager->remove($file);
             $this->entityManager->flush();
 
-            return [
-                'message' => 'Fichier supprimé avec succès.',
-            ];
+            if (!$deleteUser) {
+                return [
+                    'message' => 'Fichier supprimé avec succès.',
+                ];
+            }
 
         } catch (Exception $e) {
             $this->logger->error('Erreur lors de la suppression du fichier ' . $id . ': ' . $e->getMessage());
@@ -247,6 +249,8 @@ class FileService
                 'error' => $e->getMessage(),
             ];
         }
+
+        return null;
     }
 
     /**
