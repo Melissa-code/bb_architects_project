@@ -90,7 +90,7 @@ export default function NavigationBar() {
                             <ListItemText primary="Comptes"/>
                         </ListItemButton></>)}
 
-                <ListItemButton onClick={handleDisconnect} sx={{alignSelf: 'flex-end'}}>
+                <ListItemButton onClick={handleDisconnect} sx={{justifyContent: 'flex-end'}}>
                     <ListItemIcon>
                         <MeetingRoomIcon color="error"/>
                     </ListItemIcon>
