@@ -8,7 +8,6 @@ import LoginForm from '../components/LoginForm'
 import RegisterForm from '../components/RegisterForm'
 import Navigation from '../components/navigation/Navigation'
 import Connexion from '../pages/Connexion'
-import AdminUserDataGrid from "../components/table/AdminUserDataGrid.jsx";
 import AdminFileDataGrid from "../components/table/AdminFileDataGrid.jsx";
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import RedirectPage from "../components/navigation/RedirectPage.jsx";
@@ -18,6 +17,7 @@ import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import PageAdminDashboard from "../pages/PageAdminDashboard.jsx";
 import PageAdminClients from "../pages/PageAdminClients.jsx";
 import PageNotFound from "../pages/PageNotFound.jsx";
+import PageUnauthorized from "../pages/PageUnauthorized.jsx";
 
 const router = createBrowserRouter([{path: '*', element: <Root/>}])
 const themeOptions = createTheme({
@@ -57,20 +57,26 @@ function Root() {
             <Route element={<Navigation/>}>
                 <Route path="user">
                     <Route path="" element={<Navigate to="/user/storage" replace/>}/>
-                    <Route path="storage" element={<ProtectedRoute><PageUserStorage/></ProtectedRoute>}/>
-                    <Route path="profile" element={<ProtectedRoute><PageUserProfile/></ProtectedRoute>}/>
+                    <Route path="storage"
+                           element={<ProtectedRoute requiredRole={"ROLE_USER"}><PageUserStorage/></ProtectedRoute>}/>
+                    <Route path="profile"
+                           element={<ProtectedRoute requiredRole={"ROLE_USER"}><PageUserProfile/></ProtectedRoute>}/>
                 </Route>
                 <Route path="admin">
                     <Route path="" element={<Navigate to="/admin/dashboard" replace/>}/>
-                    <Route path='dashboard' element={<ProtectedRoute><PageAdminDashboard/></ProtectedRoute>}/>
-                    <Route path='clients' element={<ProtectedRoute><PageAdminClients/></ProtectedRoute>}/>
-                    <Route path='storage/:id' element={<ProtectedRoute><AdminFileDataGrid/></ProtectedRoute>}
+                    <Route path='dashboard' element={<ProtectedRoute
+                        requiredRole={"ROLE_ADMIN"}><PageAdminDashboard/></ProtectedRoute>}/>
+                    <Route path='clients'
+                           element={<ProtectedRoute requiredRole={"ROLE_ADMIN"}><PageAdminClients/></ProtectedRoute>}/>
+                    <Route path='storage/:id'
+                           element={<ProtectedRoute requiredRole={"ROLE_ADMIN"}><AdminFileDataGrid/></ProtectedRoute>}
                     />
                 </Route>
             </Route>
 
             <Route path="download/:id" element={<RedirectPage/>}/>
             <Route path="*" element={<PageNotFound/>}/>
+            <Route path="/unauthorized" element={<PageUnauthorized/>}/>
         </Routes>
     )
 }

@@ -3,7 +3,7 @@ import {jwtDecode} from 'jwt-decode';
 import {useNavigate} from 'react-router-dom'
 import ModalExpiredToken from "./modals/ModalExpiredToken.jsx";
 
-const ProtectedRoute = ({children}) => {
+const ProtectedRoute = ({children, requiredRole}) => {
     const [openModal, setOpenModal] = useState(false);
 
     const navigate = useNavigate();
@@ -19,6 +19,8 @@ const ProtectedRoute = ({children}) => {
                 if (decodedToken.exp < currentTime) {
                     localStorage.removeItem('BBStorage_token')
                     setOpenModal(true)
+                } else if (!decodedToken.roles || !decodedToken.roles.includes(requiredRole)) {
+                    navigate('/unauthorized');
                 }
 
 
