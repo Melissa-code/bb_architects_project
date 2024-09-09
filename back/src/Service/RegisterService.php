@@ -79,6 +79,7 @@ class RegisterService
         $user->setFirstname($data['firstname']);
         $user->setLastname($data['lastname']);
         $user->setEmail($data['email']);
+        $this->validatePassword($data['password']);
         // Hash the password in the database
         $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
         $this->validateFrenchPhone($data['country'], $data['phone']);
@@ -171,6 +172,23 @@ class RegisterService
                     'Le numéro de téléphone doit contenir 10 chiffres.'
                 );
             }
+        }
+    }
+
+    /**
+     * Check if the password has :
+     * 1 maj - min - 1 number - 1symbol - 8 characters minimum
+     *
+     * @param string $password
+     * @return void
+     */
+    private function validatePassword(string $password): void
+    {
+        if (!preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{10,}$/', $password)) {
+            throw new InvalidArgumentException(
+                'Le mot de passe doit contenir au moins une majuscule, un chiffre, un caractère spécial et '.
+                'avoir au moins 10 caractères.'
+            );
         }
     }
 }

@@ -44,7 +44,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     #[Assert\NotBlank(message : "Veuillez renseigner un mot de passe.")]
     #[Assert\Length(
-        min: 8,
+        min: 10,
         max: 200,
         minMessage: 'Le mot de passe doit comporter au minimum {{ limit }} caractères',
         maxMessage: 'Le mot de passe doit comporter au maximum {{ limit }} caractères')
