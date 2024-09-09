@@ -1,6 +1,5 @@
 import AdminUserDataGrid from "../components/table/AdminUserDataGrid.jsx";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 
 function PageAdminClients() {
@@ -10,7 +9,7 @@ function PageAdminClients() {
                 Liste des Clients
             </Typography>
             <Typography variant="subtitle1" gutterBottom>
-                Vue d'ensemble des clients et de leur stockage
+                Vue d&apos;ensemble des clients et de leur stockage
             </Typography>
         </Box>
         <Box sx={{flex: 1, display: 'flex', flexDirection: 'column'}}>

@@ -39,7 +39,7 @@ function PageAdminDashboard() {
             Dashboard Administrateur
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
-            Vue d'ensemble des statistiques et du stockage
+            Retrouvez les informations sur l&apos;espace de stockage
         </Typography>
 
         <Grid item xl={12} sx={{mb: 4}}>

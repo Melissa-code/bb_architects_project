@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 function AdminFileDataGrid() {
     const {columns, open, handleClose, handleOpen, rowData, setRowData, data, navigate} = UseAdminFileDataGrid()
 
+    console.log(data)
     return (
         <Box sx={{p: 4, bgcolor: 'background.paper', display: 'flex', flexDirection: 'column', height: '100vh'}}>
             <Box sx={{mb: 2}}>
@@ -14,7 +15,7 @@ function AdminFileDataGrid() {
                     Données des fichiers
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom>
-                    Vue d'ensemble des fichiers disponibles et leur gestion
+                    Vue d&apos;ensemble des fichiers disponibles et leur gestion
                 </Typography>
             </Box>
             <Box sx={{flex: 1, display: 'flex', flexDirection: 'column'}}>
