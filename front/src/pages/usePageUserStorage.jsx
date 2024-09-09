@@ -49,8 +49,7 @@ function usePageUserStorage() {
             setOpenAlertDeleteKo(true)
         },
     })
-
-    // TODO : Mettre en place composant pour récupérer les informations de stockage
+    
     let storagePercentage
     if (data) {
         const {total_weight_files, total_storage_capacity} = data

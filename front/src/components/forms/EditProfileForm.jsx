@@ -107,7 +107,6 @@ function EditProfileForm(props) {
                                 touched.confirmPassword &&
                                 errors.confirmPassword
                             }
-                            //TODO : Personnalisation graphique à revoir
                             sx={'margin-top:8px;'}
                         />
                         <Divider/>
@@ -248,7 +247,6 @@ function EditProfileForm(props) {
                             variant="contained"
                             fullWidth
                             type="submit"
-                            //TODO : Personnalisation graphique à revoir
                             sx={'margin-top:8px'}>
                             S&apos;inscrire
                         </Button>
