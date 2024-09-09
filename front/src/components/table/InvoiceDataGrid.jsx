@@ -13,6 +13,8 @@ function InvoiceDataGrid() {
         }
     )
 
+    console.log(data)
+
     function handleDownloadFile(row) {
         console.log(row)
     }
@@ -69,6 +71,7 @@ function InvoiceDataGrid() {
         },
     ]
     return <DataGrid
+        getRowId={(row) => row?.invoice_id}
         rows={data?.invoices}
         columns={columns}
         initialState={{
@@ -79,15 +82,14 @@ function InvoiceDataGrid() {
             },
             columns: {
                 columnVisibilityModel: {
-                    id: false, // Masquer la colonne ID
+                    invoice_id: false,
                 },
             },
         }}
-        pageSizeOptions={[5, 10, 25]} // Options supplémentaires pour la pagination
+        pageSizeOptions={[5, 10, 25]}
         disableRowSelectionOnClick
         onRowClick={({row}) => {
             console.log("Téléchargement", row)
-            //Mettre en place le téléchargement du fichier.
         }}
         sx={{
             '& .MuiDataGrid-root': {
