@@ -56,9 +56,9 @@ class RegisterController extends AbstractController
             $invoiceService->createInvoice($user);
 
             // Send an email confirmation to the new client
-            $registration = "Confirmation Inscription";
+            $object = "Confirmation Inscription";
             $message = "Cher client, nous vous confirmons votre inscription sur la plateforme de gestion de fichiers BB Architects.";
-            $confirmationEmailService->sendConfirmationEmail($registration, $message);
+            $confirmationEmailService->sendConfirmationEmail($object, $message);
 
             return new JsonResponse(['message' => 'Nouveau compte utilisateur créé avec succès.'], 201);
         } catch (InvalidArgumentException $e) {
@@ -91,12 +91,16 @@ class RegisterController extends AbstractController
         $user = $userRepository->find($id);
 
         try {
+            $numberOfFiles = 0;
             // Delete all the files of the user
             $allFilesOfUser = $fileRepository->findByUserSortedByDate($user);
             if (empty($allFilesOfUser)) {
                 $logger->error('Aucun fichier trouvé pour l\'utilisateur: ' . $user->getId());
             }
             if ($allFilesOfUser) {
+                $numberOfFiles = count($allFilesOfUser);
+                $logger->info('Nombre de fichiers trouvés pour l\'utilisateur ' . $user->getId() . ' : ' . $numberOfFiles);
+
                 foreach ($allFilesOfUser as $fileOfUser) {
                     $fileService->deleteFileById($fileOfUser->getId(), true);
                     $logger->error('Suppression de tous les fichiers pour l\'utilisateur : ' . $user->getId());
@@ -130,14 +134,21 @@ class RegisterController extends AbstractController
                 }
             }
 
+            // Send an email : confirmation to delete the user account
+            $object = "Confirmation Suppression de compte et de vos fichiers";
+            $message = "Cher client, nous vous confirmons la suppression de votre compte sur la plateforme de gestion de fichiers BB Architects.";
+            $confirmationEmailService->sendConfirmationEmail($object, $message);
+
+            // Send an email : notification to the admin to delete the user account
+            $object = "Notification Suppression du compte de ". $user->getFirstname().' '. $user->getLastname() .
+                ' (ID : '. $user->getId() . ")";
+            $message = "Cher Administrateur, nous vous confirmons la suppression de compte de " . $user->getFirstname().
+                ' '.$user->getLastname() . ' (ID : '. $user->getId() . ") et de ses ". $numberOfFiles. " fichiers.";
+            $confirmationEmailService->sendConfirmationEmail($object, $message, true);
+
             // Delete the user
             $validateSaveEntityService->remove($user);
             $logger->error('Suppression de l\'utilisateur : '. $user->getId());
-
-            // Send an email confirmation to delete the user account
-            $registration = "Confirmation Suppression de compte et de vos fichiers";
-            $message = "Cher client, nous vous confirmons la suppression de votre compte sur la plateforme de gestion de fichiers BB Architects.";
-            $confirmationEmailService->sendConfirmationEmail($registration, $message);
 
         } catch (InvalidArgumentException $e) {
             return new JsonResponse(['error : ' => $e->getMessage()], 400);

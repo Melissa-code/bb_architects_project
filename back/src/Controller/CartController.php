@@ -76,9 +76,9 @@ class CartController extends AbstractController
             $this->invoiceService->createInvoice($user, $order);
 
             // Send an email confirmation
-            $registration = "Confirmation achat d'espace de stockage supplémentaire";
+            $object = "Confirmation achat d'espace de stockage supplémentaire";
             $message = "Cher client, nous vous confirmons l'achat d'un espace de stockage supplémentaire de 20 Go à 20 €.";
-            $confirmationEmailService->sendConfirmationEmail($registration, $message);
+            $confirmationEmailService->sendConfirmationEmail($object, $message);
 
             return new JsonResponse([
                 'message' => 'La commande a bien été effectuée.',

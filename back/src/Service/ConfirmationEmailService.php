@@ -17,31 +17,55 @@ class ConfirmationEmailService
      * Send an email confirmation
      * cf. https://github.com/mailjet/mailjet-apiv3-php
      */
-    public function sendConfirmationEmail(string $registration, string $message): void
+    public function sendConfirmationEmail(string $object, string $message, bool $admin = false): void
     {
         // Get my public & private key (.env.local)
         $mj = new \Mailjet\Client($_ENV['MJ_APIKEY_PUBLIC'], $_ENV['MJ_APIKEY_PRIVATE'], true, ['version' => 'v3.1']);
 
-        $body = [
-            'Messages' => [
-                [
-                    'From' => [
-                        'Email' => $_ENV['MJ_FROM_EMAIL'],
-                        'Name' => $_ENV['MJ_FROM_NAME'],
-                    ],
-                    'To' => [
-                        [
-                            'Email' => $_ENV['MJ_TO_EMAIL'],
-                            'Name' => $_ENV['MJ_TO_NAME'],
-                        ]
-                    ],
-                    'Subject' => $registration,
-                    'TextPart' => "Greetings from Mailjet!",
-                    'HTMLPart' => "<h3>".$message."<a href=\"https://www.mailjet.com/\">Mailjet</a>!</h3>
+        if (!$admin) {
+            $body = [
+                'Messages' => [
+                    [
+                        'From' => [
+                            'Email' => $_ENV['MJ_FROM_EMAIL'],
+                            'Name' => $_ENV['MJ_FROM_NAME'],
+                        ],
+                        'To' => [
+                            [
+                                'Email' => $_ENV['MJ_TO_EMAIL'],
+                                'Name' => $_ENV['MJ_TO_NAME'],
+                            ]
+                        ],
+                        'Subject' => $object,
+                        'TextPart' => "Greetings from Mailjet!",
+                        'HTMLPart' => "<h3>".$message."<a href=\"https://www.mailjet.com/\">Mailjet</a>!</h3>
             <br />Cordialement, l'équipe de BB Architects"
+                    ]
                 ]
-            ]
-        ];
+            ];
+        } else {
+            $body = [
+                'Messages' => [
+                    [
+                        'From' => [
+                            'Email' => $_ENV['MJ_FROM_EMAIL'],
+                            'Name' => $_ENV['MJ_FROM_NAME'],
+                        ],
+                        'To' => [
+                            [
+                                'Email' => $_ENV['MJ_FROM_EMAIL'],
+                                'Name' => $_ENV['MJ_FROM_NAME'],
+                            ]
+                        ],
+                        'Subject' => $object,
+                        'TextPart' => "Greetings from Mailjet!",
+                        'HTMLPart' => "<h3>".$message."<a href=\"https://www.mailjet.com/\">Mailjet</a>!</h3>
+            <br />Cordialement, l'équipe de BB Architects"
+                    ]
+                ]
+            ];
+        }
+
 
         // All resources are located in the Resources class
         $response = $mj->post(Resources::$Email, ['body' => $body]);
