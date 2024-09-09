@@ -56,10 +56,12 @@ function Root() {
             </Route>
             <Route element={<Navigation/>}>
                 <Route path="user">
+                    <Route path="" element={<Navigate to="/user/storage" replace/>}/>
                     <Route path="storage" element={<ProtectedRoute><PageUserStorage/></ProtectedRoute>}/>
                     <Route path="profile" element={<ProtectedRoute><PageUserProfile/></ProtectedRoute>}/>
                 </Route>
                 <Route path="admin">
+                    <Route path="" element={<Navigate to="/admin/dashboard" replace/>}/>
                     <Route path='dashboard' element={<ProtectedRoute><PageAdminDashboard/></ProtectedRoute>}/>
                     <Route path='clients' element={<ProtectedRoute><PageAdminClients/></ProtectedRoute>}/>
                     <Route path='storage/:id' element={<ProtectedRoute><AdminFileDataGrid/></ProtectedRoute>}
