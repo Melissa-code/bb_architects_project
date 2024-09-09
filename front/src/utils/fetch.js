@@ -217,12 +217,30 @@ export async function fetchDeleteUser(token, id) {
             Authorization: `Bearer ${token}`,
         }
     })
-    
+
     if (response.ok) {
         return response.json();
     } else {
         const errorData = await response.json();
         const errorMessage = errorData.message || 'Erreur de récupération des factures. Veuillez réessayer.';
+        throw new Error(errorMessage);
+    }
+}
+
+export async function fetchDownloadInvoice(id, token) {
+    const response = await fetch(`${endpoint}/download_invoice/${id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    })
+
+    console.log(response.blob())
+
+    if (response.ok) {
+        return response.blob();
+    } else {
+        const errorData = await response.json();
+        const errorMessage = errorData.message || 'Erreur lors du téléchargement. Veuillez réessayer.';
         throw new Error(errorMessage);
     }
 }
