@@ -41,7 +41,16 @@ function LoginForm() {
     }
 
     return (
-        <>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                maxWidth: 600,
+                mx: 'auto',
+                p: 2,
+            }}
+        >
             <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
                 <LockOutlinedIcon/>
             </Avatar>
@@ -57,7 +66,7 @@ function LoginForm() {
                 onSubmit={(values, {setSubmitting}) => handleSubmit(values, setSubmitting)}
             >
                 {({values, handleChange, handleBlur, touched, errors}) => (
-                    <Box component={Form} noValidate sx={{mt: 1, width: '100%', maxWidth: 400}}>
+                    <Box component={Form} noValidate sx={{width: '100%', mt: 2}}>
                         <TextField
                             fullWidth
                             id="email"
@@ -114,7 +123,7 @@ function LoginForm() {
 
             <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} type="login" message={successAlertMessage}/>
             <AlertFail open={openFailure} setOpen={setOpenFailure} error={errorMessage} message={failAlertMessage}/>
-        </>
+        </Box>
 
     )
 }
