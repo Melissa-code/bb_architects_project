@@ -8,6 +8,7 @@ use App\Repository\OrderRepository;
 use App\Repository\StorageSpaceRepository;
 use App\Repository\UserRepository;
 use App\Repository\UserStoragePurchaseRepository;
+use App\Service\ConfirmationEmailService;
 use App\Service\FileService;
 use App\Service\InvoiceService;
 use App\Service\RegisterService;
@@ -30,6 +31,7 @@ class RegisterController extends AbstractController
         Request $request,
         RegisterService $registerService,
         InvoiceService $invoiceService,
+        ConfirmationEmailService $confirmationEmailService,
         LoggerInterface $logger,
     ): JsonResponse {
         try {
@@ -52,6 +54,11 @@ class RegisterController extends AbstractController
 
             // Create an invoice
             $invoiceService->createInvoice($user);
+
+            // Send an email confirmation to the new client
+            $registration = "Confirmation Inscription";
+            $message = "Cher client, nous vous confirmons votre inscription sur la plateforme de gestion de fichiers BB Architects.";
+            $confirmationEmailService->sendConfirmationEmail($registration, $message);
 
             return new JsonResponse(['message' => 'Nouveau compte utilisateur créé avec succès.'], 201);
         } catch (InvalidArgumentException $e) {
