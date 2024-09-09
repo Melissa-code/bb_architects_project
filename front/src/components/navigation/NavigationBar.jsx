@@ -13,6 +13,7 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom'
 import {ListItem} from '@mui/material'
 import {useNavigate} from 'react-router-dom'
 import {getUserRole} from "../../utils/jwt.js";
+import {Storage} from "@mui/icons-material";
 
 export default function NavigationBar() {
     const [selectedIndex, setSelectedIndex] = React.useState(1)
@@ -61,7 +62,7 @@ export default function NavigationBar() {
                                 selected={selectedIndex === 0}
                                 onClick={(event) => handleListItemClick(event, 0, '/user/storage')}>
                                 <ListItemIcon>
-                                    <HomeIcon/>
+                                    <Storage/>
                                 </ListItemIcon>
                                 <ListItemText primary="Stockage"/>
                             </ListItemButton>
