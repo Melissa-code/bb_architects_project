@@ -2,7 +2,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import Chip from '@mui/material/Chip'
 import {GridActionsCellItem} from '@mui/x-data-grid'
-import {useMutation, useQuery} from '@tanstack/react-query'
+import {QueryClient, useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {useState} from 'react'
 import {fetchDeleteFile, fetchGetFiles, fetchGetProfile} from "../utils/fetch.js";
 import {chipColor} from "../utils/chipColors.js";
@@ -18,6 +18,8 @@ function usePageUserStorage() {
     const [openAlertDeleteKo, setOpenAlertDeleteKo] = useState(false)
 
     const token = localStorage.getItem('BBStorage_token')
+
+    const queryClient = useQueryClient()
 
     const {data, isError, error} = useQuery({
         queryKey: ['GetFiles'],
@@ -39,8 +41,10 @@ function usePageUserStorage() {
     const deleteFile = useMutation({
         mutationKey: ['DeleteFile'],
         mutationFn: (variables) => fetchDeleteFile(variables, token),
-        onSuccess: () => {
+        onSuccess: async () => {
             setOpenAlertDeleteOk(true)
+            setOpenDeleteDialog(false)
+            await queryClient.invalidateQueries({queryKey: ["GetFiles"]})
         },
         onError: (error) => {
             // TODO : Alert "Erreur lors de la suppression"
