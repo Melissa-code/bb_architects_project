@@ -7,30 +7,34 @@ function PageUserProfile() {
     const {data} = usePageUserProfile()
 
     return (
-        <Box sx={{p: 4}}> {/* Ajout de padding global pour éviter que le contenu ne soit collé aux bords */}
-            <Grid container spacing={4}> {/* Espacement augmenté pour plus d'aération */}
+        <Box sx={{p: 4}}> {/* Padding global pour éviter que le contenu ne soit collé aux bords */}
+            <Grid container spacing={4}> {/* Espacement global pour aérer le contenu */}
+
                 {/* Carte d'info utilisateur */}
-                <Grid item xl={6}>
+                <Grid item xs={12} xl={4}>
                     <ProfileUserInfoCard data={data}/>
                 </Grid>
 
                 {/* Carte de stockage */}
-                <Grid item xl={6}>
+                <Grid item xs={12} xl={4}>
                     <Card
-                        sx={{minWidth: 275, maxWidth: 350, p: 2}}> {/* Ajout de padding interne pour plus d'aération */}
+                        sx={{
+                            minWidth: 275,
+                            maxWidth: 350,
+                            p: 3,
+                            mx: 'auto'
+                        }}> {/* Padding interne et centrage horizontal */}
                         <CardHeader
                             title="Stockage"
                             sx={{
                                 bgcolor: 'primary.main',
                                 color: 'white',
-                                textAlign: 'center'
+                                textAlign: 'center',
+                                borderRadius: '4px',
                             }}
                         />
                         <CardContent>
-                            <Typography
-                                variant="body1"
-                                color="textSecondary"
-                                gutterBottom>
+                            <Typography variant="body1" color="textSecondary" gutterBottom>
                                 {data?.user?.filesNumber} fichiers
                             </Typography>
                             <Typography
@@ -39,15 +43,12 @@ function PageUserProfile() {
                                 sx={{fontWeight: 'bold', mb: 1}}>
                                 Capacité totale
                             </Typography>
-                            <Typography
-                                variant="body1"
-                                color="textSecondary"
-                                gutterBottom>
+                            <Typography variant="body1" color="textSecondary" gutterBottom>
                                 {data?.user?.total_storage_capacity} Go
                             </Typography>
                         </CardContent>
 
-                        <CardActions sx={{justifyContent: 'center'}}> {/* Centrer le bouton */}
+                        <CardActions sx={{justifyContent: 'center'}}>
                             <Button
                                 size="medium"
                                 variant="contained"
@@ -59,14 +60,15 @@ function PageUserProfile() {
                 </Grid>
 
                 {/* Section des factures */}
-                <Grid item xs={12}> {/* Full width section */}
-                    <Box sx={{mt: 4}}> {/* Ajout d'une marge supérieure pour espacer cette section */}
+                <Grid item xs={12}>
+                    <Box sx={{mt: 4}}> {/* Marge supérieure pour espacer cette section */}
                         <Typography variant="h6" gutterBottom>
                             Factures
                         </Typography>
                         {/* Contenu des factures (à ajouter) */}
                     </Box>
                 </Grid>
+
             </Grid>
         </Box>
 

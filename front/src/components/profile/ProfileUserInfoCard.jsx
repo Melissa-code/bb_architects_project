@@ -25,44 +25,43 @@ function ProfileUserInfoCard({...props}) {
 
     return (
         <>
-            <Card sx={{minWidth: 275, maxWidth: 350}}>
+            <Card sx={{minWidth: 275, maxWidth: 400, p: 2}}> {/* Ajout de padding interne */}
                 <CardHeader
-                    title={'Informations personnelles'}
+                    title="Informations personnelles"
                     subheader={fullName}
+                    sx={{
+                        bgcolor: 'primary.main',  // Couleur de fond du header
+                        color: 'white',           // Couleur du texte
+                        textAlign: 'center'       // Alignement du texte centré
+                    }}
                 />
                 <CardContent>
-                    <Typography sx={{fontSize: 16}} color="text.primary">
+                    <Typography variant="body1" color="textPrimary" gutterBottom>
                         Adresse email
                     </Typography>
-                    <Typography
-                        sx={{fontSize: 16}}
-                        color="text.secondary"
-                        gutterBottom>
+                    <Typography variant="body2" color="textSecondary">
                         {data?.user?.email}
                     </Typography>
-                    <Typography sx={{fontSize: 16}} color="text.primary">
+
+                    <Typography variant="body1" color="textPrimary" gutterBottom>
                         Adresse postale
                     </Typography>
-                    <Typography sx={{fontSize: 16}} color="text.secondary">
+                    <Typography variant="body2" color="textSecondary">
                         {address1}
                     </Typography>
-                    <Typography
-                        sx={{fontSize: 16}}
-                        color="text.secondary"
-                        gutterBottom>
+                    <Typography variant="body1" color="textSecondary">
                         {address2}
                     </Typography>
-                    <Typography sx={{fontSize: 16}} color="text.primary">
+
+                    <Typography variant="body1" color="textPrimary" gutterBottom>
                         Téléphone
                     </Typography>
-                    <Typography
-                        sx={{fontSize: 16}}
-                        color="text.secondary"
-                        gutterBottom>
+                    <Typography variant="body2" color="textSecondary">
                         {data?.user?.phone}
                     </Typography>
                 </CardContent>
-                <CardActions>
+
+                <CardActions sx={{justifyContent: 'center'}}> {/* Centrer les boutons */}
                     <Button size="medium" variant="contained">
                         Modifier
                     </Button>
@@ -78,6 +77,7 @@ function ProfileUserInfoCard({...props}) {
 
             <ProfileConfirmDelete open={open} setOpen={setOpen}/>
         </>
+
     )
 }
 
