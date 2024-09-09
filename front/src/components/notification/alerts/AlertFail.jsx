@@ -59,19 +59,31 @@ function AlertFail({...props}) {
                     open={openModal}
                     onClose={handleCloseModal}
                     aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description">
+                    aria-describedby="modal-modal-description"
+                >
                     <Box sx={style}>
-                        <Typography>
-                            Une erreur a été rencontrée.
+                        <Typography
+                            id="modal-modal-title"
+                            variant="h6"
+                            component="h2"
+                            gutterBottom
+                            sx={{fontWeight: 'bold', color: 'error.main'}}
+                        >
+                            Une erreur a été rencontrée
                         </Typography>
-                        <Typography>
-                            Veuillez trouver le détail de l&apos;erreur ci-dessous
+                        <Typography variant="body2" gutterBottom>
+                            Veuillez trouver le détail de l&apos;erreur ci-dessous :
                         </Typography>
-                        <Divider/>
-                        <Typography>
-                            {error?.message}
+                        <Divider sx={{my: 2}}/>
+                        <Typography variant="body1" sx={{color: 'text.secondary'}}>
+                            {error?.message || 'Aucun détail disponible'}
                         </Typography>
-                        <Button onClick={handleClose}>
+                        <Button
+                            onClick={handleCloseModal}
+                            variant="contained"
+                            color="error"
+                            sx={{mt: 3, display: 'block', ml: 'auto'}}
+                        >
                             Fermer
                         </Button>
                     </Box>
