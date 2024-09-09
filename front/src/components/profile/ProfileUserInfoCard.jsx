@@ -75,7 +75,7 @@ function ProfileUserInfoCard({...props}) {
                 </CardActions>
             </Card>
 
-            <ProfileConfirmDelete open={open} setOpen={setOpen}/>
+            <ProfileConfirmDelete open={open} setOpen={setOpen} id={data?.user?.id}/>
         </>
 
     )

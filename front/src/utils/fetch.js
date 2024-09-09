@@ -209,3 +209,20 @@ export async function fetchGetInvoice(token) {
         throw new Error(errorMessage);
     }
 }
+
+export async function fetchDeleteUser(token, id) {
+    const response = await fetch(`${endpoint}/delete_user/${id}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${token}`,
+        }
+    })
+    
+    if (response.ok) {
+        return response.json();
+    } else {
+        const errorData = await response.json();
+        const errorMessage = errorData.message || 'Erreur de récupération des factures. Veuillez réessayer.';
+        throw new Error(errorMessage);
+    }
+}
