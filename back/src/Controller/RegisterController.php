@@ -95,15 +95,15 @@ class RegisterController extends AbstractController
             // Delete all the files of the user
             $allFilesOfUser = $fileRepository->findByUserSortedByDate($user);
             if (empty($allFilesOfUser)) {
-                $logger->error('Aucun fichier trouvé pour l\'utilisateur: ' . $user->getId());
+                $logger->info('Aucun fichier trouvé pour l\'utilisateur: ' . $user->getId());
             }
-            if ($allFilesOfUser) {
+            if (count($allFilesOfUser) > 0) {
                 $numberOfFiles = count($allFilesOfUser);
                 $logger->info('Nombre de fichiers trouvés pour l\'utilisateur ' . $user->getId() . ' : ' . $numberOfFiles);
 
                 foreach ($allFilesOfUser as $fileOfUser) {
                     $fileService->deleteFileById($fileOfUser->getId(), true);
-                    $logger->error('Suppression de tous les fichiers pour l\'utilisateur : ' . $user->getId());
+                    $logger->info('Suppression de tous les fichiers pour l\'utilisateur : ' . $user->getId());
                 }
             }
 
@@ -112,7 +112,7 @@ class RegisterController extends AbstractController
             if (count($userStoragePurchases) > 0) {
                 foreach ($userStoragePurchases as $userStoragePurchase) {
                     $validateSaveEntityService->remove($userStoragePurchase);
-                    $logger->error('Suppression de userStoragePurchase pour l\'utilisateur : ' . $user->getId());
+                    $logger->info('Suppression de userStoragePurchase pour l\'utilisateur : ' . $user->getId());
                 }
             }
 
@@ -120,8 +120,19 @@ class RegisterController extends AbstractController
             $invoices = $invoiceRepository->findBy(['user' => $user]);
             if (count($invoices) > 0) {
                 foreach ($invoices as $invoice) {
+                    $filePath = __DIR__ . '/../../var/invoices/invoice_' . $invoice->getId() . '.txt';
                     $validateSaveEntityService->remove($invoice);
-                    $logger->error('Suppression des factures pour l\'utilisateur : ' . $user->getId());
+                    $logger->info('Suppression des factures pour l\'utilisateur : ' . $user->getId());
+                    // Delete the invoice txt file
+                    if (file_exists($filePath)) {
+                        if (unlink($filePath)) {
+                            $logger->info('Fichier supprimé : ' . $filePath);
+                        } else {
+                            $logger->error('Erreur lors de la suppression du fichier : ' . $filePath);
+                        }
+                    } else {
+                        $logger->info('Le fichier n\'existe pas : ' . $filePath);
+                    }
                 }
             }
 
@@ -130,12 +141,12 @@ class RegisterController extends AbstractController
             if (count($orders) > 0) {
                 foreach ($orders as $order) {
                     $validateSaveEntityService->remove($order);
-                    $logger->error('Suppression des commandes pour l\'utilisateur : ' . $user->getId());
+                    $logger->info('Suppression des commandes pour l\'utilisateur : ' . $user->getId());
                 }
             }
 
             // Send an email : confirmation to delete the user account
-            $object = "Confirmation Suppression de compte et de vos fichiers";
+            $object = "Confirmation Suppression de votre compte et de vos fichiers";
             $message = "Cher client, nous vous confirmons la suppression de votre compte sur la plateforme de gestion de fichiers BB Architects.";
             $confirmationEmailService->sendConfirmationEmail($object, $message);
 
@@ -148,7 +159,7 @@ class RegisterController extends AbstractController
 
             // Delete the user
             $validateSaveEntityService->remove($user);
-            $logger->error('Suppression de l\'utilisateur : '. $user->getId());
+            $logger->info('Suppression de l\'utilisateur : '. $user->getId());
 
         } catch (InvalidArgumentException $e) {
             return new JsonResponse(['error : ' => $e->getMessage()], 400);

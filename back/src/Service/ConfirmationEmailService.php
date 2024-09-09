@@ -38,7 +38,7 @@ class ConfirmationEmailService
                         ],
                         'Subject' => $object,
                         'TextPart' => "Greetings from Mailjet!",
-                        'HTMLPart' => "<h3>".$message."<a href=\"https://www.mailjet.com/\">Mailjet</a>!</h3>
+                        'HTMLPart' => "<h3>".$message."</h3>
             <br />Cordialement, l'équipe de BB Architects"
                     ]
                 ]
@@ -65,7 +65,6 @@ class ConfirmationEmailService
                 ]
             ];
         }
-
 
         // All resources are located in the Resources class
         $response = $mj->post(Resources::$Email, ['body' => $body]);

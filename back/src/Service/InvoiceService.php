@@ -191,8 +191,8 @@ class InvoiceService
         $content .= "Société : " . $invoice->getCompany()->getName() . "\n";
         $content .= "Adresse : " . $invoice->getCompany()->getAddress() . "\n";
         $content .= "SIRET : " . $invoice->getCompany()->getSiret() . "\n\n";
-        $content .= "unit_price : " . (string)self::UNIT_PRICE . " € \n\n";
-        $content .= "quantity : " . $quantity . "\n\n";
+        $content .= "Prix unitaire : " . (string)self::UNIT_PRICE . " € \n\n";
+        $content .= "quantité : " . $quantity . "\n\n";
         $content .= "Prix total HT : " . $total['totalPriceHT'] . ' € HT' . "\n\n";
         $content .= "TVA : " . $total['tva'] . ' €' . "\n\n";
         $content .= "Montant TTC à régler  : " . $total['totalTTC'] . ' € TTC' . "\n\n";
