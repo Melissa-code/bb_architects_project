@@ -77,6 +77,7 @@ class RegisterController extends AbstractController
         int $id,
         UserRepository $userRepository,
         FileRepository $fileRepository,
+        ConfirmationEmailService $confirmationEmailService,
         UserStoragePurchaseRepository $userStoragePurchaseRepository,
         StorageSpaceRepository $storageSpaceRepository,
         InvoiceRepository $invoiceRepository,
@@ -132,6 +133,11 @@ class RegisterController extends AbstractController
             // Delete the user
             $validateSaveEntityService->remove($user);
             $logger->error('Suppression de l\'utilisateur : '. $user->getId());
+
+            // Send an email confirmation to delete the user account
+            $registration = "Confirmation Suppression de compte et de vos fichiers";
+            $message = "Cher client, nous vous confirmons la suppression de votre compte sur la plateforme de gestion de fichiers BB Architects.";
+            $confirmationEmailService->sendConfirmationEmail($registration, $message);
 
         } catch (InvalidArgumentException $e) {
             return new JsonResponse(['error : ' => $e->getMessage()], 400);
