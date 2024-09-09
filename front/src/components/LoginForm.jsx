@@ -11,6 +11,7 @@ import {fetchLogin} from '../utils/fetch'
 import {loginSchema} from '../validation/validation'
 import AlertFail from './notification/alerts/AlertFail'
 import AlertSuccess from './notification/alerts/AlertSuccess'
+import Box from "@mui/material/Box";
 
 
 function LoginForm() {
@@ -53,11 +54,10 @@ function LoginForm() {
                 validateOnChange={false}
                 validateOnBlur={false}
                 validationSchema={loginSchema}
-                onSubmit={(values, setSubmitting) =>
-                    handleSubmit(values, setSubmitting)
-                }>
+                onSubmit={(values, {setSubmitting}) => handleSubmit(values, setSubmitting)}
+            >
                 {({values, handleChange, handleBlur, touched, errors}) => (
-                    <Form>
+                    <Box component={Form} noValidate sx={{mt: 1, width: '100%', maxWidth: 400}}>
                         <TextField
                             fullWidth
                             id="email"
@@ -87,16 +87,19 @@ function LoginForm() {
                             helperText={touched.password && errors.password}
                         />
                         <Button
-                            color="primary"
-                            variant="contained"
+                            type="submit"
                             fullWidth
-                            type="submit">
+                            variant="contained"
+                            color="primary"
+                            sx={{mt: 2, mb: 2}}
+                        >
                             Se connecter
                         </Button>
-                    </Form>
+                    </Box>
                 )}
             </Formik>
-            <Grid container>
+
+            <Grid container sx={{mt: 2, px: 4}}>
                 <Grid item xs>
                     <Link href="#" variant="body2">
                         {'Mot de passe oublié ?'}
@@ -108,9 +111,11 @@ function LoginForm() {
                     </Link>
                 </Grid>
             </Grid>
-            <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} type={"login"} message={successAlertMessage}/>
+
+            <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} type="login" message={successAlertMessage}/>
             <AlertFail open={openFailure} setOpen={setOpenFailure} error={errorMessage} message={failAlertMessage}/>
         </>
+
     )
 }
 
