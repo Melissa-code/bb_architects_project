@@ -10,7 +10,6 @@ function UserFileDataGrid({...props}) {
         setOpen,
         columns,
         rowData,
-        storagePercentage,
         data,
         openDeleteDialog, handleDelete, handleCloseDialogDelete, isPending
     } =

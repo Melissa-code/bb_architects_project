@@ -4,7 +4,6 @@ import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import HomeIcon from '@mui/icons-material/Home'
 import PersonIcon from '@mui/icons-material/Person'
 import NavigationButtonAdd from './NavigationButtonAdd'
 import GroupIcon from '@mui/icons-material/Group'
@@ -17,13 +16,9 @@ import {Storage} from "@mui/icons-material";
 
 export default function NavigationBar() {
     const [selectedIndex, setSelectedIndex] = React.useState(1)
-    const [open, setOpen] = React.useState(true)
     const navigate = useNavigate()
     const {roles} = getUserRole()
 
-    const handleClick = () => {
-        setOpen(!open)
-    }
     const handleListItemClick = (event, index, path) => {
         setSelectedIndex(index)
         navigate(path)

@@ -1,16 +1,10 @@
-import {Grid, Box} from "@mui/material";
+import {Grid} from "@mui/material";
 import usePageUserStorage from "./usePageUserStorage.jsx";
 import UserFileDataGrid from "../components/table/UserFileDataGrid.jsx";
 import GaugeUserStorage from "../components/GaugeUserStorage.jsx";
 import CardWelcomeUser from "../components/cards/CardWelcomeUser.jsx";
 import AlertFail from "../components/notification/alerts/AlertFail.jsx";
 import AlertSuccess from "../components/notification/alerts/AlertSuccess.jsx";
-
-// Constantes pour les messages d'alerte
-const ALERT_MESSAGES = {
-    DELETE_FAIL: "Erreur suppression",
-    DELETE_SUCCESS: "Suppression réalisée"
-};
 
 function PageUserStorage() {
     const {
@@ -60,13 +54,13 @@ function PageUserStorage() {
             <AlertFail
                 open={openAlertDeleteKo}
                 setOpen={setOpenAlertDeleteKo}
-                message={ALERT_MESSAGES.DELETE_FAIL}
+                message={"Erreur suppression"}
             />
 
             <AlertSuccess
                 open={openAlertDeleteOk}
                 setOpen={setOpenAlertDeleteOk}
-                message={ALERT_MESSAGES.DELETE_SUCCESS}
+                message={"Suppression réalisée"}
             />
         </>
     );

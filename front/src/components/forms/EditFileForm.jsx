@@ -22,13 +22,10 @@ function EditFileForm({...props}) {
             variables.fileId = rowData.id
             return fetchUpdateFile(variables, token)
         },
-        onSuccess: (data) => {
-            // TODO : Mettre une alerte Success
+        onSuccess: () => {
             alert('Modification réussie')
         },
-        onError: (error) => {
-            // TODO : Mettre une alerte Erreur
-            console.log(error)
+        onError: () => {
             alert('Modification échouée.')
         },
     })

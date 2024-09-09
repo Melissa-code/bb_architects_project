@@ -2,7 +2,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import Chip from '@mui/material/Chip'
 import {GridActionsCellItem} from '@mui/x-data-grid'
-import {QueryClient, useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {useState} from 'react'
 import {fetchDeleteFile, fetchGetFiles, fetchGetProfile} from "../utils/fetch.js";
 import {chipColor} from "../utils/chipColors.js";
@@ -12,7 +12,6 @@ function usePageUserStorage() {
     const [rowData, setRowData] = useState({})
     const [open, setOpen] = useState(false)
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
-    const [openAlertDelete, setOpenAlertDelete] = useState(false)
     const [idDelete, setIdDelete] = useState(0)
     const [openAlertDeleteOk, setOpenAlertDeleteOk] = useState(false)
     const [openAlertDeleteKo, setOpenAlertDeleteKo] = useState(false)
@@ -46,9 +45,8 @@ function usePageUserStorage() {
             setOpenDeleteDialog(false)
             await queryClient.invalidateQueries({queryKey: ["GetFiles"]})
         },
-        onError: (error) => {
-            // TODO : Alert "Erreur lors de la suppression"
-            alert(error.message)
+        onError: () => {
+            setOpenAlertDeleteKo(true)
         },
     })
 
