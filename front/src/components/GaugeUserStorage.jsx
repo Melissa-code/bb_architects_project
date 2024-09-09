@@ -2,6 +2,8 @@ import {Button, Card, CardActions, CardContent, CardHeader} from "@mui/material"
 import {Gauge} from "@mui/x-charts/Gauge";
 
 function GaugeUserStorage({...props}) {
+    const {percentage} = props
+
     return <Card sx={{
         maxWidth: "100%",
         height: 150,
@@ -19,10 +21,11 @@ function GaugeUserStorage({...props}) {
             sx={{padding: 0, textAlign: "center"}}
         />
         <CardContent sx={{display: "flex", justifyContent: "center", alignItems: "center", padding: 0}}>
-            <Gauge width={120} height={120} value={60} startAngle={-90} endAngle={90}/>
+            <Gauge width={120} height={120} value={parseInt(percentage)} startAngle={-90} endAngle={90}
+                   text={(value) => `${value.value} %`}/>
         </CardContent>
         <CardActions sx={{justifyContent: "center", padding: 0}}>
-            <Button size="small">Acheter de l'espace</Button>
+            <Button size="small">Acheter de l&apos;espace</Button>
         </CardActions>
     </Card>
 }

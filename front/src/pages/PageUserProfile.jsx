@@ -35,6 +35,13 @@ function PageUserProfile() {
                             }}
                         />
                         <CardContent>
+                            <Typography
+                                variant="body2"
+                                color="textPrimary"
+                                sx={{fontWeight: 'bold', mb: 1}}>
+                                Nombre de fichiers
+                            </Typography>
+
                             <Typography variant="body1" color="textSecondary" gutterBottom>
                                 {data?.user?.filesNumber} fichiers
                             </Typography>
@@ -60,9 +67,8 @@ function PageUserProfile() {
                     </Card>
                 </Grid>
 
-                {/* Section des factures */}
                 <Grid item xs={12}>
-                    <Box sx={{mt: 4}}> {/* Marge supérieure pour espacer cette section */}
+                    <Box sx={{mt: 4}}>
                         <Typography variant="h6" gutterBottom>
                             Factures
                         </Typography>

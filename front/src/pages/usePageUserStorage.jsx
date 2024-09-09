@@ -21,7 +21,7 @@ function usePageUserStorage() {
 
     const queryClient = useQueryClient()
 
-    const {data, isError, error} = useQuery({
+    const {data, isError, error, isPending} = useQuery({
         queryKey: ['GetFiles'],
         queryFn: () => fetchGetFiles(token),
         enabled: !!token,
@@ -173,7 +173,8 @@ function usePageUserStorage() {
         openAlertDeleteKo,
         openAlertDeleteOk,
         setOpenAlertDeleteOk,
-        setOpenAlertDeleteKo
+        setOpenAlertDeleteKo,
+        isPending
     }
 }
 

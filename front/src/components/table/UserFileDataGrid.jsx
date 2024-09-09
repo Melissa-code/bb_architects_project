@@ -2,6 +2,7 @@ import Box from '@mui/material/Box'
 import {DataGrid} from '@mui/x-data-grid'
 import EditFileForm from '../forms/EditFileForm'
 import DialogUserFileDelete from "../modals/DialogUserFileDelete.jsx";
+import {Stack} from "@mui/material";
 
 function UserFileDataGrid({...props}) {
     const {
@@ -11,7 +12,7 @@ function UserFileDataGrid({...props}) {
         rowData,
         storagePercentage,
         data,
-        openDeleteDialog, handleDelete, handleCloseDialogDelete
+        openDeleteDialog, handleDelete, handleCloseDialogDelete, isPending
     } =
         props
 
@@ -19,6 +20,7 @@ function UserFileDataGrid({...props}) {
         <>
             <Box sx={{height: 400, width: '100%', mt: 2}}>
                 <DataGrid
+                    loading={isPending}
                     rows={data?.files}
                     columns={columns}
                     initialState={{
@@ -37,6 +39,16 @@ function UserFileDataGrid({...props}) {
                     disableRowSelectionOnClick
                     onRowClick={({row}) => {
                         window.open(import.meta.env.VITE_BACKEND_URL + row.filePath, '_blank')
+                    }}
+                    slots={{
+                        noResultsOverlay: () =>
+                            (<Stack height="100%" alignItems="center" justifyContent="center">
+                                Aucun résultat.
+                            </Stack>),
+                        noRowsOverlay: () =>
+                            (<Stack height="100%" alignItems="center" justifyContent="center">
+                                Aucun document.
+                            </Stack>)
                     }}
                 />
             </Box>

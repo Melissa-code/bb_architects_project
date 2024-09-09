@@ -13,8 +13,6 @@ function InvoiceDataGrid() {
         }
     )
 
-    console.log(data)
-
     function handleDownloadFile(row) {
         console.log(row)
     }
@@ -89,7 +87,7 @@ function InvoiceDataGrid() {
         pageSizeOptions={[5, 10, 25]}
         disableRowSelectionOnClick
         onRowClick={({row}) => {
-            console.log("Téléchargement", row)
+            window.open(import.meta.env.VITE_API_URL + `/download_invoice/${row.invoice_id}`, '_blank')
         }}
         sx={{
             '& .MuiDataGrid-root': {

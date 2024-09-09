@@ -27,7 +27,7 @@ function PageUserStorage() {
         openAlertDeleteKo,
         openAlertDeleteOk,
         setOpenAlertDeleteOk,
-        setOpenAlertDeleteKo
+        setOpenAlertDeleteKo, isPending
     } = usePageUserStorage();
 
     return (
@@ -38,7 +38,7 @@ function PageUserStorage() {
                 </Grid>
 
                 <Grid item xs={12} md={4} lg={3}>
-                    <GaugeUserStorage/>
+                    <GaugeUserStorage percentage={storagePercentage}/>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -52,6 +52,7 @@ function PageUserStorage() {
                         openDeleteDialog={openDeleteDialog}
                         handleDelete={handleDelete}
                         handleCloseDialogDelete={handleCloseDialogDelete}
+                        isPending={isPending}
                     />
                 </Grid>
             </Grid>

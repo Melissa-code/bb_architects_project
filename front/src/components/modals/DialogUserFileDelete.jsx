@@ -10,7 +10,7 @@ function DialogUserFileDelete({...props}) {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description">
             <DialogTitle id="alert-dialog-title">
-                {'Suppression de votre compte'}
+                {`Suppression d'un fichier`}
             </DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
