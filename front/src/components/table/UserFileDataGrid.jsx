@@ -47,7 +47,7 @@ function UserFileDataGrid({...props}) {
                             </Stack>),
                         noRowsOverlay: () =>
                             (<Stack height="100%" alignItems="center" justifyContent="center">
-                                Aucun document.
+                                Aucun utilisateur.
                             </Stack>)
                     }}
                 />

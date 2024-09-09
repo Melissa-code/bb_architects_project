@@ -15,7 +15,7 @@ function UseAdminFileDataGrid() {
     const navigate = useNavigate()
     const token = localStorage.getItem("BBStorage_token")
 
-    const {data, isError, error} = useQuery({
+    const {data, isPending} = useQuery({
         queryKey: ["GetUser", id],
         queryFn: () => fetchGetUserFiles(id, token)
     })
@@ -127,7 +127,7 @@ function UseAdminFileDataGrid() {
         },
     ]
 
-    return {columns, open, handleClose, handleOpen, rowData, setRowData, data, navigate}
+    return {columns, open, handleClose, handleOpen, rowData, setRowData, data, navigate, isPending}
 }
 
 export default UseAdminFileDataGrid

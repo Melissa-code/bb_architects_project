@@ -1,11 +1,12 @@
-import {useQuery} from "@tanstack/react-query";
-import {fetchGetInvoice} from "../../utils/fetch.js";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {fetchDownloadInvoice, fetchGetInvoice} from "../../utils/fetch.js";
 import {DataGrid, GridActionsCellItem} from "@mui/x-data-grid";
 import {Download} from "@mui/icons-material";
+import {Stack} from "@mui/material";
 
 function InvoiceDataGrid() {
     const token = localStorage.getItem('BBStorage_token')
-    const {data, isError, error} = useQuery(
+    const {data, isPending} = useQuery(
         {
             queryKey: ["GetInvoices"],
             queryFn: () => fetchGetInvoice(token),
@@ -13,8 +14,20 @@ function InvoiceDataGrid() {
         }
     )
 
-    function handleDownloadFile(row) {
-        console.log(row)
+    const {mutate} = useMutation({
+        mutationKey: ["DownloadInvoice"],
+        mutationFn: ({invoice_id}) => fetchDownloadInvoice(invoice_id, token),
+        onSuccess: (data) => handleDownloadInvoice(data),
+        onError: (error) => alert(error)
+    })
+
+    function handleDownloadInvoice(data) {
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(data)
+        link.setAttribute('download', `invoice.txt`)
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     const columns = [
@@ -61,7 +74,7 @@ function InvoiceDataGrid() {
                         icon={<Download/>}
                         label="Download"
                         className="textPrimary"
-                        onClick={() => handleDownloadFile(row)}
+                        onClick={() => mutate(row)}
                         color="inherit"
                     />
                 ]
@@ -86,9 +99,7 @@ function InvoiceDataGrid() {
         }}
         pageSizeOptions={[5, 10, 25]}
         disableRowSelectionOnClick
-        onRowClick={({row}) => {
-            window.open(import.meta.env.VITE_API_URL + `/download_invoice/${row.invoice_id}`, '_blank')
-        }}
+        loading={isPending}
         sx={{
             '& .MuiDataGrid-root': {
                 border: 'none', // Supprimer la bordure par défaut
@@ -106,6 +117,16 @@ function InvoiceDataGrid() {
             '& .MuiDataGrid-footerContainer': {
                 bgcolor: 'background.default', // Fond de la pagination
             },
+        }}
+        slots={{
+            noResultsOverlay: () =>
+                (<Stack height="100%" alignItems="center" justifyContent="center">
+                    Aucun résultat.
+                </Stack>),
+            noRowsOverlay: () =>
+                (<Stack height="100%" alignItems="center" justifyContent="center">
+                    Aucune facture.
+                </Stack>)
         }}
     />
 }

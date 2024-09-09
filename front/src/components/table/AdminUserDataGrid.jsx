@@ -2,12 +2,13 @@ import {DataGrid} from "@mui/x-data-grid";
 import {useNavigate} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {fetchGetUsers} from "../../utils/fetch.js";
+import {Stack} from "@mui/material";
 
 
 function AdminUserDataGrid() {
     const navigate = useNavigate();
     const token = localStorage.getItem("BBStorage_token");
-    const {data, isError, error} = useQuery({
+    const {data, isPending} = useQuery({
         queryKey: ['GetUsers'],
         queryFn: () => fetchGetUsers(token)
     })
@@ -60,6 +61,7 @@ function AdminUserDataGrid() {
         onRowClick={({row}) => {
             navigate(`/admin/storage/${row.id}`);
         }}
+        loading={isPending}
         sx={{
             '& .MuiDataGrid-root': {
                 border: 'none', // Supprimer la bordure par défaut
@@ -77,6 +79,16 @@ function AdminUserDataGrid() {
             '& .MuiDataGrid-footerContainer': {
                 bgcolor: 'background.default', // Fond de la pagination
             },
+        }}
+        slots={{
+            noResultsOverlay: () =>
+                (<Stack height="100%" alignItems="center" justifyContent="center">
+                    Aucun résultat.
+                </Stack>),
+            noRowsOverlay: () =>
+                (<Stack height="100%" alignItems="center" justifyContent="center">
+                    Aucun client.
+                </Stack>)
         }}
     />
 }

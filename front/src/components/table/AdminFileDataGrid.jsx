@@ -1,13 +1,11 @@
 import Box from "@mui/material/Box";
 import {DataGrid} from "@mui/x-data-grid";
 import UseAdminFileDataGrid from "./UseAdminFileDataGrid.jsx";
-import ModalAdminFileDataGrid from "../modals/ModalAdminFileDataGrid.jsx";
 import Typography from "@mui/material/Typography";
 
 function AdminFileDataGrid() {
-    const {columns, open, handleClose, handleOpen, rowData, setRowData, data, navigate} = UseAdminFileDataGrid()
+    const {columns, data, navigate, isPending} = UseAdminFileDataGrid()
 
-    console.log(data)
     return (
         <Box sx={{p: 4, bgcolor: 'background.paper', display: 'flex', flexDirection: 'column', height: '100vh'}}>
             <Box sx={{mb: 2}}>
@@ -40,6 +38,7 @@ function AdminFileDataGrid() {
                         onRowClick={({row}) => {
                             navigate(`/download/${row.id}`);
                         }}
+                        loading={isPending}
                         sx={{
                             '& .MuiDataGrid-root': {
                                 border: 'none', // Supprimer la bordure par défaut
