@@ -175,3 +175,17 @@ export async function fetchDownloadFile(id, token) {
 
     return response.json()
 }
+
+export async function fetchGetInvoice(token) {
+    const response = await fetch(`${endpoint}/invoice`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    })
+
+    if (!response.ok) {
+        throw new Error(`Erreur lors de la récupération des utilisateurs. Veuillez réessayer`)
+    }
+
+    return response.json()
+}

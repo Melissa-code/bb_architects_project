@@ -2,6 +2,7 @@ import Grid from "@mui/material/Grid";
 import ProfileUserInfoCard from "../components/profile/ProfileUserInfoCard.jsx";
 import {Box, Button, Card, CardActions, CardHeader, CardContent, Typography} from "@mui/material";
 import usePageUserProfile from "./usePageUserProfile.js";
+import InvoiceDataGrid from "../components/table/InvoiceDataGrid.jsx";
 
 function PageUserProfile() {
     const {data} = usePageUserProfile()
@@ -65,7 +66,7 @@ function PageUserProfile() {
                         <Typography variant="h6" gutterBottom>
                             Factures
                         </Typography>
-                        {/* Contenu des factures (à ajouter) */}
+                        <InvoiceDataGrid/>
                     </Box>
                 </Grid>
 
