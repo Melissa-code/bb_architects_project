@@ -38,7 +38,7 @@ function UserFileDataGrid({...props}) {
                     pageSizeOptions={[5]}
                     disableRowSelectionOnClick
                     onRowClick={({row}) => {
-                        window.open(import.meta.env.VITE_BACKEND_URL + row.filePath, '_blank')
+                        window.open(import.meta.env.VITE_BACKEND_URL + `/${row.filePath}`, '_blank')
                     }}
                     slots={{
                         noResultsOverlay: () =>
