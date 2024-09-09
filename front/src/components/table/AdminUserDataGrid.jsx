@@ -31,7 +31,7 @@ function AdminUserDataGrid() {
             field: 'storageSpaceOfUser',
             headerName: 'Stockage utilisé',
             headerAlign: 'center',
-            width: 110,
+            width: 200,
             valueGetter: (params) => {
                 const {totalWeightInGo, totalStorageCapacity} = params
                 const storagePercentage = parseInt((totalWeightInGo * 100) / totalStorageCapacity)

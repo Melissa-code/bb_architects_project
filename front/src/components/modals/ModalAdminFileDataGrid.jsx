@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import {Divider} from "@mui/material";
 
 function ModalAdminFileDataGrid({...props}) {
     const {open, handleClose, data} = props
@@ -21,7 +22,7 @@ function ModalAdminFileDataGrid({...props}) {
                         Adresse email
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                        {data.user.email}
+                        {"data.user.email"}
                     </Typography>
                 </Box>
                 <Box>
@@ -29,7 +30,7 @@ function ModalAdminFileDataGrid({...props}) {
                         Autre information
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                        {data.user.otherInfo}
+                        {"data.user.otherInfo"}
                     </Typography>
                 </Box>
             </Box>

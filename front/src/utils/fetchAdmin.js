@@ -59,9 +59,9 @@ export async function fetchDownloadFile(id, token) {
     })
 
     if (response.ok) {
-        return response.json();
+        return response.blob();
     } else {
-        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorData = await response.json();
         const errorMessage = errorData.message || 'Erreur lors du téléchargement. Veuillez réessayer.';
         throw new Error(errorMessage);
     }

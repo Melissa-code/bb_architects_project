@@ -61,8 +61,6 @@ function AdminFileDataGrid() {
                     />
                 </Box>
             </Box>
-            <ModalAdminFileDataGrid open={open} handleClose={handleClose} data={rowData}/>
-
         </Box>
     );
 

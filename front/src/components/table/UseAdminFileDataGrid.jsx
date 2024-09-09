@@ -4,7 +4,8 @@ import {Download, Visibility} from "@mui/icons-material";
 import {useState} from "react";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {useNavigate, useParams} from "react-router-dom";
-import {fetchDownloadFile, fetchGetUserFiles} from "../../utils/fetch.js";
+import {fetchGetUserFiles} from "../../utils/fetch.js";
+import {fetchDownloadFile} from "../../utils/fetchAdmin.js";
 import {chipColor} from "../../utils/chipColors.js";
 
 function UseAdminFileDataGrid() {
@@ -22,15 +23,21 @@ function UseAdminFileDataGrid() {
     const {mutate} = useMutation({
         mutationKey: ["DowloadFile", id],
         mutationFn: () => fetchDownloadFile(id, token),
-        onSuccess: () => alert("Successfully downloaded"),
-        onError: () => alert("Error encountered")
+        onSuccess: (data, variables) => handleDownloadFile(data, variables),
+        onError: (error) => alert(error)
     })
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    function handleDownloadFile(row) {
-        mutate()
+    function handleDownloadFile(data, variables) {
+        const {fileName, fileFormat} = variables
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(data)
+        link.setAttribute('download', `${fileName}.${fileFormat}`)
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     function handleShowFile(row) {
@@ -112,7 +119,7 @@ function UseAdminFileDataGrid() {
                         icon={<Download/>}
                         label="Download"
                         className="textPrimary"
-                        onClick={() => handleDownloadFile(row)}
+                        onClick={() => mutate(row)}
                         color="inherit"
                     />
                 ]
