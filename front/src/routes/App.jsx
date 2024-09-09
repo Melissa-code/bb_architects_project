@@ -1,5 +1,5 @@
 import {
-    createBrowserRouter,
+    createBrowserRouter, Navigate,
     Route,
     RouterProvider,
     Routes,
@@ -17,6 +17,7 @@ import PageUserProfile from "../pages/PageUserProfile.jsx";
 import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import PageAdminDashboard from "../pages/PageAdminDashboard.jsx";
 import PageAdminClients from "../pages/PageAdminClients.jsx";
+import PageNotFound from "../pages/PageNotFound.jsx";
 
 const router = createBrowserRouter([{path: '*', element: <Root/>}])
 const themeOptions = createTheme({
@@ -48,6 +49,7 @@ export default function App() {
 function Root() {
     return (
         <Routes>
+            <Route path="/" element={<Navigate to="/login" replace/>}/>
             <Route element={<Connexion/>}>
                 <Route path="login" element={<LoginForm/>}/>
                 <Route path="register" element={<RegisterForm/>}/>
@@ -66,6 +68,7 @@ function Root() {
             </Route>
 
             <Route path="download/:id" element={<RedirectPage/>}/>
+            <Route path="*" element={<PageNotFound/>}/>
         </Routes>
     )
 }
