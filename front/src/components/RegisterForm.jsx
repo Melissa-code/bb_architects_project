@@ -12,6 +12,7 @@ import {fetchRegister} from '../utils/fetch'
 import {useState} from 'react'
 import AlertSuccess from './notification/alerts/AlertSuccess'
 import AlertFail from './notification/alerts/AlertFail'
+import Box from "@mui/material/Box";
 
 function RegisterForm() {
     const [openSuccess, setOpenSuccess] = useState(false)
@@ -38,7 +39,16 @@ function RegisterForm() {
     }
 
     return (
-        <>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                maxWidth: 600,
+                mx: 'auto',
+                p: 2,
+            }}
+        >
             <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
                 <LockOutlinedIcon/>
             </Avatar>
@@ -54,9 +64,9 @@ function RegisterForm() {
                     firstname: '',
                     lastname: '',
                     phone: '',
-                    number_street: 0,
+                    number_street: '',
                     street: '',
-                    zipcode: 0,
+                    zipcode: '',
                     city: '',
                     country: '',
                     storage_space: true,
@@ -64,11 +74,10 @@ function RegisterForm() {
                 validateOnChange={false}
                 validateOnBlur={false}
                 validationSchema={registerSchema}
-                onSubmit={(values, setSubmitting) =>
-                    handleSubmit(values, setSubmitting)
-                }>
+                onSubmit={(values, {setSubmitting}) => handleSubmit(values, setSubmitting)}
+            >
                 {({values, handleChange, handleBlur, touched, errors}) => (
-                    <Form>
+                    <Box component={Form} noValidate sx={{width: '100%', mt: 2}}>
                         <TextField
                             fullWidth
                             id="email"
@@ -108,54 +117,46 @@ function RegisterForm() {
                             value={values.confirmPassword}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            error={
-                                touched.confirmPassword &&
-                                Boolean(errors.confirmPassword)
-                            }
-                            helperText={
-                                touched.confirmPassword &&
-                                errors.confirmPassword
-                            }
-                            //TODO : Personnalisation graphique à revoir
-                            sx={'margin-top:8px;'}
+                            error={touched.confirmPassword && Boolean(errors.confirmPassword)}
+                            helperText={touched.confirmPassword && errors.confirmPassword}
                         />
-                        <Divider/>
-                        <div>
-                            <TextField
-                                id="lastname"
-                                name="lastname"
-                                type="text"
-                                label="Nom"
-                                placeholder="Doe"
-                                margin="normal"
-                                value={values.lastname}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={
-                                    touched.lastname && Boolean(errors.lastname)
-                                }
-                                helperText={touched.lastname && errors.lastname}
-                            />
-                            <TextField
-                                id="firstname"
-                                name="firstname"
-                                type="text"
-                                label="Prénom"
-                                placeholder="John"
-                                margin="normal"
-                                value={values.firstname}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={
-                                    touched.firstname &&
-                                    Boolean(errors.firstname)
-                                }
-                                helperText={
-                                    touched.firstname && errors.firstname
-                                }
-                            />
-                        </div>
+                        <Divider sx={{my: 2}}/>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    id="lastname"
+                                    name="lastname"
+                                    type="text"
+                                    label="Nom"
+                                    placeholder="Doe"
+                                    margin="normal"
+                                    value={values.lastname}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={touched.lastname && Boolean(errors.lastname)}
+                                    helperText={touched.lastname && errors.lastname}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    id="firstname"
+                                    name="firstname"
+                                    type="text"
+                                    label="Prénom"
+                                    placeholder="John"
+                                    margin="normal"
+                                    value={values.firstname}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={touched.firstname && Boolean(errors.firstname)}
+                                    helperText={touched.firstname && errors.firstname}
+                                />
+                            </Grid>
+                        </Grid>
                         <TextField
+                            fullWidth
                             id="number_street"
                             name="number_street"
                             type="number"
@@ -165,15 +166,11 @@ function RegisterForm() {
                             value={values.number_street}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            error={
-                                touched.number_street &&
-                                Boolean(errors.number_street)
-                            }
-                            helperText={
-                                touched.number_street && errors.number_street
-                            }
+                            error={touched.number_street && Boolean(errors.number_street)}
+                            helperText={touched.number_street && errors.number_street}
                         />
                         <TextField
+                            fullWidth
                             id="street"
                             name="street"
                             type="text"
@@ -186,32 +183,40 @@ function RegisterForm() {
                             error={touched.street && Boolean(errors.street)}
                             helperText={touched.street && errors.street}
                         />
-                        <TextField
-                            id="zipcode"
-                            name="zipcode"
-                            type="number"
-                            label="Code postal"
-                            placeholder="75000"
-                            margin="normal"
-                            value={values.zipcode}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.zipcode && Boolean(errors.zipcode)}
-                            helperText={touched.zipcode && errors.zipcode}
-                        />
-                        <TextField
-                            id="city"
-                            name="city"
-                            type="text"
-                            label="Ville"
-                            placeholder="Paris"
-                            margin="normal"
-                            value={values.city}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={touched.city && Boolean(errors.city)}
-                            helperText={touched.city && errors.city}
-                        />
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    id="zipcode"
+                                    name="zipcode"
+                                    type="number"
+                                    label="Code postal"
+                                    placeholder="75000"
+                                    margin="normal"
+                                    value={values.zipcode}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={touched.zipcode && Boolean(errors.zipcode)}
+                                    helperText={touched.zipcode && errors.zipcode}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    id="city"
+                                    name="city"
+                                    type="text"
+                                    label="Ville"
+                                    placeholder="Paris"
+                                    margin="normal"
+                                    value={values.city}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    error={touched.city && Boolean(errors.city)}
+                                    helperText={touched.city && errors.city}
+                                />
+                            </Grid>
+                        </Grid>
                         <TextField
                             fullWidth
                             id="country"
@@ -223,7 +228,8 @@ function RegisterForm() {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             error={touched.country && Boolean(errors.country)}
-                            helperText={touched.country && errors.country}>
+                            helperText={touched.country && errors.country}
+                        >
                             {countries.map((country) => (
                                 <MenuItem key={country} value={country}>
                                     {country}
@@ -244,27 +250,20 @@ function RegisterForm() {
                             error={touched.phone && Boolean(errors.phone)}
                             helperText={touched.phone && errors.phone}
                         />
-                        <TextField
-                            id="storage_space"
-                            name="storage_space"
-                            type="hidden"
-                            value={values.storage_space}
-                            sx={{overflow: 'hidden'}}
-                        />
-
                         <Button
                             color="primary"
                             variant="contained"
                             fullWidth
                             type="submit"
-                            //TODO : Personnalisation graphique à revoir
-                            sx={'margin-top:8px'}>
+                            sx={{mt: 2}}
+                        >
                             S&apos;inscrire
                         </Button>
-                    </Form>
+                    </Box>
                 )}
             </Formik>
-            <Grid container>
+
+            <Grid container spacing={2} sx={{mt: 2}}>
                 <Grid item xs>
                     <Link href="#" variant="body2">
                         {'Mot de passe oublié ?'}
@@ -276,9 +275,10 @@ function RegisterForm() {
                     </Link>
                 </Grid>
             </Grid>
+
             <AlertSuccess open={openSuccess} setOpen={setOpenSuccess} type={"register"} message={alertSuccessMessage}/>
             <AlertFail open={openFailure} setOpen={setOpenFailure} alert={alertFailMessage}/>
-        </>
+        </Box>
     )
 }
 
