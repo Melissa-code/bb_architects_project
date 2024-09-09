@@ -10,11 +10,11 @@ export async function fetchLogin(data) {
     })
 
     if (response.ok) {
-        return response.json()
+        return response.json();
     } else {
-        // TODO : récupérer l'erreur du backend
-        console.error(response)
-        throw new Error('Erreur de connexion. Veuillez réessayer.')
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de connexion. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
 }
 
@@ -28,10 +28,11 @@ export async function fetchRegister(data) {
     })
 
     if (response.ok) {
-        return response.json()
+        return response.json();
     } else {
-        // TODO : récupérer l'erreur du backend
-        throw new Error('Erreur de connexion. Veuillez réessayer.')
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || `Erreur d'inscription. Veuillez réessayer.`;
+        throw new Error(errorMessage);
     }
 }
 
@@ -44,9 +45,11 @@ export async function fetchGetProfile(token) {
     })
 
     if (response.ok) {
-        return response.json()
+        return response.json();
     } else {
-        throw new Error(`Erreur d'accès au profil. Veuillez réessayer.`)
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de récupération du profil. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
 }
 
@@ -61,9 +64,12 @@ export async function fetchGetFiles(token) {
     )
 
     if (response.ok) {
-        return await response.json()
+        return response.json();
+    } else {
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de récupération des fichiers. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
-    throw new Error(`Erreur récupération des fichiers. Statut : ${response.status}`)
 }
 
 export async function fetchCreateFile(data, token) {
@@ -76,11 +82,11 @@ export async function fetchCreateFile(data, token) {
     })
 
     if (response.ok) {
-        return response.json()
+        return response.json();
     } else {
-        // TODO : récupérer l'erreur du backend
-        console.error(response)
-        throw new Error('Erreur de connexion. Veuillez réessayer.')
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || `Erreur d'upload. Veuillez réessayer.`;
+        throw new Error(errorMessage);
     }
 }
 
@@ -98,9 +104,11 @@ export async function fetchUpdateFile(data, token) {
     )
 
     if (response.ok) {
-        return response.json()
+        return response.json();
     } else {
-        throw new Error(`Erreur mise à jour du fichier. Statut : ${response.status}`)
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de mise à jour du fichier. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
 }
 
@@ -114,9 +122,11 @@ export async function fetchDeleteFile(id, token) {
     })
 
     if (response.ok) {
-        return response.json()
+        return response.json();
     } else {
-        throw new Error(`Erreur lors de la suppression du fichier. Statut : ${response.status}`)
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de suppression du fichier. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
 }
 
@@ -127,11 +137,13 @@ export async function fetchGetCategories(token) {
         },
     })
 
-    if (!response.ok) {
-        throw new Error(`Erreur récupréation des fichiers. Veuillez réessayer`)
+    if (response.ok) {
+        return response.json();
+    } else {
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de récupération des catégories. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
-
-    return response.json()
 }
 
 export async function fetchGetUsers(token) {
@@ -141,11 +153,13 @@ export async function fetchGetUsers(token) {
         },
     })
 
-    if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des utilisateurs. Veuillez réessayer`)
+    if (response.ok) {
+        return response.json();
+    } else {
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de récupération des utilisateurs. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
-
-    return response.json()
 }
 
 export async function fetchGetUserFiles(id, token) {
@@ -155,11 +169,13 @@ export async function fetchGetUserFiles(id, token) {
         },
     })
 
-    if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des utilisateurs. Veuillez réessayer`)
+    if (response.ok) {
+        return response.json();
+    } else {
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de récupération des fichiers. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
-
-    return response.json()
 }
 
 export async function fetchDownloadFile(id, token) {
@@ -169,11 +185,13 @@ export async function fetchDownloadFile(id, token) {
         },
     })
 
-    if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des utilisateurs. Veuillez réessayer`)
+    if (response.ok) {
+        return response.json();
+    } else {
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur lors du téléchargement. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
-
-    return response.json()
 }
 
 export async function fetchGetInvoice(token) {
@@ -183,9 +201,11 @@ export async function fetchGetInvoice(token) {
         },
     })
 
-    if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des utilisateurs. Veuillez réessayer`)
+    if (response.ok) {
+        return response.json();
+    } else {
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de récupération des factures. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
-
-    return response.json()
 }

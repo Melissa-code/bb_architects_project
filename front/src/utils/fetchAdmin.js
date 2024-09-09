@@ -9,11 +9,13 @@ export async function fetchGetStatistics(token) {
         },
     })
 
-    if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des statistiques. Response status: ${response.status}`);
+    if (response.ok) {
+        return response.json();
+    } else {
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de récupération des statistiques. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
-
-    return response.json()
 }
 
 export async function fetchGetUsers(token) {
@@ -24,11 +26,13 @@ export async function fetchGetUsers(token) {
         },
     })
 
-    if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des utilisateurs. Response status: ${response.status}`)
+    if (response.ok) {
+        return response.json();
+    } else {
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de récupération des utilisateurs. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
-
-    return response.json()
 }
 
 export async function fetchGetUserFiles(id, token) {
@@ -38,11 +42,13 @@ export async function fetchGetUserFiles(id, token) {
         },
     })
 
-    if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des utilisateurs. Veuillez réessayer`)
+    if (response.ok) {
+        return response.json();
+    } else {
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur de récupération des fichiers. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
-
-    return response.json()
 }
 
 export async function fetchDownloadFile(id, token) {
@@ -52,9 +58,11 @@ export async function fetchDownloadFile(id, token) {
         },
     })
 
-    if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des utilisateurs. Veuillez réessayer`)
+    if (response.ok) {
+        return response.json();
+    } else {
+        const errorData = await response.json(); // Suppose que l'erreur est en format JSON
+        const errorMessage = errorData.message || 'Erreur lors du téléchargement. Veuillez réessayer.';
+        throw new Error(errorMessage);
     }
-
-    return response.json()
 }
