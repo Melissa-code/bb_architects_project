@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\OrderRepository;
 use App\Repository\QuantityCartStorageRepository;
 use App\Service\CartService;
+use App\Service\ConfirmationEmailService;
 use App\Service\InvoiceService;
 use App\Service\ValidateSaveEntityService;
 use Exception;
@@ -49,6 +50,7 @@ class CartController extends AbstractController
     public function createCart(
         #[CurrentUser] ?UserInterface $user,
         Request $request,
+        ConfirmationEmailService $confirmationEmailService,
         ValidateSaveEntityService $validateSaveEntityService,
         QuantityCartStorageRepository $quantityCartStorageRepository,
     ): JsonResponse {
@@ -72,6 +74,11 @@ class CartController extends AbstractController
 
             // Create an invoice
             $this->invoiceService->createInvoice($user, $order);
+
+            // Send an email confirmation
+            $object = "Confirmation achat d'espace de stockage supplémentaire";
+            $message = "Cher client, nous vous confirmons l'achat d'un espace de stockage supplémentaire de 20 Go à 20 €.";
+            $confirmationEmailService->sendConfirmationEmail($object, $message);
 
             return new JsonResponse([
                 'message' => 'La commande a bien été effectuée.',
