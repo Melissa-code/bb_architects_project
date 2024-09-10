@@ -1,0 +1,109 @@
+{
+  "message": "Clients récupérés avec succès.",
+  "clients": [
+    {
+      "id": 4,
+      "firstname": "Biles",
+      "lastname": "Simone",
+      "email": "simone@gmail.com",
+      "phone": "0612123433",
+      "userCreatedAt": "21-08-2024 18:37:05",
+      "address": {
+        "addressId": 4,
+        "number_street": "1",
+        "street": "rue de la Boëtie",
+        "zipcode": "75008",
+        "city": "Paris",
+        "country": "France"
+      },
+      "storageSpaceOfUser": {
+        "totalWeightInGo": 0.005859375,
+        "totalStorageCapacity": 20,
+        "availableStorageSpace": 19.994140625
+      }
+    },{
+      "id": 23,
+      "firstname": "Ferry",
+      "lastname": "Jules",
+      "email": "jules@gmail.com",
+      "phone": "0611111111",
+      "userCreatedAt": "01/07/2024 19:51:18",
+      "address": {
+        "addressId": 36,
+        "number_street": "45",
+        "street": "rue du Mont-Cenis",
+        "zipcode": "75018",
+        "city": "Paris",
+        "country": "France"
+      },
+      "storageSpaceOfUser": {
+        "totalWeightInGo": 0.0087890625,
+        "totalStorageCapacity": 20,
+        "availableStorageSpace": 19.9912109375
+      }
+    },
+    {
+      "id": 24,
+      "firstname": "Loiseau",
+      "lastname": "Edouard",
+      "email": "edouard@gmail.com",
+      "phone": "0611111313",
+      "userCreatedAt": "15/08/2024 08:54:20",
+      "address": {
+        "addressId": 37,
+        "number_street": "10",
+        "street": "rue des Paons",
+        "zipcode": "77920",
+        "city": "Fontainebleau",
+        "country": "France"
+      },
+      "storageSpaceOfUser": {
+        "totalWeightInGo": 0.015625,
+        "totalStorageCapacity": 20,
+        "availableStorageSpace": 19.984375
+      }
+    },
+    {
+      "id": 29,
+      "firstname": "Prit",
+      "lastname": "Eddy",
+      "email": "eddy@gmail.com",
+      "phone": "0612123433",
+      "userCreatedAt": "21/08/2024 16:35:28",
+      "address": {
+        "addressId": 42,
+        "number_street": "1",
+        "street": "rue de la Boëtie",
+        "zipcode": "75008",
+        "city": "Paris",
+        "country": "France"
+      },
+      "storageSpaceOfUser": {
+        "totalWeightInGo": 0,
+        "totalStorageCapacity": 20,
+        "availableStorageSpace": 20
+      }
+    },
+    {
+      "id": 22,
+      "firstname": "Stone",
+      "lastname": "Emma",
+      "email": "emma@gmail.com",
+      "phone": "0612121212",
+      "userCreatedAt": "30/06/2024 18:59:28",
+      "address": {
+        "addressId": 32,
+        "number_street": "3",
+        "street": "boulevard du Général de Gaulle",
+        "zipcode": "45000",
+        "city": "Orléans",
+        "country": "France"
+      },
+      "storageSpaceOfUser": {
+        "totalWeightInGo": 0.0068359375,
+        "totalStorageCapacity": 20,
+        "availableStorageSpace": 19.9931640625
+      }
+    }
+  ]
+}
