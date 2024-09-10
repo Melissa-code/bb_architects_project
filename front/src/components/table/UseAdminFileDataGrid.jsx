@@ -41,11 +41,9 @@ function UseAdminFileDataGrid() {
     }
 
     function handleShowFile(row) {
-        console.log("Vue du document", row)
-        // window.open(
-        //     import.meta.env.VITE_BACKEND_URL + row.filePath,
-        //     '_blank'
-        // )
+        window.open(
+            import.meta.env.VITE_BACKEND_URL + `/${row.filePath}`,
+            '_blank')
     }
 
     const columns = [

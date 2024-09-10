@@ -35,9 +35,6 @@ function AdminFileDataGrid() {
                         }}
                         pageSizeOptions={[5, 10, 25]} // Options supplémentaires pour la pagination
                         disableRowSelectionOnClick
-                        onRowClick={({row}) => {
-                            navigate(`/download/${row.id}`);
-                        }}
                         loading={isPending}
                         sx={{
                             '& .MuiDataGrid-root': {
