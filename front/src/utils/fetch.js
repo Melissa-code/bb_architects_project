@@ -72,19 +72,23 @@ export async function fetchGetFiles(token) {
     }
 }
 
-export async function fetchCreateFile(data, token) {
-    const response = await fetch(`${endpoint}/file/create_file`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-        body: data,
-    })
+export async function fetchCreateFile(file, category, fileName, token) {
+    const formData = new FormData()
+    formData.append('pathFile', file)
+    formData.append('name', fileName)
+    formData.append('categoryId', category)
 
-    if (response.ok) {
-        return response.json();
-    } else {
-        const errorData = await response.json();
+    try {
+        const response = await fetch(`${endpoint}/file/create_file`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+        })
+        return await response.json();
+    } catch (error) {
+        const errorData = await error.json();
         const errorMessage = errorData.message || `Erreur d'upload. Veuillez réessayer.`;
         throw new Error(errorMessage);
     }

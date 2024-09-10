@@ -1,7 +1,7 @@
 import Button from '@mui/material/Button'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import {useState} from 'react'
-import CreateFileForm from '../forms/CreateFileForm'
+import AddFileForm from "../forms/AddFileForm.jsx";
 
 export default function NavigationButtonAdd() {
     const [open, setOpen] = useState(false)
@@ -12,10 +12,10 @@ export default function NavigationButtonAdd() {
             <Button
                 variant="contained"
                 onClick={handleOpen}
-                endIcon={<AddCircleOutlineIcon />}>
+                endIcon={<AddCircleOutlineIcon/>}>
                 Ajouter un fichier
             </Button>
-            <CreateFileForm open={open} setOpen={setOpen} />
+            <AddFileForm open={open} setOpen={setOpen}/>
         </>
     )
 }

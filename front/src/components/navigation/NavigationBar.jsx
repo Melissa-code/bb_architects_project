@@ -1,4 +1,3 @@
-import * as React from 'react'
 import Box from '@mui/material/Box'
 import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
@@ -13,9 +12,11 @@ import {ListItem} from '@mui/material'
 import {useNavigate} from 'react-router-dom'
 import {getUserRole} from "../../utils/jwt.js";
 import {Storage} from "@mui/icons-material";
+import {useState} from "react";
+import {palette} from "@mui/system";
 
 export default function NavigationBar() {
-    const [selectedIndex, setSelectedIndex] = React.useState(1)
+    const [selectedIndex, setSelectedIndex] = useState(1)
     const navigate = useNavigate()
     const {roles} = getUserRole()
 
@@ -36,7 +37,6 @@ export default function NavigationBar() {
             justifyContent: 'space-between',
             height: '100vh',
             minWidth: 200,
-            background: "primary.main"
         }}>
             <Box
                 component="img"

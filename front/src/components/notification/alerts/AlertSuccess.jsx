@@ -4,7 +4,7 @@ import useApp from "../../../routes/useApp.js";
 import {useNavigate} from "react-router-dom";
 
 function AlertSuccess({...props}) {
-    const {open, setOpen, type, message} = props
+    const {open, setOpen, type, message, setOpenModal} = props
     const {handleRedirection} = useApp()
     const navigate = useNavigate()
 
@@ -21,6 +21,7 @@ function AlertSuccess({...props}) {
             navigate('/login')
         }
         setOpen(false)
+        setOpenModal && setOpenModal(false)
     }
 
     return (
