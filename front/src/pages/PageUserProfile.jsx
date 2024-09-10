@@ -22,6 +22,7 @@ function PageUserProfile() {
                         sx={{
                             minWidth: 275,
                             maxWidth: 350,
+                            height: 380,
                             p: 3,
                             mx: 'auto'
                         }}> {/* Padding interne et centrage horizontal */}

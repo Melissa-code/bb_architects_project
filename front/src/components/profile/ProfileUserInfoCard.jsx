@@ -25,25 +25,27 @@ function ProfileUserInfoCard({...props}) {
 
     return (
         <>
-            <Card sx={{minWidth: 275, maxWidth: 400, p: 2}}> {/* Ajout de padding interne */}
+            <Card sx={{minWidth: 275, maxWidth: 400, height: 380, p: 2}}>
                 <CardHeader
                     title="Informations personnelles"
                     subheader={fullName}
                     sx={{
-                        bgcolor: 'primary.main',  // Couleur de fond du header
-                        color: 'white',           // Couleur du texte
-                        textAlign: 'center'       // Alignement du texte centré
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                        textAlign: 'center'
                     }}
                 />
                 <CardContent>
-                    <Typography variant="body1" color="textPrimary" gutterBottom>
+                    <Typography variant="body1" color="textPrimary" gutterBottom
+                                sx={{fontWeight: 'bold'}}>
                         Adresse email
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
                         {data?.user?.email}
                     </Typography>
 
-                    <Typography variant="body1" color="textPrimary" gutterBottom>
+                    <Typography variant="body1" color="textPrimary" gutterBottom
+                                sx={{fontWeight: 'bold'}}>
                         Adresse postale
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
@@ -53,7 +55,8 @@ function ProfileUserInfoCard({...props}) {
                         {address2}
                     </Typography>
 
-                    <Typography variant="body1" color="textPrimary" gutterBottom>
+                    <Typography variant="body1" color="textPrimary" gutterBottom
+                                sx={{fontWeight: 'bold'}}>
                         Téléphone
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
@@ -61,8 +64,8 @@ function ProfileUserInfoCard({...props}) {
                     </Typography>
                 </CardContent>
 
-                <CardActions sx={{justifyContent: 'center'}}> {/* Centrer les boutons */}
-                    <Button size="medium" variant="contained">
+                <CardActions sx={{justifyContent: 'center'}}>
+                    <Button size="medium" variant="contained" disabled>
                         Modifier
                     </Button>
                     <Button
