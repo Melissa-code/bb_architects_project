@@ -7,10 +7,10 @@ import Typography from '@mui/material/Typography'
 import {useMutation} from '@tanstack/react-query'
 import {Form, Formik} from 'formik'
 import {useState} from 'react'
-import {fetchLogin} from '../utils/fetch'
-import {loginSchema} from '../validation/validation'
-import AlertFail from './notification/alerts/AlertFail'
-import AlertSuccess from './notification/alerts/AlertSuccess'
+import {fetchLogin} from '../../utils/fetch.js'
+import {loginSchema} from '../../validation/validation.js'
+import AlertFail from '../notification/alerts/AlertFail.jsx'
+import AlertSuccess from '../notification/alerts/AlertSuccess.jsx'
 import Box from "@mui/material/Box";
 
 

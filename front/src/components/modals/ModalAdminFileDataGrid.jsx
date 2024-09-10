@@ -6,7 +6,6 @@ import {Divider} from "@mui/material";
 function ModalAdminFileDataGrid({...props}) {
     const {open, handleClose, data} = props
 
-    console.log("data from Admin modal", data)
     return (
         <Modal
             open={open}

@@ -4,8 +4,8 @@ import {
     RouterProvider,
     Routes,
 } from 'react-router-dom'
-import LoginForm from '../components/LoginForm'
-import RegisterForm from '../components/RegisterForm'
+import LoginForm from '../components/forms/LoginForm.jsx'
+import RegisterForm from '../components/forms/RegisterForm.jsx'
 import Navigation from '../components/navigation/Navigation'
 import Connexion from '../pages/Connexion'
 import AdminFileDataGrid from "../components/table/AdminFileDataGrid.jsx";
